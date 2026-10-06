@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Início')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments/layout :: sidebar('home')}"></aside>
+  <div class="main">
+    <header th:replace="~{fragments/layout :: topbar(null, null, null)}"></header>
+    <main class="content">
+      <!-- Home page. No model attributes required. -->
+      <section class="hero">
+        <svg class="swirl" viewBox="0 0 40 40" aria-hidden="true"><path d="M8 28c2-10 10-16 18-14 6 1.6 6 9 0 10-5 .8-7-4-4-6" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+        <h1>Painel Quimia</h1>
+        <p>Gerencie usuários, empresas, produtos químicos, fichas de descarte e o histórico de uso em um só lugar.</p>
+      </section>
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+      <h2 class="label section-title">PESSOAS</h2>
+      <div class="tiles">
+        <a class="card tile" th:href="@{/users}">
+          <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+          <span class="h3">Usuários</span>
+          <p>Pessoas cadastradas no aplicativo Quimia.</p>
+        </a>
+        <a class="card tile" th:href="@{/admins}">
+          <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span class="h3">Administradores</span>
+          <p>Contas com acesso ao painel administrativo.</p>
+        </a>
+        <a class="card tile" th:href="@{/companies}">
+          <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/></svg></span>
+          <span class="h3">Empresas</span>
+          <p>Empresas fabricantes responsáveis pelos produtos (Usuário_empresa).</p>
+        </a>
+      </div>
+      <h2 class="label section-title">PRODUTOS</h2>
+      <div class="tiles">
+        <a class="card tile" th:href="@{/products}">
+          <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6"/><path d="M10 3v6L4.5 18.5A2 2 0 0 0 6.2 21.5h11.6a2 2 0 0 0 1.7-3L14 9V3"/><path d="M7 15h10"/></svg></span>
+          <span class="h3">Produtos</span>
+          <p>Produtos químicos de uso doméstico e suas informações técnicas.</p>
+        </a>
+        <a class="card tile" th:href="@{/disposals}">
+          <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 19H4.8a1.8 1.8 0 0 1-1.6-2.7L5 13"/><path d="M11 19h8.2a1.8 1.8 0 0 0 1.6-2.7l-1.2-2"/><path d="m14 16-3 3 3 3"/><path d="M8.3 5.6 9.4 3.7a1.8 1.8 0 0 1 3.2 0l3.9 6.8"/><path d="m13.4 10.6 3.1 0-1-3.2"/><path d="M5.3 13.5 7 10.6l-3.1.2"/></svg></span>
+          <span class="h3">Fichas de descarte (FDS)</span>
+          <p>Orientações de descarte do produto e da embalagem (Descarte_fds).</p>
+        </a>
+      </div>
+      <h2 class="label section-title">USO DOMÉSTICO</h2>
+      <div class="tiles">
+        <a class="card tile" th:href="@{/shelves}">
+          <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M3 15h18"/></svg></span>
+          <span class="h3">Estantes</span>
+          <p>Locais da casa onde cada usuário guarda seus produtos.</p>
+        </a>
+        <a class="card tile" th:href="@{/histories}">
+          <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+          <span class="h3">Históricos</span>
+          <p>Registros de uso, mistura ou descarte de produtos pelos usuários.</p>
+        </a>
+        <a class="card tile" th:href="@{/history-types}">
+          <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="1.5"/></svg></span>
+          <span class="h3">Tipos de histórico</span>
+          <p>Tabela enumerativa com as categorias de histórico (ex.: uso, mistura, descarte).</p>
+        </a>
+        <a class="card tile" th:href="@{/locations}">
+          <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+          <span class="h3">Localizações</span>
+          <p>Endereço aproximado (CEP e coordenadas) associado ao usuário.</p>
+        </a>
+      </div>
+      <h2 class="label section-title">AUDITORIA</h2>
+      <div class="tiles">
+        <a class="card tile" th:href="@{/admin-logs}">
+          <span class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg></span>
+          <span class="h3">Histórico de alterações</span>
+          <p>Histórico de alterações feitas pelos administradores, com opção de desfazer (Admin_log_edição).</p>
+        </a>
+      </div>
+    </main>
+  </div>
+</div>
+<script th:replace="~{fragments/layout :: scripts}"></script>
+</body>
+</html>
