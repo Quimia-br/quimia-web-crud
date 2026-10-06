@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Administrador')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments/layout :: sidebar('admins')}"></aside>
+  <div class="main">
+    <header th:replace="~{fragments/layout :: topbar('Administradores', @{/admins}, ${admin.id == null ? 'Novo administrador' : 'Editar'})}"></header>
+    <main class="content">
+      <!--
+        Admin form (create and edit)
+        Model:   "admin" -> Admin (null id = create)
+        Submit:  POST /admins/save  (use @Valid + BindingResult to show per-field errors)
+      -->
+      <div class="page-head">
+        <div>
+          <h1 class="h1" th:text="${admin.id == null} ? 'Novo administrador' : 'Editar administrador'">Novo administrador</h1>
+          <p th:if="${admin.id != null}">Registro <span class="code" th:text="'#' + ${admin.id}">#1</span></p>
+          <p th:if="${admin.id == null}">Preencha os campos abaixo. Campos com <span style="color:var(--feedback-error)">*</span> são obrigatórios.</p>
+        </div>
+        <a class="btn btn-ghost" th:href="@{/admins}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>Voltar</a>
+      </div>
+
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+
+      <form class="card form-card" th:action="@{/admins/save}" th:object="${admin}" method="post" novalidate>
+        <div class="alert alert-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span th:each="err : ${#fields.globalErrors()}" th:text="${err}">Erro</span>
+        </div>
+        <input type="hidden" th:field="*{id}">
+        <div class="form-section">
+          <h2 class="h3" style="margin-bottom:var(--space-4)">Dados do administrador</h2>
+          <div class="form-grid">
+            <div class="field" th:classappend="${#fields.hasErrors('name')} ? 'has-error'">
+              <label for="name">Nome<span class="req" aria-hidden="true">*</span></label>
+              <input type="text" th:field="*{name}" id="name" required>
+              <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Erro</span>
+            </div>
+            <div class="field" th:classappend="${#fields.hasErrors('email')} ? 'has-error'">
+              <label for="email">Email<span class="req" aria-hidden="true">*</span></label>
+              <input type="email" th:field="*{email}" id="email" required>
+              <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Erro</span>
+            </div>
+            <div class="field" th:classappend="${#fields.hasErrors('registrationDate')} ? 'has-error'">
+              <label for="registrationDate">Data de cadastro</label>
+              <input type="date" th:field="*{registrationDate}" id="registrationDate">
+              <span class="error" th:if="${#fields.hasErrors('registrationDate')}" th:errors="*{registrationDate}">Erro</span>
+            </div>
+            <div class="field" th:classappend="${#fields.hasErrors('passwordHash')} ? 'has-error'">
+              <label for="passwordHash">Senha<span class="req" aria-hidden="true" th:if="*{id == null}">*</span></label>
+              <input type="password" th:field="*{passwordHash}" id="passwordHash" autocomplete="new-password" th:required="*{id == null}">
+              <span class="hint" th:if="*{id != null}">Deixe em branco para manter a senha atual.</span>
+              <span class="error" th:if="${#fields.hasErrors('passwordHash')}" th:errors="*{passwordHash}">Erro</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <a class="btn btn-ghost" th:href="@{/admins}">Cancelar</a>
+          <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h8V3"/><path d="M8 21v-7h8v7"/></svg>Salvar</button>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+<script th:replace="~{fragments/layout :: scripts}"></script>
+</body>
+</html>

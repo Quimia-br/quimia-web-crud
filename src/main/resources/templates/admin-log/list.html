@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Histórico de alterações')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments/layout :: sidebar('admin-logs')}"></aside>
+  <div class="main">
+    <header th:replace="~{fragments/layout :: topbar('Histórico de alterações', @{/admin-logs}, null)}"></header>
+    <main class="content">
+      <!--
+        Change history (Admin_log_edição) — read-only.
+        Every create/update/delete done in the panel must create an entry here (in the service layer),
+        storing the record as JSON before (previousData) and after (newData) the operation.
+
+        Model:   "adminLogs" -> List<AdminLog>  (newest first)
+        Routes:  GET  /admin-logs              list
+                 GET  /admin-logs/{id}         detail with before × after comparison
+                 POST /admin-logs/{id}/undo    reverts the change:
+                      INSERT -> deletes the created record
+                      UPDATE -> writes previousData back
+                      DELETE -> recreates the record from previousData
+                 (the undo creates a new log entry, so it can be undone as well)
+        Flash:   "message" (e.g. "Alteração desfeita.") or "error" (e.g. record changed after this log)
+      -->
+      <div class="page-head">
+        <div>
+          <h1 class="h1">Histórico de alterações</h1>
+          <p>Tudo o que os administradores criaram, editaram ou excluíram. Use “Desfazer” para reverter uma alteração.</p>
+        </div>
+      </div>
+
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+
+      <section class="card">
+        <div class="card-toolbar">
+          <label class="filter">
+            <span class="sr-only">Filtrar alterações</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" placeholder="Filtrar por tabela, admin, registro…" data-filter="#data-table" data-count="#row-count">
+          </label>
+          <div class="chips" role="group" aria-label="Tipo de alteração" data-chip-filter="#data-table">
+            <button type="button" class="chip active" data-value="">Todas</button>
+            <button type="button" class="chip" data-value="INSERT"><span class="dot act-insert"></span>Criação</button>
+            <button type="button" class="chip" data-value="UPDATE"><span class="dot act-update"></span>Edição</button>
+            <button type="button" class="chip" data-value="DELETE"><span class="dot act-delete"></span>Exclusão</button>
+          </div>
+          <span class="count" id="row-count" th:text="${#lists.size(adminLogs)} + ' registros'">0 registros</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data" id="data-table">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Data</th>
+                <th scope="col">Alteração</th>
+                <th scope="col">Tabela</th>
+                <th scope="col">Registro</th>
+                <th scope="col">Administrador</th>
+                <th scope="col" class="actions"><span class="sr-only">Ações</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="item : ${adminLogs}" data-row th:attr="data-action=${item.action}">
+                <td class="id" th:text="${item.id}">1</td>
+                <td th:text="${item.date != null ? #temporals.format(item.date, 'dd/MM/yyyy') : '—'}">01/09/2026</td>
+                <td><span class="act-badge" th:classappend="${item.action == 'INSERT'} ? 'act-insert' : (${item.action == 'DELETE'} ? 'act-delete' : 'act-update')" th:text="${item.action == 'INSERT' ? 'Criação' : (item.action == 'DELETE' ? 'Exclusão' : 'Edição')}">Edição</span></td>
+                <td class="code" th:text="${item.affectedTable}">produto</td>
+                <td class="code" th:text="'#' + ${item.recordId}">#2</td>
+                <td th:text="${item.admin?.name}">Admin</td>
+                <td class="actions">
+                  <a class="icon-btn edit" th:href="@{/admin-logs/{id}(id=${item.id})}" title="Ver alteração" aria-label="Ver alteração"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></a>
+                  <button type="button" class="btn btn-ghost btn-sm" title="Desfazer esta alteração"
+                          th:attr="data-undo-url=@{/admin-logs/{id}/undo(id=${item.id})},data-undo-msg=${item.action == 'INSERT' ? 'O registro #' + item.recordId + ' de ' + item.affectedTable + ' será excluído, voltando ao estado anterior à criação.' : (item.action == 'DELETE' ? 'O registro #' + item.recordId + ' de ' + item.affectedTable + ' será recriado com os dados anteriores à exclusão.' : 'O registro #' + item.recordId + ' de ' + item.affectedTable + ' voltará a ter os valores anteriores a esta edição.')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Desfazer</button>
+                </td>
+              </tr>
+              <tr data-no-result hidden>
+                <td class="empty" colspan="7"><strong>Nenhum resultado</strong>Nenhuma alteração corresponde ao filtro.</td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(adminLogs)}">
+                <td class="empty" colspan="7">
+                  <strong>Nenhuma alteração registrada</strong>
+                  As alterações feitas pelos administradores aparecerão aqui automaticamente.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <dialog class="confirm" id="confirm-undo" aria-labelledby="undo-title">
+        <div class="confirm-icon undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="22" height="22"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></div>
+        <h2 class="h2" id="undo-title">Desfazer alteração?</h2>
+        <p data-undo-text>Esta alteração será revertida.</p>
+        <p class="small muted" style="margin-top:calc(-1 * var(--space-3))">A reversão também fica registrada neste histórico, então pode ser desfeita depois.</p>
+        <form method="post" class="undo-form" action="#">
+          <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <div class="confirm-actions">
+            <button type="button" class="btn btn-ghost" data-undo-cancel>Cancelar</button>
+            <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Desfazer</button>
+          </div>
+        </form>
+      </dialog>
+    </main>
+  </div>
+</div>
+<script th:replace="~{fragments/layout :: scripts}"></script>
+</body>
+</html>

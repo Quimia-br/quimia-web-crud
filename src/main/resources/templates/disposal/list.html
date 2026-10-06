@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Fichas de descarte (FDS)')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments/layout :: sidebar('disposals')}"></aside>
+  <div class="main">
+    <header th:replace="~{fragments/layout :: topbar('Fichas de descarte (FDS)', @{/disposals}, null)}"></header>
+    <main class="content">
+      <!--
+        Disposal list
+        Model:   "disposals" -> List<Disposal>
+        Routes:  GET /disposals | GET /disposals/new | GET /disposals/{id}/edit | POST /disposals/{id}/delete
+      -->
+      <div class="page-head">
+        <div>
+          <h1 class="h1">Fichas de descarte (FDS)</h1>
+          <p>Orientações de descarte do produto e da embalagem (Descarte_fds).</p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/disposals/new}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Nova ficha de descarte</a>
+      </div>
+
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+
+      <section class="card">
+        <div class="card-toolbar">
+          <label class="filter">
+            <span class="sr-only">Filtrar fichas de descarte (fds)</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" placeholder="Filtrar fichas de descarte (fds)…" data-filter="#data-table" data-count="#row-count">
+          </label>
+          <span class="count" id="row-count" th:text="${#lists.size(disposals)} + ' registros'">0 registros</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data" id="data-table">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Produto</th>
+                <th scope="col">Descarte do produto</th>
+                <th scope="col">Descarte da embalagem</th>
+                <th scope="col" class="actions"><span class="sr-only">Ações</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="item : ${disposals}" data-row>
+                <td class="id" th:text="${item.id}">1</td>
+                <td th:text="${item.product?.name}">valor</td>
+                <td><div class="truncate" th:text="${item.productDisposalMethod}" th:title="${item.productDisposalMethod}">texto</div></td>
+                <td><div class="truncate" th:text="${item.packagingDisposalMethod}" th:title="${item.packagingDisposalMethod}">texto</div></td>
+                <td class="actions">
+                  <a class="icon-btn edit" th:href="@{/disposals/{id}/edit(id=${item.id})}" title="Editar" aria-label="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg></a>
+                  <button type="button" class="icon-btn delete" title="Excluir" aria-label="Excluir"
+                          th:attr="data-delete-url=@{/disposals/{id}/delete(id=${item.id})},data-delete-name=${item.product?.name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg></button>
+                </td>
+              </tr>
+              <tr data-no-result hidden>
+                <td class="empty" colspan="5"><strong>Nenhum resultado</strong>Nenhum registro corresponde ao filtro.</td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(disposals)}">
+                <td class="empty" colspan="5">
+                  <strong>Nenhuma ficha de descarte cadastrada</strong>
+                  Clique em “Nova ficha de descarte” para adicionar o primeiro registro.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <dialog th:replace="~{fragments/layout :: confirmDelete}"></dialog>
+    </main>
+  </div>
+</div>
+<script th:replace="~{fragments/layout :: scripts}"></script>
+</body>
+</html>
