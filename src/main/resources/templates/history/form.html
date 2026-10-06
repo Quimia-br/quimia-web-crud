@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Histórico')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments/layout :: sidebar('histories')}"></aside>
+  <div class="main">
+    <header th:replace="~{fragments/layout :: topbar('Históricos', @{/histories}, ${history.id == null ? 'Novo histórico' : 'Editar'})}"></header>
+    <main class="content">
+      <!--
+        History form (create and edit)
+        Model:   "history" -> History (null id = create)
+                 "historyTypes" -> List (select options)
+                 "shelves" -> List (select options)
+                 "userProducts" -> List (select options)
+                 "users" -> List (select options)
+        Submit:  POST /histories/save  (use @Valid + BindingResult to show per-field errors)
+      -->
+      <div class="page-head">
+        <div>
+          <h1 class="h1" th:text="${history.id == null} ? 'Novo histórico' : 'Editar histórico'">Novo histórico</h1>
+          <p th:if="${history.id != null}">Registro <span class="code" th:text="'#' + ${history.id}">#1</span></p>
+          <p th:if="${history.id == null}">Preencha os campos abaixo. Campos com <span style="color:var(--feedback-error)">*</span> são obrigatórios.</p>
+        </div>
+        <a class="btn btn-ghost" th:href="@{/histories}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>Voltar</a>
+      </div>
+
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+
+      <form class="card form-card" th:action="@{/histories/save}" th:object="${history}" method="post" novalidate>
+        <div class="alert alert-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span th:each="err : ${#fields.globalErrors()}" th:text="${err}">Erro</span>
+        </div>
+        <input type="hidden" th:field="*{id}">
+        <div class="form-section">
+          <h2 class="h3" style="margin-bottom:var(--space-4)">Dados do histórico</h2>
+          <div class="form-grid">
+            <div class="field" th:classappend="${#fields.hasErrors('historyType.id')} ? 'has-error'">
+              <label for="historyType">Tipo de histórico<span class="req" aria-hidden="true">*</span></label>
+              <select th:field="*{historyType.id}" id="historyType" required>
+                <option value="">Selecione…</option>
+                <option th:each="o : ${historyTypes}" th:value="${o.id}" th:text="${o.name}">Opção</option>
+              </select>
+              <span class="error" th:if="${#fields.hasErrors('historyType.id')}" th:errors="*{historyType.id}">Erro</span>
+            </div>
+            <div class="field" th:classappend="${#fields.hasErrors('user.id')} ? 'has-error'">
+              <label for="user">Usuário<span class="req" aria-hidden="true">*</span></label>
+              <select th:field="*{user.id}" id="user" required>
+                <option value="">Selecione…</option>
+                <option th:each="o : ${users}" th:value="${o.id}" th:text="${o.name}">Opção</option>
+              </select>
+              <span class="error" th:if="${#fields.hasErrors('user.id')}" th:errors="*{user.id}">Erro</span>
+            </div>
+            <div class="field" th:classappend="${#fields.hasErrors('shelf.id')} ? 'has-error'">
+              <label for="shelf">Estante<span class="req" aria-hidden="true">*</span></label>
+              <select th:field="*{shelf.id}" id="shelf" required>
+                <option value="">Selecione…</option>
+                <option th:each="o : ${shelves}" th:value="${o.id}" th:text="${o.room + (o.user != null ? ' — ' + o.user.name : '')}">Opção</option>
+              </select>
+              <span class="error" th:if="${#fields.hasErrors('shelf.id')}" th:errors="*{shelf.id}">Erro</span>
+            </div>
+            <div class="field" th:classappend="${#fields.hasErrors('userProduct.id')} ? 'has-error'">
+              <label for="userProduct">Produto do usuário<span class="req" aria-hidden="true">*</span></label>
+              <select th:field="*{userProduct.id}" id="userProduct" required>
+                <option value="">Selecione…</option>
+                <option th:each="o : ${userProducts}" th:value="${o.id}" th:text="${(o.product != null ? o.product.name : 'Produto') + ' (#' + o.id + ')'}">Opção</option>
+              </select>
+              <span class="error" th:if="${#fields.hasErrors('userProduct.id')}" th:errors="*{userProduct.id}">Erro</span>
+            </div>
+            <div class="field" th:classappend="${#fields.hasErrors('executionDate')} ? 'has-error'">
+              <label for="executionDate">Data de execução<span class="req" aria-hidden="true">*</span></label>
+              <input type="date" th:field="*{executionDate}" id="executionDate" required>
+              <span class="error" th:if="${#fields.hasErrors('executionDate')}" th:errors="*{executionDate}">Erro</span>
+            </div>
+            <div class="field" th:classappend="${#fields.hasErrors('executionTime')} ? 'has-error'">
+              <label for="executionTime">Horário</label>
+              <input type="time" th:field="*{executionTime}" id="executionTime">
+              <span class="error" th:if="${#fields.hasErrors('executionTime')}" th:errors="*{executionTime}">Erro</span>
+            </div>
+            <div class="field full" th:classappend="${#fields.hasErrors('resultDescription')} ? 'has-error'">
+              <label for="resultDescription">Descrição do resultado</label>
+              <textarea th:field="*{resultDescription}" id="resultDescription" rows="4"></textarea>
+              <span class="error" th:if="${#fields.hasErrors('resultDescription')}" th:errors="*{resultDescription}">Erro</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <a class="btn btn-ghost" th:href="@{/histories}">Cancelar</a>
+          <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h8V3"/><path d="M8 21v-7h8v7"/></svg>Salvar</button>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+<script th:replace="~{fragments/layout :: scripts}"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Alteração')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments/layout :: sidebar('admin-logs')}"></aside>
+  <div class="main">
+    <header th:replace="~{fragments/layout :: topbar('Histórico de alterações', @{/admin-logs}, 'Alteração #' + ${adminLog.id})}"></header>
+    <main class="content">
+      <!--
+        Change detail (Admin_log_edição) — read-only.
+        Model:   "adminLog" -> AdminLog
+        previousData / newData must be a JSON object (e.g. {"name":"X","brand":"Y"}).
+        The field-by-field comparison is built in the browser (quimia.js); if the content
+        is not JSON, both texts are shown side by side.
+      -->
+      <div class="page-head">
+        <div>
+          <h1 class="h1"><span th:text="${adminLog.action == 'INSERT' ? 'Criação' : (adminLog.action == 'DELETE' ? 'Exclusão' : 'Edição')}">Edição</span> em <span class="code" th:text="${adminLog.affectedTable} + ' #' + ${adminLog.recordId}">produto #2</span></h1>
+          <p>Alteração <span class="code" th:text="'#' + ${adminLog.id}">#1</span> do histórico</p>
+        </div>
+        <div style="display:flex;gap:var(--space-3);flex-wrap:wrap">
+          <a class="btn btn-ghost" th:href="@{/admin-logs}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>Voltar</a>
+          <button type="button" class="btn btn-primary" title="Desfazer esta alteração"
+                          th:attr="data-undo-url=@{/admin-logs/{id}/undo(id=${adminLog.id})},data-undo-msg=${adminLog.action == 'INSERT' ? 'O registro #' + adminLog.recordId + ' de ' + adminLog.affectedTable + ' será excluído, voltando ao estado anterior à criação.' : (adminLog.action == 'DELETE' ? 'O registro #' + adminLog.recordId + ' de ' + adminLog.affectedTable + ' será recriado com os dados anteriores à exclusão.' : 'O registro #' + adminLog.recordId + ' de ' + adminLog.affectedTable + ' voltará a ter os valores anteriores a esta edição.')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Desfazer</button>
+        </div>
+      </div>
+
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+
+      <section class="card form-card">
+        <dl class="meta">
+          <div><dt>Tipo</dt><dd><span class="act-badge" th:classappend="${adminLog.action == 'INSERT'} ? 'act-insert' : (${adminLog.action == 'DELETE'} ? 'act-delete' : 'act-update')" th:text="${adminLog.action == 'INSERT' ? 'Criação' : (adminLog.action == 'DELETE' ? 'Exclusão' : 'Edição')}">Edição</span></dd></div>
+          <div><dt>Data</dt><dd th:text="${adminLog.date != null ? #temporals.format(adminLog.date, 'dd/MM/yyyy') : '—'}">01/09/2026</dd></div>
+          <div><dt>Administrador</dt><dd th:text="${adminLog.admin?.name}">Admin</dd></div>
+          <div><dt>Tabela</dt><dd class="code" th:text="${adminLog.affectedTable}">produto</dd></div>
+          <div><dt>Registro</dt><dd class="code" th:text="'#' + ${adminLog.recordId}">#2</dd></div>
+        </dl>
+      </section>
+
+      <section class="card" style="margin-top:var(--space-5)">
+        <div class="card-toolbar">
+          <h2 class="h3">Antes × depois</h2>
+          <div class="legend small">
+            <span><i class="sw changed"></i>alterado</span>
+            <span><i class="sw added"></i>adicionado</span>
+            <span><i class="sw removed"></i>removido</span>
+          </div>
+        </div>
+        <div class="diff" id="diff" th:attr="data-before=${adminLog.previousData},data-after=${adminLog.newData}">
+          <div class="raw-grid">
+            <div><h3 class="label muted">ANTES</h3><pre class="raw" th:text="${adminLog.previousData ?: '—'}">—</pre></div>
+            <div><h3 class="label muted">DEPOIS</h3><pre class="raw" th:text="${adminLog.newData ?: '—'}">—</pre></div>
+          </div>
+        </div>
+      </section>
+
+      <dialog class="confirm" id="confirm-undo" aria-labelledby="undo-title">
+        <div class="confirm-icon undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="22" height="22"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></div>
+        <h2 class="h2" id="undo-title">Desfazer alteração?</h2>
+        <p data-undo-text>Esta alteração será revertida.</p>
+        <p class="small muted" style="margin-top:calc(-1 * var(--space-3))">A reversão também fica registrada neste histórico, então pode ser desfeita depois.</p>
+        <form method="post" class="undo-form" action="#">
+          <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <div class="confirm-actions">
+            <button type="button" class="btn btn-ghost" data-undo-cancel>Cancelar</button>
+            <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Desfazer</button>
+          </div>
+        </form>
+      </dialog>
+    </main>
+  </div>
+</div>
+<script th:replace="~{fragments/layout :: scripts}"></script>
+</body>
+</html>

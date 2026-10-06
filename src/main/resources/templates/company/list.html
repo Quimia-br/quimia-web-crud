@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Empresas')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments/layout :: sidebar('companies')}"></aside>
+  <div class="main">
+    <header th:replace="~{fragments/layout :: topbar('Empresas', @{/companies}, null)}"></header>
+    <main class="content">
+      <!--
+        Company list
+        Model:   "companies" -> List<Company>
+        Routes:  GET /companies | GET /companies/new | GET /companies/{id}/edit | POST /companies/{id}/delete
+      -->
+      <div class="page-head">
+        <div>
+          <h1 class="h1">Empresas</h1>
+          <p>Empresas fabricantes responsáveis pelos produtos (Usuário_empresa).</p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/companies/new}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Nova empresa</a>
+      </div>
+
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+
+      <section class="card">
+        <div class="card-toolbar">
+          <label class="filter">
+            <span class="sr-only">Filtrar empresas</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" placeholder="Filtrar empresas…" data-filter="#data-table" data-count="#row-count">
+          </label>
+          <span class="count" id="row-count" th:text="${#lists.size(companies)} + ' registros'">0 registros</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data" id="data-table">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Nome</th>
+                <th scope="col">CNPJ</th>
+                <th scope="col">Porte</th>
+                <th scope="col">Cadastro</th>
+                <th scope="col" class="actions"><span class="sr-only">Ações</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="item : ${companies}" data-row>
+                <td class="id" th:text="${item.id}">1</td>
+                <td th:text="${item.name}">valor</td>
+                <td class="code" th:text="${item.cnpj}">valor</td>
+                <td th:text="${item.size}">valor</td>
+                <td th:text="${item.registrationDate != null ? #temporals.format(item.registrationDate, 'dd/MM/yyyy') : '—'}">valor</td>
+                <td class="actions">
+                  <a class="icon-btn edit" th:href="@{/companies/{id}/edit(id=${item.id})}" title="Editar" aria-label="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg></a>
+                  <button type="button" class="icon-btn delete" title="Excluir" aria-label="Excluir"
+                          th:attr="data-delete-url=@{/companies/{id}/delete(id=${item.id})},data-delete-name=${item.name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg></button>
+                </td>
+              </tr>
+              <tr data-no-result hidden>
+                <td class="empty" colspan="6"><strong>Nenhum resultado</strong>Nenhum registro corresponde ao filtro.</td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(companies)}">
+                <td class="empty" colspan="6">
+                  <strong>Nenhuma empresa cadastrada</strong>
+                  Clique em “Nova empresa” para adicionar o primeiro registro.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <dialog th:replace="~{fragments/layout :: confirmDelete}"></dialog>
+    </main>
+  </div>
+</div>
+<script th:replace="~{fragments/layout :: scripts}"></script>
+</body>
+</html>

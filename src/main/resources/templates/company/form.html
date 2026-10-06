@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Empresa')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments/layout :: sidebar('companies')}"></aside>
+  <div class="main">
+    <header th:replace="~{fragments/layout :: topbar('Empresas', @{/companies}, ${company.id == null ? 'Nova empresa' : 'Editar'})}"></header>
+    <main class="content">
+      <!--
+        Company form (create and edit)
+        Model:   "company" -> Company (null id = create)
+        Submit:  POST /companies/save  (use @Valid + BindingResult to show per-field errors)
+      -->
+      <div class="page-head">
+        <div>
+          <h1 class="h1" th:text="${company.id == null} ? 'Nova empresa' : 'Editar empresa'">Nova empresa</h1>
+          <p th:if="${company.id != null}">Registro <span class="code" th:text="'#' + ${company.id}">#1</span></p>
+          <p th:if="${company.id == null}">Preencha os campos abaixo. Campos com <span style="color:var(--feedback-error)">*</span> são obrigatórios.</p>
+        </div>
+        <a class="btn btn-ghost" th:href="@{/companies}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>Voltar</a>
+      </div>
+
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+
+      <form class="card form-card" th:action="@{/companies/save}" th:object="${company}" method="post" novalidate>
+        <div class="alert alert-error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span th:each="err : ${#fields.globalErrors()}" th:text="${err}">Erro</span>
+        </div>
+        <input type="hidden" th:field="*{id}">
+        <div class="form-section">
+          <h2 class="h3" style="margin-bottom:var(--space-4)">Dados da empresa</h2>
+          <div class="form-grid">
+            <div class="field" th:classappend="${#fields.hasErrors('name')} ? 'has-error'">
+              <label for="name">Nome<span class="req" aria-hidden="true">*</span></label>
+              <input type="text" th:field="*{name}" id="name" required>
+              <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Erro</span>
+            </div>
+            <div class="field" th:classappend="${#fields.hasErrors('cnpj')} ? 'has-error'">
+              <label for="cnpj">CNPJ<span class="req" aria-hidden="true">*</span></label>
+              <input type="text" th:field="*{cnpj}" id="cnpj" class="mono" placeholder="00.000.000/0000-00" required>
+              <span class="error" th:if="${#fields.hasErrors('cnpj')}" th:errors="*{cnpj}">Erro</span>
+            </div>
+            <div class="field" th:classappend="${#fields.hasErrors('size')} ? 'has-error'">
+              <label for="size">Porte</label>
+              <input type="text" th:field="*{size}" id="size" placeholder="Ex.: MEI, pequena, média, grande">
+              <span class="error" th:if="${#fields.hasErrors('size')}" th:errors="*{size}">Erro</span>
+            </div>
+            <div class="field" th:classappend="${#fields.hasErrors('registrationDate')} ? 'has-error'">
+              <label for="registrationDate">Data de cadastro</label>
+              <input type="date" th:field="*{registrationDate}" id="registrationDate">
+              <span class="error" th:if="${#fields.hasErrors('registrationDate')}" th:errors="*{registrationDate}">Erro</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <a class="btn btn-ghost" th:href="@{/companies}">Cancelar</a>
+          <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h8V3"/><path d="M8 21v-7h8v7"/></svg>Salvar</button>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+<script th:replace="~{fragments/layout :: scripts}"></script>
+</body>
+</html>

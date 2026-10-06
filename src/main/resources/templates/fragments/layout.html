@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<!--
+  Shared fragments of Quimia CRUD.
+  Usage in each page:
+    <head th:replace="~{fragments/layout :: head('Page title')}"></head>
+    <aside th:replace="~{fragments/layout :: sidebar('menu-key')}"></aside>
+    <header th:replace="~{fragments/layout :: topbar('Section', @{/section-url}, 'Current page')}"></header>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+    <dialog th:replace="~{fragments/layout :: confirmDelete}"></dialog>
+    <script th:replace="~{fragments/layout :: scripts}"></script>
+  Expected flash attributes (RedirectAttributes#addFlashAttribute): "message" (success) and "error".
+-->
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title} + ' · Quimia CRUD'">Quimia CRUD</title>
+  <link rel="stylesheet" th:href="@{/css/quimia.css}" href="../../static/css/quimia.css">
+</head>
+<body>
+
+<aside class="sidebar" th:fragment="sidebar(active)" id="sidebar" aria-label="Menu principal">
+  <a class="brand" th:href="@{/}">
+    <span class="brand-logo"><svg viewBox="0 0 40 40" width="28" height="28" aria-hidden="true"><defs><linearGradient id="qg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#22C55E"/><stop offset="1" stop-color="#22B8B8"/></linearGradient></defs><path d="M8 28c2-10 10-16 18-14 6 1.6 6 9 0 10-5 .8-7-4-4-6" fill="none" stroke="url(#qg)" stroke-width="4" stroke-linecap="round"/></svg></span>
+    <span class="brand-name">Quimia<small>Painel CRUD</small></span>
+  </a>
+  <nav style="display:flex;flex-direction:column;gap:var(--space-5)">
+    <div class="nav-group">
+      <a class="nav-link" th:href="@{/}" th:classappend="${active == 'home'} ? 'active'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg><span>Início</span></a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-title">Pessoas</div>
+      <a class="nav-link" th:href="@{/users}" th:classappend="${active == 'users'} ? 'active'"
+         th:attr="aria-current=${active == 'users'} ? 'page' : null"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Usuários</span></a>
+      <a class="nav-link" th:href="@{/admins}" th:classappend="${active == 'admins'} ? 'active'"
+         th:attr="aria-current=${active == 'admins'} ? 'page' : null"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Administradores</span></a>
+      <a class="nav-link" th:href="@{/companies}" th:classappend="${active == 'companies'} ? 'active'"
+         th:attr="aria-current=${active == 'companies'} ? 'page' : null"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/></svg><span>Empresas</span></a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-title">Produtos</div>
+      <a class="nav-link" th:href="@{/products}" th:classappend="${active == 'products'} ? 'active'"
+         th:attr="aria-current=${active == 'products'} ? 'page' : null"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6"/><path d="M10 3v6L4.5 18.5A2 2 0 0 0 6.2 21.5h11.6a2 2 0 0 0 1.7-3L14 9V3"/><path d="M7 15h10"/></svg><span>Produtos</span></a>
+      <a class="nav-link" th:href="@{/disposals}" th:classappend="${active == 'disposals'} ? 'active'"
+         th:attr="aria-current=${active == 'disposals'} ? 'page' : null"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 19H4.8a1.8 1.8 0 0 1-1.6-2.7L5 13"/><path d="M11 19h8.2a1.8 1.8 0 0 0 1.6-2.7l-1.2-2"/><path d="m14 16-3 3 3 3"/><path d="M8.3 5.6 9.4 3.7a1.8 1.8 0 0 1 3.2 0l3.9 6.8"/><path d="m13.4 10.6 3.1 0-1-3.2"/><path d="M5.3 13.5 7 10.6l-3.1.2"/></svg><span>Fichas de descarte (FDS)</span></a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-title">Uso doméstico</div>
+      <a class="nav-link" th:href="@{/shelves}" th:classappend="${active == 'shelves'} ? 'active'"
+         th:attr="aria-current=${active == 'shelves'} ? 'page' : null"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M3 15h18"/></svg><span>Estantes</span></a>
+      <a class="nav-link" th:href="@{/histories}" th:classappend="${active == 'histories'} ? 'active'"
+         th:attr="aria-current=${active == 'histories'} ? 'page' : null"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Históricos</span></a>
+      <a class="nav-link" th:href="@{/history-types}" th:classappend="${active == 'history-types'} ? 'active'"
+         th:attr="aria-current=${active == 'history-types'} ? 'page' : null"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="1.5"/></svg><span>Tipos de histórico</span></a>
+      <a class="nav-link" th:href="@{/locations}" th:classappend="${active == 'locations'} ? 'active'"
+         th:attr="aria-current=${active == 'locations'} ? 'page' : null"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg><span>Localizações</span></a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-title">Auditoria</div>
+      <a class="nav-link" th:href="@{/admin-logs}" th:classappend="${active == 'admin-logs'} ? 'active'"
+         th:attr="aria-current=${active == 'admin-logs'} ? 'page' : null"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg><span>Histórico de alterações</span></a>
+    </div>
+  </nav>
+</aside>
+
+<header class="topbar" th:fragment="topbar(section, sectionUrl, page)">
+  <div style="display:flex;align-items:center;gap:var(--space-3)">
+    <button type="button" class="icon-btn menu-toggle" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <nav class="breadcrumb" aria-label="Trilha">
+      <a th:href="@{/}">Início</a>
+      <th:block th:if="${section != null}">
+        <span aria-hidden="true">/</span>
+        <a th:href="${sectionUrl}" th:text="${section}">Seção</a>
+      </th:block>
+      <th:block th:if="${page != null}">
+        <span aria-hidden="true">/</span>
+        <span th:text="${page}" style="color:var(--foreground-primary)">Página</span>
+      </th:block>
+    </nav>
+  </div>
+</header>
+
+<div th:fragment="alerts" th:remove="tag">
+  <div class="alert alert-success" role="status" data-autohide th:if="${message != null}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><span th:text="${message}">Registro salvo com sucesso.</span>
+  </div>
+  <div class="alert alert-error" role="alert" th:if="${error != null}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span th:text="${error}">Não foi possível concluir a operação.</span>
+  </div>
+</div>
+
+<dialog class="confirm" id="confirm-delete" th:fragment="confirmDelete" aria-labelledby="confirm-title">
+  <div class="confirm-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="22" height="22"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg></div>
+  <h2 class="h2" id="confirm-title">Excluir registro?</h2>
+  <p>Você está prestes a excluir <strong data-confirm-name>este registro</strong>. Esta ação não pode ser desfeita.</p>
+  <form method="post" class="confirm-form" action="#">
+    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <div class="confirm-actions">
+      <button type="button" class="btn btn-ghost" data-confirm-cancel>Cancelar</button>
+      <button type="submit" class="btn btn-danger">Excluir</button>
+    </div>
+  </form>
+</dialog>
+
+<script th:fragment="scripts" th:src="@{/js/quimia.js}" src="../../static/js/quimia.js" defer></script>
+
+</body>
+</html>
