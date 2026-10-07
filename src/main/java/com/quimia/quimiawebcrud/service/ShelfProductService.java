@@ -10,26 +10,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class ShelfProductService {
+public class ShelfProductService extends CrudService<ShelfProduct, ShelfProductId, ShelfProductRequestDTO, ShelfProductResponseDTO> {
 
     private final ShelfProductRepository repository;
     private final ShelfProductMapper mapper;
 
-    public List<ShelfProductResponseDTO> readAll() {
-        return repository.findAll().stream()
-                .map(mapper::toResponse)
-                .toList();
+    @Override
+    protected ShelfProductRepository getRepository() {
+        return repository;
     }
 
-    public ShelfProductResponseDTO findById(Integer shelfId, Integer productId) {
-        return mapper.toResponse(getEntity(shelfId, productId));
+    @Override
+    protected ShelfProductMapper getMapper() {
+        return mapper;
     }
 
+    @Override
     @Transactional
     public ShelfProductResponseDTO create(ShelfProductRequestDTO request) {
         ShelfProductId id = new ShelfProductId(request.getShelfId(), request.getProductId());
@@ -37,25 +35,24 @@ public class ShelfProductService {
             throw new IllegalStateException("O produto " + id.getProductId()
                     + " ja esta na estante " + id.getShelfId() + ".");
         }
-        ShelfProduct entity = repository.save(mapper.toEntity(request));
-        return mapper.toResponse(entity);
+        return super.create(request);
     }
 
-    @Transactional
+    @Override
+    protected RuntimeException notFound(ShelfProductId id) {
+        return new RuntimeException("Registro nao encontrado (estante "
+                + id.getShelfId() + ", produto " + id.getProductId() + ")");
+    }
+
+    public ShelfProductResponseDTO findById(Integer shelfId, Integer productId) {
+        return findById(new ShelfProductId(shelfId, productId));
+    }
+
     public ShelfProductResponseDTO update(Integer shelfId, Integer productId, ShelfProductRequestDTO request) {
-        ShelfProduct entity = getEntity(shelfId, productId);
-        mapper.updateEntity(entity, request);
-        return mapper.toResponse(entity);
+        return update(new ShelfProductId(shelfId, productId), request);
     }
 
-    @Transactional
     public void delete(Integer shelfId, Integer productId) {
-        repository.delete(getEntity(shelfId, productId));
-    }
-
-    private ShelfProduct getEntity(Integer shelfId, Integer productId) {
-        return repository.findById(new ShelfProductId(shelfId, productId))
-                .orElseThrow(() -> new RuntimeException("Registro nao encontrado (estante "
-                        + shelfId + ", produto " + productId + ")"));
+        delete(new ShelfProductId(shelfId, productId));
     }
 }

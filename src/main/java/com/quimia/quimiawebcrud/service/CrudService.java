@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Transactional(readOnly = true)
-public abstract class Service<E, ID, Req, Res> {
+public abstract class CrudService<E, ID, Req, Res> {
 
     protected abstract JpaRepository<E, ID> getRepository();
 
