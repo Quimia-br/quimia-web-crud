@@ -6,38 +6,28 @@ import com.quimia.quimiawebcrud.mapper.CompanyMapper;
 import com.quimia.quimiawebcrud.model.Company;
 import com.quimia.quimiawebcrud.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import org.mindrot.jbcrypt.BCrypt;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class CompanyService {
+public class CompanyService extends CrudService<Company, Integer, CompanyRequestDTO, CompanyResponseDTO> {
 
     private final CompanyRepository repository;
     private final CompanyMapper mapper;
 
-    private String hashPassword(String originalPassword) {
-        return BCrypt.hashpw(originalPassword, BCrypt.gensalt());
+    @Override
+    protected CompanyRepository getRepository() {
+        return repository;
     }
 
-    private boolean hasText(String value) {
-        return value != null && !value.isBlank();
+    @Override
+    protected CompanyMapper getMapper() {
+        return mapper;
     }
 
-    public List<CompanyResponseDTO> readAll() {
-        return repository.findAll().stream()
-                .map(mapper::toResponse)
-                .toList();
-    }
-
-    public CompanyResponseDTO findById(Integer id) {
-        return mapper.toResponse(getEntity(id));
-    }
-
+    @Override
     @Transactional
     public CompanyResponseDTO create(CompanyRequestDTO request) {
         if (!hasText(request.getPassword())) {
@@ -48,6 +38,7 @@ public class CompanyService {
         return mapper.toResponse(repository.save(entity));
     }
 
+    @Override
     @Transactional
     public CompanyResponseDTO update(Integer id, CompanyRequestDTO request) {
         Company entity = getEntity(id);
@@ -58,13 +49,11 @@ public class CompanyService {
         return mapper.toResponse(entity);
     }
 
-    @Transactional
-    public void delete(Integer id) {
-        repository.delete(getEntity(id));
+    private String hashPassword(String originalPassword) {
+        return BCrypt.hashpw(originalPassword, BCrypt.gensalt());
     }
 
-    private Company getEntity(Integer id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Registro nao encontrado com o ID: " + id));
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 }
