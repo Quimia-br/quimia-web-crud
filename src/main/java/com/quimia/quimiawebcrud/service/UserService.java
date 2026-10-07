@@ -6,38 +6,28 @@ import com.quimia.quimiawebcrud.mapper.UserMapper;
 import com.quimia.quimiawebcrud.model.User;
 import com.quimia.quimiawebcrud.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import org.mindrot.jbcrypt.BCrypt;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class UserService {
+public class UserService extends CrudService<User, Integer, UserRequestDTO, UserResponseDTO> {
 
     private final UserRepository repository;
     private final UserMapper mapper;
 
-    private String hashPassword(String originalPassword) {
-        return BCrypt.hashpw(originalPassword, BCrypt.gensalt());
+    @Override
+    protected UserRepository getRepository() {
+        return repository;
     }
 
-    private boolean hasText(String value) {
-        return value != null && !value.isBlank();
+    @Override
+    protected UserMapper getMapper() {
+        return mapper;
     }
 
-    public List<UserResponseDTO> readAll() {
-        return repository.findAll().stream()
-                .map(mapper::toResponse)
-                .toList();
-    }
-
-    public UserResponseDTO findById(Integer id) {
-        return mapper.toResponse(getEntity(id));
-    }
-
+    @Override
     @Transactional
     public UserResponseDTO create(UserRequestDTO request) {
         if (!hasText(request.getPassword())) {
@@ -48,6 +38,7 @@ public class UserService {
         return mapper.toResponse(repository.save(entity));
     }
 
+    @Override
     @Transactional
     public UserResponseDTO update(Integer id, UserRequestDTO request) {
         User entity = getEntity(id);
@@ -58,13 +49,11 @@ public class UserService {
         return mapper.toResponse(entity);
     }
 
-    @Transactional
-    public void delete(Integer id) {
-        repository.delete(getEntity(id));
+    private String hashPassword(String originalPassword) {
+        return BCrypt.hashpw(originalPassword, BCrypt.gensalt());
     }
 
-    private User getEntity(Integer id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Registro nao encontrado com o ID: " + id));
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 }
