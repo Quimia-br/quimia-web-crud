@@ -10,35 +10,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * Base CRUD controller for the Thymeleaf views.
- * <p>
- * Routes (relative to the subclass {@code @RequestMapping}):
- * GET / | GET /new | GET /{id}/edit | POST /save | POST /{id}/delete
- * <p>
- * Views: {@code <viewFolder>/list} and {@code <viewFolder>/form}.
- */
 @Controller
 public abstract class GenericController<T, ID, Res, Req> {
 
     protected abstract CrudService<T, ID, Req, Res> getService();
 
-    /** URL prefix used in redirects, e.g. "/locations". */
     protected abstract String getBasePath();
 
-    /** Template folder, e.g. "location". */
     protected abstract String getViewFolder();
 
-    /** Model attribute for the form object, e.g. "location". */
     protected abstract String getSingularName();
 
-    /** Model attribute for the list, e.g. "locations". */
     protected abstract String getPluralName();
 
-    /** Empty response used to render the "new" form (id == null). */
     protected abstract Res newResponse();
 
-    /** Hook for extra form data, e.g. select options. */
     protected void addFormAttributes(Model model) {
     }
 
