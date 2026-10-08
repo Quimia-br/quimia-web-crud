@@ -10,26 +10,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class UserProductService {
+public class UserProductService extends CrudService<UserProduct, UserProductId, UserProductRequestDTO, UserProductResponseDTO> {
 
     private final UserProductRepository repository;
     private final UserProductMapper mapper;
 
-    public List<UserProductResponseDTO> readAll() {
-        return repository.findAll().stream()
-                .map(mapper::toResponse)
-                .toList();
+    @Override
+    protected UserProductRepository getRepository() {
+        return repository;
     }
 
-    public UserProductResponseDTO findById(Integer userId, Integer productId) {
-        return mapper.toResponse(getEntity(userId, productId));
+    @Override
+    protected UserProductMapper getMapper() {
+        return mapper;
     }
 
+    @Override
     @Transactional
     public UserProductResponseDTO create(UserProductRequestDTO request) {
         UserProductId id = new UserProductId(request.getUserId(), request.getProductId());
@@ -37,18 +35,20 @@ public class UserProductService {
             throw new IllegalStateException("O usuario " + id.getUserId()
                     + " ja possui o produto " + id.getProductId() + ".");
         }
-        UserProduct entity = repository.save(mapper.toEntity(request));
-        return mapper.toResponse(entity);
+        return super.create(request);
     }
 
-    @Transactional
+    @Override
+    protected RuntimeException notFound(UserProductId id) {
+        return new RuntimeException("Registro nao encontrado (usuario "
+                + id.getUserId() + ", produto " + id.getProductId() + ")");
+    }
+
+    public UserProductResponseDTO findById(Integer userId, Integer productId) {
+        return findById(new UserProductId(userId, productId));
+    }
+
     public void delete(Integer userId, Integer productId) {
-        repository.delete(getEntity(userId, productId));
-    }
-
-    private UserProduct getEntity(Integer userId, Integer productId) {
-        return repository.findById(new UserProductId(userId, productId))
-                .orElseThrow(() -> new RuntimeException("Registro nao encontrado (usuario "
-                        + userId + ", produto " + productId + ")"));
+        delete(new UserProductId(userId, productId));
     }
 }
