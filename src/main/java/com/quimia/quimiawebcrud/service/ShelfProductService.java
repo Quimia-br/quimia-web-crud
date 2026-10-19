@@ -2,6 +2,8 @@ package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.dto.ShelfProductRequestDTO;
 import com.quimia.quimiawebcrud.dto.ShelfProductResponseDTO;
+import com.quimia.quimiawebcrud.exception.DuplicateResourceException;
+import com.quimia.quimiawebcrud.exception.ResourceNotFoundException;
 import com.quimia.quimiawebcrud.mapper.ShelfProductMapper;
 import com.quimia.quimiawebcrud.model.ShelfProduct;
 import com.quimia.quimiawebcrud.model.id.ShelfProductId;
@@ -32,15 +34,15 @@ public class ShelfProductService extends CrudService<ShelfProduct, ShelfProductI
     public ShelfProductResponseDTO create(ShelfProductRequestDTO request) {
         ShelfProductId id = new ShelfProductId(request.getShelfId(), request.getProductId());
         if (repository.existsById(id)) {
-            throw new IllegalStateException("O produto " + id.getProductId()
-                    + " ja esta na estante " + id.getShelfId() + ".");
+            throw new DuplicateResourceException("O produto " + id.getProductId()
+                    + " já está na estante " + id.getShelfId() + ".");
         }
         return super.create(request);
     }
 
     @Override
-    protected RuntimeException notFound(ShelfProductId id) {
-        return new RuntimeException("Registro nao encontrado (estante "
+    protected ResourceNotFoundException notFound(ShelfProductId id) {
+        return new ResourceNotFoundException("Registro não encontrado (estante "
                 + id.getShelfId() + ", produto " + id.getProductId() + ")");
     }
 

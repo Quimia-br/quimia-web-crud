@@ -33,6 +33,6 @@ public class UserProductMapper implements Mapper<UserProduct, UserProductRequest
     @Override
     public void updateEntity(UserProduct entity, UserProductRequestDTO request) {
         throw new UnsupportedOperationException(
-                "produtos_usuarios nao possui colunas alem da chave; exclua e crie novamente.");
+                "produtos_usuarios não possui colunas além da chave; exclua e crie novamente.");
     }
 }

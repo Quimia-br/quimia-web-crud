@@ -2,6 +2,7 @@ package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.dto.AdminRequestDTO;
 import com.quimia.quimiawebcrud.dto.AdminResponseDTO;
+import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.AdminMapper;
 import com.quimia.quimiawebcrud.model.Admin;
 import com.quimia.quimiawebcrud.repository.AdminRepository;
@@ -31,7 +32,7 @@ public class AdminService extends CrudService<Admin, Integer, AdminRequestDTO, A
     @Transactional
     public AdminResponseDTO create(AdminRequestDTO request) {
         if (!hasText(request.getPassword())) {
-            throw new IllegalArgumentException("A senha e obrigatoria.");
+            throw new InvalidDataException("A senha é obrigatória.");
         }
         Admin entity = mapper.toEntity(request);
         entity.setPasswordHash(hashPassword(request.getPassword()));
