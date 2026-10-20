@@ -1,7 +1,9 @@
 package com.quimia.quimiawebcrud.controller;
 
 import com.quimia.quimiawebcrud.dto.BaseResponseDTO;
+import org.springframework.ui.Model;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,5 +22,14 @@ final class Lookups {
             map.put(item.getId(), item);
         }
         return map;
+    }
+
+    /**
+     * Recupera um mapa que o controller já colocou no model (ex.: "companiesById").
+     */
+    @SuppressWarnings("unchecked")
+    static <R> Map<Integer, R> fromModel(Model model, String name) {
+        Object value = model.getAttribute(name);
+        return value == null ? Collections.emptyMap() : (Map<Integer, R>) value;
     }
 }

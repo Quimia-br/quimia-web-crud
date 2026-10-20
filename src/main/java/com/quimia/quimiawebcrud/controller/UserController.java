@@ -7,7 +7,11 @@ import com.quimia.quimiawebcrud.service.CrudService;
 import com.quimia.quimiawebcrud.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Map;
+import java.util.function.Predicate;
 
 @Controller
 @RequestMapping("/users")
@@ -34,5 +38,12 @@ public class UserController extends GenericController<User, Integer, UserRespons
     @Override
     protected String getPluralName() {
         return "users";
+    }
+
+    @Override
+    protected Predicate<UserResponseDTO> filterBy(Map<String, String> params, Model model) {
+        return user -> Filters.matchesText(params.get("busca"), user.getUserName(), user.getEmail())
+                && Filters.sameEnum(user.getStatus(), params.get("status"))
+                && Filters.inDateRange(user.getSignUpDate(), params.get("cadastroDe"), params.get("cadastroAte"));
     }
 }

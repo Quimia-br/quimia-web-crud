@@ -1,38 +1,24 @@
 package com.quimia.quimiawebcrud.controller;
 
 import com.quimia.quimiawebcrud.service.CrudService;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 /**
- * Rotas comuns das telas de cadastro: a lista traz também os formulários (popups) de criar, editar e excluir.
+ * Telas de cadastro: além da lista, têm as rotas de salvar e excluir usadas pelos popups.
  */
-public abstract class GenericController<T, ID, Res, Req> {
+public abstract class GenericController<T, ID, Res, Req> extends ListController<Res> {
 
     protected abstract CrudService<T, ID, Req, Res> getService();
 
-    protected abstract String getBasePath();
-
-    protected abstract String getViewFolder();
-
-    protected abstract String getPluralName();
-
-    /**
-     * Dados extras que a lista precisa (ex.: nomes das empresas para os produtos).
-     */
-    protected void addListAttributes(Model model) {
-    }
-
-    @GetMapping
-    public String list(Model model) {
-        model.addAttribute(getPluralName(), getService().readAll());
-        addListAttributes(model);
-        return getViewFolder() + "/list";
+    @Override
+    protected List<Res> readAll() {
+        return getService().readAll();
     }
 
     @PostMapping("/save")

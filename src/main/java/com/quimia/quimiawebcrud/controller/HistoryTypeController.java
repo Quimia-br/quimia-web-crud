@@ -7,7 +7,11 @@ import com.quimia.quimiawebcrud.service.CrudService;
 import com.quimia.quimiawebcrud.service.HistoryTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Map;
+import java.util.function.Predicate;
 
 @Controller
 @RequestMapping("/history-types")
@@ -34,5 +38,10 @@ public class HistoryTypeController extends GenericController<HistoryType, Intege
     @Override
     protected String getPluralName() {
         return "historyTypes";
+    }
+
+    @Override
+    protected Predicate<HistoryTypeResponseDTO> filterBy(Map<String, String> params, Model model) {
+        return type -> Filters.matchesText(params.get("busca"), type.getName());
     }
 }

@@ -11,6 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Map;
+import java.util.function.Predicate;
+
 @Controller
 @RequestMapping("/products")
 @RequiredArgsConstructor
@@ -42,5 +45,12 @@ public class ProductController extends GenericController<Product, Integer, Produ
     @Override
     protected void addListAttributes(Model model) {
         model.addAttribute("companiesById", Lookups.byId(companyService.readAll()));
+    }
+
+    @Override
+    protected Predicate<ProductResponseDTO> filterBy(Map<String, String> params, Model model) {
+        return product -> Filters.matchesText(params.get("busca"), product.getName(), product.getCasNumber())
+                && Filters.sameId(product.getCompanyId(), params.get("empresa"))
+                && Filters.matchesText(params.get("marca"), product.getBrand());
     }
 }

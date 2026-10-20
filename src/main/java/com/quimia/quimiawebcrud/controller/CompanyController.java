@@ -7,7 +7,11 @@ import com.quimia.quimiawebcrud.service.CompanyService;
 import com.quimia.quimiawebcrud.service.CrudService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Map;
+import java.util.function.Predicate;
 
 @Controller
 @RequestMapping("/companies")
@@ -34,5 +38,12 @@ public class CompanyController extends GenericController<Company, Integer, Compa
     @Override
     protected String getPluralName() {
         return "companies";
+    }
+
+    @Override
+    protected Predicate<CompanyResponseDTO> filterBy(Map<String, String> params, Model model) {
+        return company -> Filters.matchesText(params.get("busca"), company.getName(), company.getCnpj(), company.getEmail())
+                && Filters.sameEnum(company.getSize(), params.get("porte"))
+                && Filters.sameEnum(company.getStatus(), params.get("status"));
     }
 }
