@@ -9,6 +9,8 @@
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
     <link rel="stylesheet" href="../../static/css/photo.css" th:href="@{/css/photo.css}">
+
+    <script src="../../static/js/password-toggle.js" th:src="@{/js/password-toggle.js}" defer></script>
 </head>
 
 <body>
@@ -161,7 +163,10 @@
 
             <div class="field">
                 <label for="novo-senha">Senha <span class="required" aria-hidden="true">*</span></label>
-                <input type="password" id="novo-senha" name="password" autocomplete="new-password" required>
+                <div class="password-field">
+                    <input type="password" id="novo-senha" name="password" autocomplete="new-password" required>
+                    <button type="button" class="btn-icon password-toggle" data-password-toggle aria-pressed="false" aria-label="Mostrar senha"><img class="icon-eye" src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""><img class="icon-eye-off" src="../../static/icons/eye-off.svg" th:src="@{/icons/eye-off.svg}" alt=""></button>
+                </div>
             </div>
 
             <div class="field">
@@ -231,7 +236,10 @@
 
             <div class="field">
                 <label th:attr="for=|editar-senha-${item.id}|">Nova senha</label>
-                <input type="password" name="password" autocomplete="new-password" th:attr="id=|editar-senha-${item.id}|,aria-describedby=|editar-senha-${item.id}-dica|">
+                <div class="password-field">
+                    <input type="password" name="password" autocomplete="new-password" th:attr="id=|editar-senha-${item.id}|,aria-describedby=|editar-senha-${item.id}-dica|">
+                    <button type="button" class="btn-icon password-toggle" data-password-toggle aria-pressed="false" aria-label="Mostrar senha"><img class="icon-eye" src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""><img class="icon-eye-off" src="../../static/icons/eye-off.svg" th:src="@{/icons/eye-off.svg}" alt=""></button>
+                </div>
                 <p class="field-hint" th:attr="id=|editar-senha-${item.id}-dica|">Deixe em branco para manter a senha atual.</p>
             </div>
 

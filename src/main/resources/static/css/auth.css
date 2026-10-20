@@ -195,4 +195,17 @@
 .auth-message-error {
   color: var(--color-danger);
   font-weight: 700;
+
+/* Botão de olho dentro do campo de senha do login */
+.auth-field .password-toggle {
+  position: static;
+  flex: none;
+  width: 2.4rem;
+  height: 2.4rem;
+  transform: none;
+}
+
+.auth-field .password-toggle img {
+  width: 1.6rem;
+  height: 1.6rem;
 }
