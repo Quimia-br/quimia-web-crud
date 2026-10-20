@@ -18,6 +18,7 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
     private final UserRepository repository;
     private final UserMapper mapper;
     private final PasswordHasher passwordHasher;
+    private final PhotoStorageService photoStorage;
 
     @Override
     protected UserRepository getRepository() {
@@ -37,6 +38,7 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
         }
         User entity = mapper.toEntity(request);
         entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
+        entity.setPhotoUrl(photoStorage.replace(request.getPhoto(), null));
         return mapper.toResponse(repository.save(entity));
     }
 
@@ -44,11 +46,21 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
     @Transactional
     public UserResponseDTO update(Integer id, UserRequestDTO request) {
         User entity = getEntity(id);
+        String currentPhoto = entity.getPhotoUrl();
         mapper.updateEntity(entity, request);
+        entity.setPhotoUrl(photoStorage.replace(request.getPhoto(), currentPhoto));
         if (hasText(request.getPassword())) {
             entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
         }
         return mapper.toResponse(entity);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Integer id) {
+        String photoUrl = getEntity(id).getPhotoUrl();
+        super.delete(id);
+        photoStorage.release(photoUrl);
     }
 
     private boolean hasText(String value) {

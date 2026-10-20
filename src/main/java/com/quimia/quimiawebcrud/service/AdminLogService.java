@@ -8,6 +8,9 @@ import com.quimia.quimiawebcrud.repository.AdminLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AdminLogService extends CrudService<AdminLog, Integer, AdminLogRequestDTO, AdminLogResponseDTO> {
@@ -23,5 +26,12 @@ public class AdminLogService extends CrudService<AdminLog, Integer, AdminLogRequ
     @Override
     protected AdminLogMapper getMapper() {
         return mapper;
+    }
+
+    public List<AdminLogResponseDTO> readAllNewestFirst() {
+        List<AdminLogResponseDTO> logs = readAll();
+        logs.sort(Comparator.comparing(AdminLogResponseDTO::getEditDate,
+                Comparator.nullsLast(Comparator.reverseOrder())));
+        return logs;
     }
 }

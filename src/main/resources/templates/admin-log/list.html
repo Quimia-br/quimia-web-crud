@@ -54,40 +54,42 @@
             <h1>Relatório de administradores</h1>
         </header>
 
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
         <form class="toolbar" method="get">
             <div class="toolbar-search">
                 <label for="busca" class="sr-only">Buscar por administrador</label>
-                <input type="search" id="busca" name="busca" placeholder="Buscar por administrador...">
+                <input type="search" id="busca" name="busca" placeholder="Buscar por administrador..." th:value="${filters['busca']}">
             </div>
             <div class="toolbar-filter">
                 <label for="acao">Ação</label>
                 <select id="acao" name="acao">
                     <option value="">Todas</option>
-                    <option value="INSERT">Inclusão</option>
-                    <option value="UPDATE">Alteração</option>
-                    <option value="DELETE">Exclusão</option>
+                    <option value="INSERT" th:selected="${filters['acao'] == 'INSERT'}">Inclusão</option>
+                    <option value="UPDATE" th:selected="${filters['acao'] == 'UPDATE'}">Alteração</option>
+                    <option value="DELETE" th:selected="${filters['acao'] == 'DELETE'}">Exclusão</option>
                 </select>
             </div>
             <div class="toolbar-filter">
                 <label for="tabela">Tabela</label>
                 <select id="tabela" name="tabela">
                     <option value="">Todas</option>
-                    <option value="admins">Administradores</option>
-                    <option value="usuarios">Usuários</option>
-                    <option value="usuarios_empresas">Empresas</option>
-                    <option value="produtos">Produtos</option>
-                    <option value="descartes_fds">Descartes</option>
-                    <option value="localizacoes">Localizações</option>
-                    <option value="estantes">Estantes</option>
-                    <option value="historicos">Históricos</option>
-                    <option value="tipos_historicos">Tipos de histórico</option>
+                    <option value="admins" th:selected="${filters['tabela'] == 'admins'}">Administradores</option>
+                    <option value="usuarios" th:selected="${filters['tabela'] == 'usuarios'}">Usuários</option>
+                    <option value="usuarios_empresas" th:selected="${filters['tabela'] == 'usuarios_empresas'}">Empresas</option>
+                    <option value="produtos" th:selected="${filters['tabela'] == 'produtos'}">Produtos</option>
+                    <option value="descartes_fds" th:selected="${filters['tabela'] == 'descartes_fds'}">Descartes</option>
+                    <option value="localizacoes" th:selected="${filters['tabela'] == 'localizacoes'}">Localizações</option>
+                    <option value="estantes" th:selected="${filters['tabela'] == 'estantes'}">Estantes</option>
+                    <option value="historicos" th:selected="${filters['tabela'] == 'historicos'}">Históricos</option>
+                    <option value="tipos_historicos" th:selected="${filters['tabela'] == 'tipos_historicos'}">Tipos de histórico</option>
                 </select>
             </div>
             <div class="toolbar-filter">
                 <label for="datade">Data de</label>
-                <input type="date" id="datade" name="dataDe">
+                <input type="date" id="datade" name="dataDe" th:value="${filters['dataDe']}">
                 <label for="dataate">até</label>
-                <input type="date" id="dataate" name="dataAte">
+                <input type="date" id="dataate" name="dataAte" th:value="${filters['dataAte']}">
             </div>
             <button type="submit" class="btn btn-secondary">Filtrar</button>
         </form>
@@ -106,42 +108,25 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Lucas Almeida</td>
-                        <td><span class="badge badge-neutral">Alteração</span></td>
-                        <td>Produtos</td>
-                        <td>#2</td>
-                        <td class="cell-nowrap">06/10/2026 14:32</td>
+                    <tr th:each="item : ${adminLogs}">
+                        <td>[[${item.id}]]</td>
+                        <td>[[${adminsById[item.adminId]?.userName}]]</td>
+                        <td><span th:replace="~{fragments/badges :: action(${item.action})}"></span></td>
+                        <td>[[${item.affectedTable}]]</td>
+                        <td>#[[${item.recordId}]]</td>
+                        <td class="cell-nowrap">[[${item.editDate != null ? #temporals.format(item.editDate, 'dd/MM/yyyy HH:mm') : ''}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver registro 1 do log"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver registro ${item.id} do log|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
                         </td>
                     </tr>
-
-                    <tr>
-                        <td>2</td>
-                        <td>Lucas Almeida</td>
-                        <td><span class="badge badge-danger">Exclusão</span></td>
-                        <td>Estantes</td>
-                        <td>#5</td>
-                        <td class="cell-nowrap">07/10/2026 09:15</td>
-                        <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver registro 2 do log"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
-                        </td>
+                    <tr th:if="${#lists.isEmpty(adminLogs)}">
+                        <td colspan="7">Nenhum registro encontrado.</td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
-        <nav class="pagination" aria-label="Paginação">
-            <a href="#" aria-label="Página anterior"><img src="../../static/icons/chevron-left.svg" th:src="@{/icons/chevron-left.svg}" alt=""></a>
-
-            <a href="#" aria-current="page">1</a>
-
-            <a href="#">2</a>
-
-            <a href="#" aria-label="Próxima página"><img src="../../static/icons/chevron-right.svg" th:src="@{/icons/chevron-right.svg}" alt=""></a>
-        </nav>
+        <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
 </body>
 </html>
