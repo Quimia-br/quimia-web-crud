@@ -32,17 +32,7 @@ public class HistoryTypeController extends GenericController<HistoryType, Intege
     }
 
     @Override
-    protected String getSingularName() {
-        return "historyType";
-    }
-
-    @Override
     protected String getPluralName() {
         return "historyTypes";
-    }
-
-    @Override
-    protected HistoryTypeResponseDTO newResponse() {
-        return new HistoryTypeResponseDTO();
     }
 }

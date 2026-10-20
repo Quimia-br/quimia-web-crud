@@ -32,17 +32,7 @@ public class UserController extends GenericController<User, Integer, UserRespons
     }
 
     @Override
-    protected String getSingularName() {
-        return "user";
-    }
-
-    @Override
     protected String getPluralName() {
         return "users";
-    }
-
-    @Override
-    protected UserResponseDTO newResponse() {
-        return new UserResponseDTO();
     }
 }

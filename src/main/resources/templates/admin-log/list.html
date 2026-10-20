@@ -54,6 +54,8 @@
             <h1>Relatório de administradores</h1>
         </header>
 
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
         <form class="toolbar" method="get">
             <div class="toolbar-search">
                 <label for="busca" class="sr-only">Buscar por administrador</label>
@@ -106,28 +108,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Lucas Almeida</td>
-                        <td><span class="badge badge-neutral">Alteração</span></td>
-                        <td>Produtos</td>
-                        <td>#2</td>
-                        <td class="cell-nowrap">06/10/2026 14:32</td>
+                    <tr th:each="item : ${adminLogs}">
+                        <td>[[${item.id}]]</td>
+                        <td>[[${adminsById[item.adminId]?.userName}]]</td>
+                        <td><span th:replace="~{fragments/badges :: action(${item.action})}"></span></td>
+                        <td>[[${item.affectedTable}]]</td>
+                        <td>#[[${item.recordId}]]</td>
+                        <td class="cell-nowrap">[[${item.editDate != null ? #temporals.format(item.editDate, 'dd/MM/yyyy HH:mm') : ''}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver registro 1 do log"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver registro ${item.id} do log|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
                         </td>
                     </tr>
-
-                    <tr>
-                        <td>2</td>
-                        <td>Lucas Almeida</td>
-                        <td><span class="badge badge-danger">Exclusão</span></td>
-                        <td>Estantes</td>
-                        <td>#5</td>
-                        <td class="cell-nowrap">07/10/2026 09:15</td>
-                        <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver registro 2 do log"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
-                        </td>
+                    <tr th:if="${#lists.isEmpty(adminLogs)}">
+                        <td colspan="7">Nenhum registro encontrado.</td>
                     </tr>
                 </tbody>
             </table>

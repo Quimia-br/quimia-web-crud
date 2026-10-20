@@ -35,22 +35,12 @@ public class DisposalController extends GenericController<Disposal, Integer, Dis
     }
 
     @Override
-    protected String getSingularName() {
-        return "disposal";
-    }
-
-    @Override
     protected String getPluralName() {
         return "disposals";
     }
 
     @Override
-    protected DisposalResponseDTO newResponse() {
-        return new DisposalResponseDTO();
-    }
-
-    @Override
-    protected void addFormAttributes(Model model) {
-        model.addAttribute("products", productService.readAll());
+    protected void addListAttributes(Model model) {
+        model.addAttribute("productsById", Lookups.byId(productService.readAll()));
     }
 }

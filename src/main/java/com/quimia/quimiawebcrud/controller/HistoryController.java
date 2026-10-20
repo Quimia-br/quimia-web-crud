@@ -1,9 +1,5 @@
 package com.quimia.quimiawebcrud.controller;
 
-import com.quimia.quimiawebcrud.dto.HistoryRequestDTO;
-import com.quimia.quimiawebcrud.dto.HistoryResponseDTO;
-import com.quimia.quimiawebcrud.model.History;
-import com.quimia.quimiawebcrud.service.CrudService;
 import com.quimia.quimiawebcrud.service.HistoryService;
 import com.quimia.quimiawebcrud.service.HistoryTypeService;
 import com.quimia.quimiawebcrud.service.ShelfService;
@@ -11,52 +7,28 @@ import com.quimia.quimiawebcrud.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * Consulta somente leitura do histórico de uso registrado pelos usuários no aplicativo.
+ */
 @Controller
 @RequestMapping("/histories")
 @RequiredArgsConstructor
-public class HistoryController extends GenericController<History, Integer, HistoryResponseDTO, HistoryRequestDTO> {
+public class HistoryController {
 
     private final HistoryService historyService;
     private final UserService userService;
     private final ShelfService shelfService;
     private final HistoryTypeService historyTypeService;
 
-    @Override
-    protected CrudService<History, Integer, HistoryRequestDTO, HistoryResponseDTO> getService() {
-        return historyService;
-    }
-
-    @Override
-    protected String getBasePath() {
-        return "/histories";
-    }
-
-    @Override
-    protected String getViewFolder() {
-        return "history";
-    }
-
-    @Override
-    protected String getSingularName() {
-        return "history";
-    }
-
-    @Override
-    protected String getPluralName() {
-        return "histories";
-    }
-
-    @Override
-    protected HistoryResponseDTO newResponse() {
-        return new HistoryResponseDTO();
-    }
-
-    @Override
-    protected void addFormAttributes(Model model) {
-        model.addAttribute("users", userService.readAll());
-        model.addAttribute("shelves", shelfService.readAll());
-        model.addAttribute("historyTypes", historyTypeService.readAll());
+    @GetMapping
+    public String list(Model model) {
+        model.addAttribute("histories", historyService.readAll());
+        model.addAttribute("usersById", Lookups.byId(userService.readAll()));
+        model.addAttribute("shelvesById", Lookups.byId(shelfService.readAll()));
+        model.addAttribute("historyTypesById", Lookups.byId(historyTypeService.readAll()));
+        return "history/list";
     }
 }

@@ -32,17 +32,7 @@ public class AdminController extends GenericController<Admin, Integer, AdminResp
     }
 
     @Override
-    protected String getSingularName() {
-        return "admin";
-    }
-
-    @Override
     protected String getPluralName() {
         return "admins";
-    }
-
-    @Override
-    protected AdminResponseDTO newResponse() {
-        return new AdminResponseDTO();
     }
 }

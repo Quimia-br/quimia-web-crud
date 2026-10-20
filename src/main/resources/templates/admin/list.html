@@ -63,6 +63,8 @@
             <h1>Administradores</h1>
         </header>
 
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
         <form class="toolbar" method="get">
             <div class="toolbar-search">
                 <label for="busca" class="sr-only">Buscar por nome ou e-mail</label>
@@ -102,34 +104,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Lucas Almeida</td>
-                        <td>lucas.almeida@quimia.com</td>
-                        <td><span class="badge badge-success">Ativo</span></td>
-                        <td>05/09/2026</td>
+                    <tr th:each="item : ${admins}">
+                        <td>[[${item.id}]]</td>
+                        <td>[[${item.userName}]]</td>
+                        <td>[[${item.email}]]</td>
+                        <td><span th:replace="~{fragments/badges :: status(${item.status})}"></span></td>
+                        <td>[[${item.signUpDate != null ? #temporals.format(item.signUpDate, 'dd/MM/yyyy') : ''}]]</td>
                         <td class = "col-actions">
-                            <a href="#" class = "btn-icon" aria-label="Ver Lucas Almeida"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver ${item.userName}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
                             
-                            <button type="button" class="btn-icon" aria-label="Editar Lucas Almeida" popovertarget="editar-admin-1"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Editar ${item.userName}|,popovertarget=|editar-admin-${item.id}|"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
 
-                            <button type="button" class="btn-icon" aria-label="Excluir Lucas Almeida" popovertarget="excluir-admin-1"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Excluir ${item.userName}|,popovertarget=|excluir-admin-${item.id}|"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
                         </td>
                     </tr>
-
-                    <tr>
-                        <td>2</td>
-                        <td>Mariana Castro</td>
-                        <td>mariana.castro@quimia.com</td>
-                        <td><span class="badge badge-success">Ativo</span></td>
-                        <td>05/09/2026</td>
-                        <td class = "col-actions">
-                            <a href="#" class = "btn-icon" aria-label="Ver Mariana Castro"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
-                            
-                            <button type="button" class="btn-icon" aria-label="Editar Mariana Castro" popovertarget="editar-admin-2"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
-
-                            <button type="button" class="btn-icon" aria-label="Excluir Mariana Castro" popovertarget="excluir-admin-2"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
-                        </td>
+                    <tr th:if="${#lists.isEmpty(admins)}">
+                        <td colspan="6">Nenhum registro encontrado.</td>
                     </tr>
                 </tbody>
             </table>
@@ -196,136 +186,71 @@
         </form>
     </dialog>
 
-    <!-- Editar e excluir: um par de popups para cada linha da tabela,
-         já com os dados daquela linha. O número no id (1, 2...) é o id
-         do registro e liga cada botão da tabela ao seu popup. -->
+    <!-- Editar e excluir: um par de popups para cada registro da lista. -->
 
-    <!-- Linha 1: Lucas Almeida -->
-    <dialog class="modal" id="editar-admin-1" popover aria-labelledby="editar-admin-1-titulo">
+    <th:block th:each="item : ${admins}">
+        <dialog class="modal" popover th:attr="id=|editar-admin-${item.id}|,aria-labelledby=|editar-admin-${item.id}-titulo|">
         <header class="modal-header">
             <div>
-                <h2 id="editar-admin-1-titulo">Editar administrador</h2>
-                <p>ID 1 · Cadastrado em 05/09/2026</p>
+                <h2 th:attr="id=|editar-admin-${item.id}-titulo|">Editar administrador</h2>
+                <p>ID [[${item.id}]] · Cadastrado em [[${item.signUpDate != null ? #temporals.format(item.signUpDate, 'dd/MM/yyyy') : ''}]]</p>
             </div>
-            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-admin-1" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|editar-admin-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
         </header>
 
         <form class="modal-form" method="post" action="#" th:action="@{/admins/save}">
-            <input type="hidden" name="id" value="1">
+            <input type="hidden" name="id" th:value="${item.id}">
 
             <div class="field">
-                <label for="editar-nome-1">Nome <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="editar-nome-1" name="userName" value="Lucas Almeida" maxlength="150" required autofocus>
+                <label th:attr="for=|editar-nome-${item.id}|">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" name="userName" maxlength="150" required autofocus th:value="${item.userName}" th:attr="id=|editar-nome-${item.id}|">
             </div>
 
             <div class="field">
-                <label for="editar-email-1">Email <span class="required" aria-hidden="true">*</span></label>
-                <input type="email" id="editar-email-1" name="email" value="lucas.almeida@quimia.com" maxlength="150" required>
+                <label th:attr="for=|editar-email-${item.id}|">Email <span class="required" aria-hidden="true">*</span></label>
+                <input type="email" name="email" maxlength="150" required th:value="${item.email}" th:attr="id=|editar-email-${item.id}|">
             </div>
 
             <div class="field">
-                <label for="editar-senha-1">Nova senha</label>
-                <input type="password" id="editar-senha-1" name="password" autocomplete="new-password" aria-describedby="editar-senha-1-dica">
-                <p class="field-hint" id="editar-senha-1-dica">Deixe em branco para manter a senha atual.</p>
+                <label th:attr="for=|editar-senha-${item.id}|">Nova senha</label>
+                <input type="password" name="password" autocomplete="new-password" th:attr="id=|editar-senha-${item.id}|,aria-describedby=|editar-senha-${item.id}-dica|">
+                <p class="field-hint" th:attr="id=|editar-senha-${item.id}-dica|">Deixe em branco para manter a senha atual.</p>
             </div>
 
             <div class="field">
-                <label for="editar-status-1">Status</label>
-                <select id="editar-status-1" name="status">
-                    <option value="ATIVO" selected>Ativo</option>
-                    <option value="INATIVO">Inativo</option>
-                    <option value="PENDENTE">Pendente</option>
-                    <option value="BLOQUEADO">Bloqueado</option>
-                    <option value="DESATIVADO">Desativado</option>
+                <label th:attr="for=|editar-status-${item.id}|">Status</label>
+                <select name="status" th:attr="id=|editar-status-${item.id}|">
+                    <option value="ATIVO" th:selected="${item.status?.name() == 'ATIVO'}">Ativo</option>
+                    <option value="INATIVO" th:selected="${item.status?.name() == 'INATIVO'}">Inativo</option>
+                    <option value="PENDENTE" th:selected="${item.status?.name() == 'PENDENTE'}">Pendente</option>
+                    <option value="BLOQUEADO" th:selected="${item.status?.name() == 'BLOQUEADO'}">Bloqueado</option>
+                    <option value="DESATIVADO" th:selected="${item.status?.name() == 'DESATIVADO'}">Desativado</option>
                 </select>
             </div>
 
             <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" popovertarget="editar-admin-1" popovertargetaction="hide">Cancelar</button>
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|editar-admin-${item.id}|">Cancelar</button>
                 <button type="submit" class="btn btn-primary">Salvar</button>
             </footer>
         </form>
     </dialog>
 
-    <dialog class="modal modal-confirm" id="excluir-admin-1" popover aria-labelledby="excluir-admin-1-titulo">
-        <form class="modal-form" method="post" action="#" th:action="@{/admins/1/delete}">
+    <dialog class="modal modal-confirm" popover th:attr="id=|excluir-admin-${item.id}|,aria-labelledby=|excluir-admin-${item.id}-titulo|">
+        <form class="modal-form" method="post" action="#" th:action="@{/admins/{id}/delete(id=${item.id})}">
             <div class="confirm">
                 <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
                 <div>
-                    <h2 id="excluir-admin-1-titulo">Excluir administrador?</h2>
-                    <p>Tem certeza de que deseja excluir <strong>“Lucas Almeida”</strong>? Essa ação não poderá ser desfeita.</p>
+                    <h2 th:attr="id=|excluir-admin-${item.id}-titulo|">Excluir administrador?</h2>
+                    <p>Tem certeza de que deseja excluir <strong>“[[${item.userName}]]”</strong>? Essa ação não poderá ser desfeita.</p>
                 </div>
             </div>
 
             <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" popovertarget="excluir-admin-1" popovertargetaction="hide" autofocus>Cancelar</button>
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" autofocus th:attr="popovertarget=|excluir-admin-${item.id}|">Cancelar</button>
                 <button type="submit" class="btn btn-danger">Excluir</button>
             </footer>
         </form>
     </dialog>
-
-    <!-- Linha 2: Mariana Castro -->
-    <dialog class="modal" id="editar-admin-2" popover aria-labelledby="editar-admin-2-titulo">
-        <header class="modal-header">
-            <div>
-                <h2 id="editar-admin-2-titulo">Editar administrador</h2>
-                <p>ID 2 · Cadastrado em 05/09/2026</p>
-            </div>
-            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-admin-2" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
-        </header>
-
-        <form class="modal-form" method="post" action="#" th:action="@{/admins/save}">
-            <input type="hidden" name="id" value="2">
-
-            <div class="field">
-                <label for="editar-nome-2">Nome <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="editar-nome-2" name="userName" value="Mariana Castro" maxlength="150" required autofocus>
-            </div>
-
-            <div class="field">
-                <label for="editar-email-2">Email <span class="required" aria-hidden="true">*</span></label>
-                <input type="email" id="editar-email-2" name="email" value="mariana.castro@quimia.com" maxlength="150" required>
-            </div>
-
-            <div class="field">
-                <label for="editar-senha-2">Nova senha</label>
-                <input type="password" id="editar-senha-2" name="password" autocomplete="new-password" aria-describedby="editar-senha-2-dica">
-                <p class="field-hint" id="editar-senha-2-dica">Deixe em branco para manter a senha atual.</p>
-            </div>
-
-            <div class="field">
-                <label for="editar-status-2">Status</label>
-                <select id="editar-status-2" name="status">
-                    <option value="ATIVO" selected>Ativo</option>
-                    <option value="INATIVO">Inativo</option>
-                    <option value="PENDENTE">Pendente</option>
-                    <option value="BLOQUEADO">Bloqueado</option>
-                    <option value="DESATIVADO">Desativado</option>
-                </select>
-            </div>
-
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" popovertarget="editar-admin-2" popovertargetaction="hide">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Salvar</button>
-            </footer>
-        </form>
-    </dialog>
-
-    <dialog class="modal modal-confirm" id="excluir-admin-2" popover aria-labelledby="excluir-admin-2-titulo">
-        <form class="modal-form" method="post" action="#" th:action="@{/admins/2/delete}">
-            <div class="confirm">
-                <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
-                <div>
-                    <h2 id="excluir-admin-2-titulo">Excluir administrador?</h2>
-                    <p>Tem certeza de que deseja excluir <strong>“Mariana Castro”</strong>? Essa ação não poderá ser desfeita.</p>
-                </div>
-            </div>
-
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" popovertarget="excluir-admin-2" popovertargetaction="hide" autofocus>Cancelar</button>
-                <button type="submit" class="btn btn-danger">Excluir</button>
-            </footer>
-        </form>
-    </dialog>
+    </th:block>
 </body>
 </html>

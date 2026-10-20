@@ -54,6 +54,8 @@
             <h1>Localização</h1>
         </header>
 
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
         <form class="toolbar" method="get">
             <div class="toolbar-search">
                 <label for="cep" class="sr-only">Buscar por CEP</label>
@@ -91,26 +93,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Lucas Almeida</td>
-                        <td class="cell-nowrap">01310-100</td>
-                        <td>-23.561414</td>
-                        <td>-46.655881</td>
+                    <tr th:each="item : ${locations}">
+                        <td>[[${item.id}]]</td>
+                        <td>[[${usersById[item.userId]?.userName}]]</td>
+                        <td class="cell-nowrap">[[${item.zipCode}]]</td>
+                        <td>[[${item.latitude}]]</td>
+                        <td>[[${item.longitude}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver localização de Lucas Almeida"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver localização de ${usersById[item.userId]?.userName}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
                         </td>
                     </tr>
-
-                    <tr>
-                        <td>2</td>
-                        <td>Mariana Castro</td>
-                        <td class="cell-nowrap">20040-020</td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver localização de Mariana Castro"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
-                        </td>
+                    <tr th:if="${#lists.isEmpty(locations)}">
+                        <td colspan="6">Nenhum registro encontrado.</td>
                     </tr>
                 </tbody>
             </table>

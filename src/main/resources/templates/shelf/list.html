@@ -54,6 +54,8 @@
             <h1>Estante</h1>
         </header>
 
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
         <form class="toolbar" method="get">
             <div class="toolbar-search">
                 <label for="busca" class="sr-only">Buscar por cômodo</label>
@@ -89,22 +91,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Cozinha</td>
-                        <td>Lucas Almeida</td>
+                    <tr th:each="item : ${shelves}">
+                        <td>[[${item.id}]]</td>
+                        <td>[[${item.room}]]</td>
+                        <td>[[${usersById[item.userId]?.userName}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver estante Cozinha de Lucas Almeida"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver estante ${item.room} de ${usersById[item.userId]?.userName}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
                         </td>
                     </tr>
-
-                    <tr>
-                        <td>2</td>
-                        <td>Lavanderia</td>
-                        <td>Mariana Castro</td>
-                        <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver estante Lavanderia de Mariana Castro"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
-                        </td>
+                    <tr th:if="${#lists.isEmpty(shelves)}">
+                        <td colspan="4">Nenhum registro encontrado.</td>
                     </tr>
                 </tbody>
             </table>

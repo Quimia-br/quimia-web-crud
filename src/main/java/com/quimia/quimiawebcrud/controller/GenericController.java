@@ -1,7 +1,6 @@
 package com.quimia.quimiawebcrud.controller;
 
 import com.quimia.quimiawebcrud.service.CrudService;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -10,7 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@Controller
+/**
+ * Rotas comuns das telas de cadastro: a lista traz também os formulários (popups) de criar, editar e excluir.
+ */
 public abstract class GenericController<T, ID, Res, Req> {
 
     protected abstract CrudService<T, ID, Req, Res> getService();
@@ -19,38 +20,19 @@ public abstract class GenericController<T, ID, Res, Req> {
 
     protected abstract String getViewFolder();
 
-    protected abstract String getSingularName();
-
     protected abstract String getPluralName();
 
-    protected abstract Res newResponse();
-
-    protected void addFormAttributes(Model model) {
+    /**
+     * Dados extras que a lista precisa (ex.: nomes das empresas para os produtos).
+     */
+    protected void addListAttributes(Model model) {
     }
 
     @GetMapping
     public String list(Model model) {
         model.addAttribute(getPluralName(), getService().readAll());
+        addListAttributes(model);
         return getViewFolder() + "/list";
-    }
-
-    @GetMapping("/new")
-    public String createForm(Model model) {
-        model.addAttribute(getSingularName(), newResponse());
-        addFormAttributes(model);
-        return getViewFolder() + "/form";
-    }
-
-    @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable("id") ID id, Model model, RedirectAttributes redirect) {
-        try {
-            model.addAttribute(getSingularName(), getService().findById(id));
-        } catch (RuntimeException e) {
-            redirect.addFlashAttribute("error", e.getMessage());
-            return redirectToList();
-        }
-        addFormAttributes(model);
-        return getViewFolder() + "/form";
     }
 
     @PostMapping("/save")
@@ -67,7 +49,6 @@ public abstract class GenericController<T, ID, Res, Req> {
             }
         } catch (RuntimeException e) {
             redirect.addFlashAttribute("error", e.getMessage());
-            return "redirect:" + getBasePath() + (id == null ? "/new" : "/" + id + "/edit");
         }
         return redirectToList();
     }
