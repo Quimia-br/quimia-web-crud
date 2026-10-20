@@ -2,6 +2,8 @@ package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.dto.UserProductRequestDTO;
 import com.quimia.quimiawebcrud.dto.UserProductResponseDTO;
+import com.quimia.quimiawebcrud.exception.DuplicateResourceException;
+import com.quimia.quimiawebcrud.exception.ResourceNotFoundException;
 import com.quimia.quimiawebcrud.mapper.UserProductMapper;
 import com.quimia.quimiawebcrud.model.UserProduct;
 import com.quimia.quimiawebcrud.model.id.UserProductId;
@@ -32,15 +34,15 @@ public class UserProductService extends CrudService<UserProduct, UserProductId, 
     public UserProductResponseDTO create(UserProductRequestDTO request) {
         UserProductId id = new UserProductId(request.getUserId(), request.getProductId());
         if (repository.existsById(id)) {
-            throw new IllegalStateException("O usuario " + id.getUserId()
-                    + " ja possui o produto " + id.getProductId() + ".");
+            throw new DuplicateResourceException("O usuário " + id.getUserId()
+                    + " já possui o produto " + id.getProductId() + ".");
         }
         return super.create(request);
     }
 
     @Override
-    protected RuntimeException notFound(UserProductId id) {
-        return new RuntimeException("Registro nao encontrado (usuario "
+    protected ResourceNotFoundException notFound(UserProductId id) {
+        return new ResourceNotFoundException("Registro não encontrado (usuário "
                 + id.getUserId() + ", produto " + id.getProductId() + ")");
     }
 

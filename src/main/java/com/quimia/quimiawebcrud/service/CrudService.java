@@ -1,5 +1,6 @@
 package com.quimia.quimiawebcrud.service;
 
+import com.quimia.quimiawebcrud.exception.ResourceNotFoundException;
 import com.quimia.quimiawebcrud.mapper.Mapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +50,7 @@ public abstract class CrudService<E, ID, Req, Res> {
                 .orElseThrow(() -> notFound(id));
     }
 
-    protected RuntimeException notFound(ID id) {
-        return new RuntimeException("Registro não encontrado com o ID: " + id);
+    protected ResourceNotFoundException notFound(ID id) {
+        return new ResourceNotFoundException("Registro não encontrado com o ID: " + id);
     }
 }

@@ -2,6 +2,7 @@ package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.dto.UserRequestDTO;
 import com.quimia.quimiawebcrud.dto.UserResponseDTO;
+import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.UserMapper;
 import com.quimia.quimiawebcrud.model.User;
 import com.quimia.quimiawebcrud.repository.UserRepository;
@@ -31,7 +32,7 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
     @Transactional
     public UserResponseDTO create(UserRequestDTO request) {
         if (!hasText(request.getPassword())) {
-            throw new IllegalArgumentException("A senha e obrigatoria.");
+            throw new InvalidDataException("A senha é obrigatória.");
         }
         User entity = mapper.toEntity(request);
         entity.setPasswordHash(hashPassword(request.getPassword()));

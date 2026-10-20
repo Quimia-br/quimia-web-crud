@@ -2,6 +2,7 @@ package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.dto.CompanyRequestDTO;
 import com.quimia.quimiawebcrud.dto.CompanyResponseDTO;
+import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.CompanyMapper;
 import com.quimia.quimiawebcrud.model.Company;
 import com.quimia.quimiawebcrud.repository.CompanyRepository;
@@ -31,7 +32,7 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
     @Transactional
     public CompanyResponseDTO create(CompanyRequestDTO request) {
         if (!hasText(request.getPassword())) {
-            throw new IllegalArgumentException("A senha e obrigatoria.");
+            throw new InvalidDataException("A senha é obrigatória.");
         }
         Company entity = mapper.toEntity(request);
         entity.setPasswordHash(hashPassword(request.getPassword()));
