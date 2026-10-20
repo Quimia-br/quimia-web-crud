@@ -2,6 +2,7 @@ package com.quimia.quimiawebcrud.dto;
 
 import com.quimia.quimiawebcrud.model.enums.Status;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -18,4 +19,5 @@ public class UserRequestDTO {
     private String password;
     private Status status;
     private String photoUrl;
+    private MultipartFile photo;
 }

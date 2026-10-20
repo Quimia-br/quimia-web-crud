@@ -18,6 +18,7 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
     private final CompanyRepository repository;
     private final CompanyMapper mapper;
     private final PasswordHasher passwordHasher;
+    private final PhotoStorageService photoStorage;
 
     @Override
     protected CompanyRepository getRepository() {
@@ -37,6 +38,7 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
         }
         Company entity = mapper.toEntity(request);
         entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
+        entity.setPhotoUrl(photoStorage.replace(request.getPhoto(), null));
         return mapper.toResponse(repository.save(entity));
     }
 
@@ -44,11 +46,21 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
     @Transactional
     public CompanyResponseDTO update(Integer id, CompanyRequestDTO request) {
         Company entity = getEntity(id);
+        String currentPhoto = entity.getPhotoUrl();
         mapper.updateEntity(entity, request);
+        entity.setPhotoUrl(photoStorage.replace(request.getPhoto(), currentPhoto));
         if (hasText(request.getPassword())) {
             entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
         }
         return mapper.toResponse(entity);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Integer id) {
+        String photoUrl = getEntity(id).getPhotoUrl();
+        super.delete(id);
+        photoStorage.release(photoUrl);
     }
 
     private boolean hasText(String value) {

@@ -1,0 +1,9 @@
+/* Pré-visualização da foto atual nos popups de usuário e empresa */
+.field-photo {
+    display: block;
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 8px;
+}

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Paginação das listas. Parâmetros: página atual (PageResult), caminho da tela e filtros ativos ("&campo=valor"). -->
+    <nav th:fragment="pagination(page, basePath, query)" class="pagination" aria-label="Paginação" th:if="${page.totalPages > 1}">
+        <a th:if="${page.hasPrevious()}" th:href="@{${basePath + '?page=' + (page.number - 1) + query}}" aria-label="Página anterior"><img th:src="@{/icons/chevron-left.svg}" alt=""></a>
+
+        <a th:each="n : ${page.window}" th:href="@{${basePath + '?page=' + n + query}}" th:text="${n}" th:attr="aria-current=${n == page.number} ? 'page' : null">1</a>
+
+        <a th:if="${page.hasNext()}" th:href="@{${basePath + '?page=' + (page.number + 1) + query}}" aria-label="Próxima página"><img th:src="@{/icons/chevron-right.svg}" alt=""></a>
+    </nav>
+</body>
+</html>
