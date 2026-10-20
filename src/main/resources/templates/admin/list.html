@@ -52,7 +52,9 @@
             </ul>
         </nav>
 
-        <a href="#" class = "nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</a>
+        <form class="sidebar-logout-form" method="post" action="#" th:action="@{/logout}">
+            <button type="submit" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</button>
+        </form>
 
     </aside>
 
