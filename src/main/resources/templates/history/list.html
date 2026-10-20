@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de usuários | Quimia</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
+
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <aside class="sidebar">
+        <a href="../admin/list.html" th:href="@{/admins}" class="sidebar-logo">
+            <img src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+        </a>
+
+        <div class="sidebar-search">
+            <label for="busca-menu" class="sr-only">Pesquisar no menu</label>
+            <input type="search" id="busca-menu" placeholder="Pesquisar...">
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Menu principal">
+            <ul>
+                <li><a href="../admin/list.html" th:href="@{/admins}" class="nav-link"><img src="../../static/icons/admin.svg" th:src="@{/icons/admin.svg}" alt="">Administradores</a></li>
+                <li><a href="../company/list.html" th:href="@{/companies}" class="nav-link"><img src="../../static/icons/company.svg" th:src="@{/icons/company.svg}" alt="">Empresas</a></li>
+                <li><a href="../user/list.html" th:href="@{/users}" class="nav-link"><img src="../../static/icons/user.svg" th:src="@{/icons/user.svg}" alt="">Usuários</a></li>
+                <li><a href="../product/list.html" th:href="@{/products}" class="nav-link"><img src="../../static/icons/product.svg" th:src="@{/icons/product.svg}" alt="">Produtos</a></li>
+                <li><a href="../disposal/list.html" th:href="@{/disposals}" class="nav-link"><img src="../../static/icons/disposal.svg" th:src="@{/icons/disposal.svg}" alt="">Descarte</a></li>
+                <li><a href="../location/list.html" th:href="@{/locations}" class="nav-link"><img src="../../static/icons/location.svg" th:src="@{/icons/location.svg}" alt="">Localização</a></li>
+                <li><a href="../shelf/list.html" th:href="@{/shelves}" class="nav-link"><img src="../../static/icons/shelf.svg" th:src="@{/icons/shelf.svg}" alt="">Estante</a></li>
+                <li><a href="../history-type/list.html" th:href="@{/history-types}" class="nav-link"><img src="../../static/icons/history-type.svg" th:src="@{/icons/history-type.svg}" alt="">Tipo histórico</a></li>
+
+                <li>
+                    <details class="nav-group" open>
+                        <summary class="nav-link"><img src="../../static/icons/report.svg" th:src="@{/icons/report.svg}" alt="">Relatórios</summary>
+                        <ul>
+                            <li><a href="../history/list.html" th:href="@{/histories}" class="nav-link" aria-current="page">Usuários</a></li>
+                            <li><a href="../admin-log/list.html" th:href="@{/admin-logs}" class="nav-link">Administradores</a></li>
+                        </ul>
+                    </details>
+                </li>
+            </ul>
+        </nav>
+
+        <a href="#" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</a>
+    </aside>
+
+    <main class="content">
+        <header class="page-header">
+            <h1>Relatório de usuários</h1>
+        </header>
+
+        <form class="toolbar" method="get">
+            <div class="toolbar-search">
+                <label for="busca" class="sr-only">Buscar por usuário</label>
+                <input type="search" id="busca" name="busca" placeholder="Buscar por usuário...">
+            </div>
+            <div class="toolbar-filter">
+                <label for="tipo">Tipo</label>
+                <select id="tipo" name="tipo">
+                    <option value="">Todos</option>
+                    <option value="1">Limpeza de ambiente</option>
+                    <option value="2">Descarte de embalagem</option>
+                </select>
+            </div>
+            <div class="toolbar-filter">
+                <label for="execucaode">Execução de</label>
+                <input type="date" id="execucaode" name="execucaoDe">
+                <label for="execucaoate">até</label>
+                <input type="date" id="execucaoate" name="execucaoAte">
+            </div>
+            <button type="submit" class="btn btn-secondary">Filtrar</button>
+        </form>
+
+        <section class="card" aria-label="Histórico de ações dos usuários">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Usuário</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Estante</th>
+                        <th scope="col">Execução</th>
+                        <th scope="col">Resultado</th>
+                        <th scope="col" class="col-actions">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Lucas Almeida</td>
+                        <td>Limpeza de ambiente</td>
+                        <td>Cozinha</td>
+                        <td class="cell-nowrap">06/10/2026 14:32</td>
+                        <td class="cell-truncate">Limpeza concluída sem ocorrências.</td>
+                        <td class="col-actions">
+                            <a href="#" class="btn-icon" aria-label="Ver registro 1"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>Mariana Castro</td>
+                        <td>Descarte de embalagem</td>
+                        <td>—</td>
+                        <td class="cell-nowrap">07/10/2026 09:15</td>
+                        <td class="cell-truncate">Embalagem enviada para coleta seletiva.</td>
+                        <td class="col-actions">
+                            <a href="#" class="btn-icon" aria-label="Ver registro 2"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <nav class="pagination" aria-label="Paginação">
+            <a href="#" aria-label="Página anterior"><img src="../../static/icons/chevron-left.svg" th:src="@{/icons/chevron-left.svg}" alt=""></a>
+
+            <a href="#" aria-current="page">1</a>
+
+            <a href="#">2</a>
+
+            <a href="#" aria-label="Próxima página"><img src="../../static/icons/chevron-right.svg" th:src="@{/icons/chevron-right.svg}" alt=""></a>
+        </nav>
+    </main>
+</body>
+</html>

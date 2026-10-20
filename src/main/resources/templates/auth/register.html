@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="auth" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar conta | Quimia</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap">
+
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/auth.css" th:href="@{/css/auth.css}">
+</head>
+
+<body>
+    <header class="auth-brand">
+        <img class="auth-logo" src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+        <p class="auth-welcome">Comece agora!</p>
+    </header>
+
+    <main class="auth-card">
+        <h1>Criar conta</h1>
+
+        <form class="auth-form" method="post" action="#" th:action="@{/register}">
+            <label class="auth-field">
+                <img src="../../static/icons/field-user.svg" th:src="@{/icons/field-user.svg}" alt="">
+                <span class="sr-only">Nome</span>
+                <input type="text" name="userName" placeholder="Nome" autocomplete="name" maxlength="150" required autofocus>
+            </label>
+
+            <label class="auth-field">
+                <img src="../../static/icons/field-mail.svg" th:src="@{/icons/field-mail.svg}" alt="">
+                <span class="sr-only">Email</span>
+                <input type="email" name="email" placeholder="Email" autocomplete="email" maxlength="150" required>
+            </label>
+
+            <label class="auth-field">
+                <img src="../../static/icons/field-password.svg" th:src="@{/icons/field-password.svg}" alt="">
+                <span class="sr-only">Senha</span>
+                <input type="password" name="password" placeholder="Senha" autocomplete="new-password" required>
+            </label>
+
+            <label class="auth-field">
+                <img src="../../static/icons/field-check.svg" th:src="@{/icons/field-check.svg}" alt="">
+                <span class="sr-only">Confirmar senha</span>
+                <input type="password" name="confirmPassword" placeholder="Confirmar senha" autocomplete="new-password" required>
+            </label>
+
+            <button type="submit" class="btn btn-primary auth-submit">Cadastre-se</button>
+        </form>
+
+        <p class="auth-switch">Já tem conta? <a href="login.html" th:href="@{/login}">Entrar</a></p>
+    </main>
+</body>
+</html>

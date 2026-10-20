@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos | Quimia</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
+
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <aside class="sidebar">
+        <a href="../admin/list.html" th:href="@{/admins}" class="sidebar-logo">
+            <img src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+        </a>
+
+        <div class="sidebar-search">
+            <label for="busca-menu" class="sr-only">Pesquisar no menu</label>
+            <input type="search" id="busca-menu" placeholder="Pesquisar...">
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Menu principal">
+            <ul>
+                <li><a href="../admin/list.html" th:href="@{/admins}" class="nav-link"><img src="../../static/icons/admin.svg" th:src="@{/icons/admin.svg}" alt="">Administradores</a></li>
+                <li><a href="../company/list.html" th:href="@{/companies}" class="nav-link"><img src="../../static/icons/company.svg" th:src="@{/icons/company.svg}" alt="">Empresas</a></li>
+                <li><a href="../user/list.html" th:href="@{/users}" class="nav-link"><img src="../../static/icons/user.svg" th:src="@{/icons/user.svg}" alt="">Usuários</a></li>
+                <li><a href="../product/list.html" th:href="@{/products}" class="nav-link" aria-current="page"><img src="../../static/icons/product.svg" th:src="@{/icons/product.svg}" alt="">Produtos</a></li>
+                <li><a href="../disposal/list.html" th:href="@{/disposals}" class="nav-link"><img src="../../static/icons/disposal.svg" th:src="@{/icons/disposal.svg}" alt="">Descarte</a></li>
+                <li><a href="../location/list.html" th:href="@{/locations}" class="nav-link"><img src="../../static/icons/location.svg" th:src="@{/icons/location.svg}" alt="">Localização</a></li>
+                <li><a href="../shelf/list.html" th:href="@{/shelves}" class="nav-link"><img src="../../static/icons/shelf.svg" th:src="@{/icons/shelf.svg}" alt="">Estante</a></li>
+                <li><a href="../history-type/list.html" th:href="@{/history-types}" class="nav-link"><img src="../../static/icons/history-type.svg" th:src="@{/icons/history-type.svg}" alt="">Tipo histórico</a></li>
+
+                <li>
+                    <details class="nav-group">
+                        <summary class="nav-link"><img src="../../static/icons/report.svg" th:src="@{/icons/report.svg}" alt="">Relatórios</summary>
+                        <ul>
+                            <li><a href="../history/list.html" th:href="@{/histories}" class="nav-link">Usuários</a></li>
+                            <li><a href="../admin-log/list.html" th:href="@{/admin-logs}" class="nav-link">Administradores</a></li>
+                        </ul>
+                    </details>
+                </li>
+            </ul>
+        </nav>
+
+        <a href="#" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</a>
+    </aside>
+
+    <main class="content">
+        <header class="page-header">
+            <h1>Produtos</h1>
+        </header>
+
+        <form class="toolbar" method="get">
+            <div class="toolbar-search">
+                <label for="busca" class="sr-only">Buscar por nome ou número CAS</label>
+                <input type="search" id="busca" name="busca" placeholder="Buscar por nome ou número CAS...">
+            </div>
+            <div class="toolbar-filter">
+                <label for="empresa">Empresa</label>
+                <select id="empresa" name="empresa">
+                    <option value="">Todas</option>
+                    <option value="1">Limpa Bem Química Ltda</option>
+                    <option value="2">Brilho Total Indústria</option>
+                </select>
+            </div>
+            <div class="toolbar-filter">
+                <label for="marca">Marca</label>
+                <input type="text" id="marca" name="marca" placeholder="Qualquer marca">
+            </div>
+            <button type="submit" class="btn btn-secondary">Filtrar</button>
+            <button type="button" class="btn btn-primary" popovertarget="novo-product">Novo produto</button>
+        </form>
+
+        <section class="card" aria-label="Lista de produtos">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Nº CAS</th>
+                        <th scope="col">Marca</th>
+                        <th scope="col">Empresa</th>
+                        <th scope="col" class="col-actions">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Hipoclorito de sódio 2,5%</td>
+                        <td class="cell-nowrap">7681-52-9</td>
+                        <td>Limpa Bem</td>
+                        <td>Limpa Bem Química Ltda</td>
+                        <td class="col-actions">
+                            <a href="#" class="btn-icon" aria-label="Ver Hipoclorito de sódio 2,5%"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+
+                            <button type="button" class="btn-icon" aria-label="Editar Hipoclorito de sódio 2,5%" popovertarget="editar-product-1"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
+
+                            <button type="button" class="btn-icon" aria-label="Excluir Hipoclorito de sódio 2,5%" popovertarget="excluir-product-1"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>Ácido clorídrico 10%</td>
+                        <td class="cell-nowrap">7647-01-0</td>
+                        <td>Brilho Total</td>
+                        <td>Brilho Total Indústria</td>
+                        <td class="col-actions">
+                            <a href="#" class="btn-icon" aria-label="Ver Ácido clorídrico 10%"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+
+                            <button type="button" class="btn-icon" aria-label="Editar Ácido clorídrico 10%" popovertarget="editar-product-2"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
+
+                            <button type="button" class="btn-icon" aria-label="Excluir Ácido clorídrico 10%" popovertarget="excluir-product-2"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <nav class="pagination" aria-label="Paginação">
+            <a href="#" aria-label="Página anterior"><img src="../../static/icons/chevron-left.svg" th:src="@{/icons/chevron-left.svg}" alt=""></a>
+
+            <a href="#" aria-current="page">1</a>
+
+            <a href="#">2</a>
+
+            <a href="#" aria-label="Próxima página"><img src="../../static/icons/chevron-right.svg" th:src="@{/icons/chevron-right.svg}" alt=""></a>
+        </nav>
+    </main>
+
+    <!-- ========== POPUPS ========== -->
+    <!-- Sem JavaScript: um botão com popovertarget="x" abre o elemento
+         que tem id="x" e o atributo popover. -->
+
+    <!-- Novo produto -->
+    <dialog class="modal" id="novo-product" popover aria-labelledby="novo-product-titulo">
+        <header class="modal-header">
+            <div>
+                <h2 id="novo-product-titulo">Novo produto</h2>
+                <p>Preencha os dados do produto. Campos com * são obrigatórios.</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="novo-product" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{/products/save}">
+            <div class="field">
+                <label for="novo-nome">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="novo-nome" name="name" placeholder="Nome do produto" maxlength="150" required autofocus>
+            </div>
+
+            <div class="field">
+                <label for="novo-cas">Nº CAS <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="novo-cas" name="casNumber" placeholder="0000000-00-0" maxlength="12" required>
+            </div>
+
+            <div class="field">
+                <label for="novo-marca">Marca <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="novo-marca" name="brand" placeholder="Marca" maxlength="150" required>
+            </div>
+
+            <div class="field">
+                <label for="novo-empresa">Empresa <span class="required" aria-hidden="true">*</span></label>
+                <select id="novo-empresa" name="companyId" required>
+                    <option value="">Selecione...</option>
+                    <option value="1">Limpa Bem Química Ltda</option>
+                    <option value="2">Brilho Total Indústria</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="novo-instrucoes">Instruções de uso <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="novo-instrucoes" name="instructions" required>
+            </div>
+
+            <div class="field">
+                <label for="novo-dosagem">Dosagem técnica <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="novo-dosagem" name="dosage" required>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="novo-product" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <!-- Editar e excluir: um par de popups para cada linha da tabela,
+         já com os dados daquela linha. O número no id (1, 2...) é o id
+         do registro e liga cada botão da tabela ao seu popup. -->
+
+    <!-- Linha 1: Hipoclorito de sódio 2,5% -->
+    <dialog class="modal" id="editar-product-1" popover aria-labelledby="editar-product-1-titulo">
+        <header class="modal-header">
+            <div>
+                <h2 id="editar-product-1-titulo">Editar produto</h2>
+                <p>ID 1</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-product-1" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{/products/save}">
+            <input type="hidden" name="id" value="1">
+
+            <div class="field">
+                <label for="editar-nome-1">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-nome-1" name="name" value="Hipoclorito de sódio 2,5%" maxlength="150" required autofocus>
+            </div>
+
+            <div class="field">
+                <label for="editar-cas-1">Nº CAS <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-cas-1" name="casNumber" value="7681-52-9" maxlength="12" required>
+            </div>
+
+            <div class="field">
+                <label for="editar-marca-1">Marca <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-marca-1" name="brand" value="Limpa Bem" maxlength="150" required>
+            </div>
+
+            <div class="field">
+                <label for="editar-empresa-1">Empresa <span class="required" aria-hidden="true">*</span></label>
+                <select id="editar-empresa-1" name="companyId" required>
+                    <option value="1" selected>Limpa Bem Química Ltda</option>
+                    <option value="2">Brilho Total Indústria</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="editar-instrucoes-1">Instruções de uso <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-instrucoes-1" name="instructions" required>
+            </div>
+
+            <div class="field">
+                <label for="editar-dosagem-1">Dosagem técnica <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-dosagem-1" name="dosage" required>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="editar-product-1" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog class="modal modal-confirm" id="excluir-product-1" popover aria-labelledby="excluir-product-1-titulo">
+        <form class="modal-form" method="post" action="#" th:action="@{/products/1/delete}">
+            <div class="confirm">
+                <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
+                <div>
+                    <h2 id="excluir-product-1-titulo">Excluir produto?</h2>
+                    <p>Tem certeza de que deseja excluir <strong>“Hipoclorito de sódio 2,5%”</strong>? Essa ação não poderá ser desfeita.</p>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="excluir-product-1" popovertargetaction="hide" autofocus>Cancelar</button>
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <!-- Linha 2: Ácido clorídrico 10% -->
+    <dialog class="modal" id="editar-product-2" popover aria-labelledby="editar-product-2-titulo">
+        <header class="modal-header">
+            <div>
+                <h2 id="editar-product-2-titulo">Editar produto</h2>
+                <p>ID 2</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-product-2" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{/products/save}">
+            <input type="hidden" name="id" value="2">
+
+            <div class="field">
+                <label for="editar-nome-2">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-nome-2" name="name" value="Ácido clorídrico 10%" maxlength="150" required autofocus>
+            </div>
+
+            <div class="field">
+                <label for="editar-cas-2">Nº CAS <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-cas-2" name="casNumber" value="7647-01-0" maxlength="12" required>
+            </div>
+
+            <div class="field">
+                <label for="editar-marca-2">Marca <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-marca-2" name="brand" value="Brilho Total" maxlength="150" required>
+            </div>
+
+            <div class="field">
+                <label for="editar-empresa-2">Empresa <span class="required" aria-hidden="true">*</span></label>
+                <select id="editar-empresa-2" name="companyId" required>
+                    <option value="1">Limpa Bem Química Ltda</option>
+                    <option value="2" selected>Brilho Total Indústria</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="editar-instrucoes-2">Instruções de uso <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-instrucoes-2" name="instructions" required>
+            </div>
+
+            <div class="field">
+                <label for="editar-dosagem-2">Dosagem técnica <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-dosagem-2" name="dosage" required>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="editar-product-2" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog class="modal modal-confirm" id="excluir-product-2" popover aria-labelledby="excluir-product-2-titulo">
+        <form class="modal-form" method="post" action="#" th:action="@{/products/2/delete}">
+            <div class="confirm">
+                <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
+                <div>
+                    <h2 id="excluir-product-2-titulo">Excluir produto?</h2>
+                    <p>Tem certeza de que deseja excluir <strong>“Ácido clorídrico 10%”</strong>? Essa ação não poderá ser desfeita.</p>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="excluir-product-2" popovertargetaction="hide" autofocus>Cancelar</button>
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </footer>
+        </form>
+    </dialog>
+</body>
+</html>

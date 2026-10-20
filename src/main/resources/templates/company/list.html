@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empresas | Quimia</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
+
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <aside class="sidebar">
+        <a href="../admin/list.html" th:href="@{/admins}" class="sidebar-logo">
+            <img src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+        </a>
+
+        <div class="sidebar-search">
+            <label for="busca-menu" class="sr-only">Pesquisar no menu</label>
+            <input type="search" id="busca-menu" placeholder="Pesquisar...">
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Menu principal">
+            <ul>
+                <li><a href="../admin/list.html" th:href="@{/admins}" class="nav-link"><img src="../../static/icons/admin.svg" th:src="@{/icons/admin.svg}" alt="">Administradores</a></li>
+                <li><a href="../company/list.html" th:href="@{/companies}" class="nav-link" aria-current="page"><img src="../../static/icons/company.svg" th:src="@{/icons/company.svg}" alt="">Empresas</a></li>
+                <li><a href="../user/list.html" th:href="@{/users}" class="nav-link"><img src="../../static/icons/user.svg" th:src="@{/icons/user.svg}" alt="">Usuários</a></li>
+                <li><a href="../product/list.html" th:href="@{/products}" class="nav-link"><img src="../../static/icons/product.svg" th:src="@{/icons/product.svg}" alt="">Produtos</a></li>
+                <li><a href="../disposal/list.html" th:href="@{/disposals}" class="nav-link"><img src="../../static/icons/disposal.svg" th:src="@{/icons/disposal.svg}" alt="">Descarte</a></li>
+                <li><a href="../location/list.html" th:href="@{/locations}" class="nav-link"><img src="../../static/icons/location.svg" th:src="@{/icons/location.svg}" alt="">Localização</a></li>
+                <li><a href="../shelf/list.html" th:href="@{/shelves}" class="nav-link"><img src="../../static/icons/shelf.svg" th:src="@{/icons/shelf.svg}" alt="">Estante</a></li>
+                <li><a href="../history-type/list.html" th:href="@{/history-types}" class="nav-link"><img src="../../static/icons/history-type.svg" th:src="@{/icons/history-type.svg}" alt="">Tipo histórico</a></li>
+
+                <li>
+                    <details class="nav-group">
+                        <summary class="nav-link"><img src="../../static/icons/report.svg" th:src="@{/icons/report.svg}" alt="">Relatórios</summary>
+                        <ul>
+                            <li><a href="../history/list.html" th:href="@{/histories}" class="nav-link">Usuários</a></li>
+                            <li><a href="../admin-log/list.html" th:href="@{/admin-logs}" class="nav-link">Administradores</a></li>
+                        </ul>
+                    </details>
+                </li>
+            </ul>
+        </nav>
+
+        <a href="#" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</a>
+    </aside>
+
+    <main class="content">
+        <header class="page-header">
+            <h1>Empresas</h1>
+        </header>
+
+        <form class="toolbar" method="get">
+            <div class="toolbar-search">
+                <label for="busca" class="sr-only">Buscar por nome, CNPJ ou e-mail</label>
+                <input type="search" id="busca" name="busca" placeholder="Buscar por nome, CNPJ ou e-mail...">
+            </div>
+            <div class="toolbar-filter">
+                <label for="porte">Porte</label>
+                <select id="porte" name="porte">
+                    <option value="">Todos</option>
+                    <option value="MICRO">Micro</option>
+                    <option value="PEQUENO">Pequeno</option>
+                    <option value="MEDIO">Médio</option>
+                    <option value="GRANDE">Grande</option>
+                    <option value="DESCONHECIDO">Desconhecido</option>
+                </select>
+            </div>
+            <div class="toolbar-filter">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="">Todos</option>
+                    <option value="ATIVO">Ativo</option>
+                    <option value="INATIVO">Inativo</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="BLOQUEADO">Bloqueado</option>
+                    <option value="DESATIVADO">Desativado</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-secondary">Filtrar</button>
+            <button type="button" class="btn btn-primary" popovertarget="novo-company">Nova empresa</button>
+        </form>
+
+        <section class="card" aria-label="Lista de empresas">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">CNPJ</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Porte</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Cadastro</th>
+                        <th scope="col" class="col-actions">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Limpa Bem Química Ltda</td>
+                        <td class="cell-nowrap">12.345.678/0001-90</td>
+                        <td>contato@limpabem.com.br</td>
+                        <td>Pequeno</td>
+                        <td><span class="badge badge-success">Ativo</span></td>
+                        <td class="cell-nowrap">02/09/2026</td>
+                        <td class="col-actions">
+                            <a href="#" class="btn-icon" aria-label="Ver Limpa Bem Química Ltda"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+
+                            <button type="button" class="btn-icon" aria-label="Editar Limpa Bem Química Ltda" popovertarget="editar-company-1"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
+
+                            <button type="button" class="btn-icon" aria-label="Excluir Limpa Bem Química Ltda" popovertarget="excluir-company-1"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>Brilho Total Indústria</td>
+                        <td class="cell-nowrap">98.765.432/0001-10</td>
+                        <td>sac@brilhototal.com.br</td>
+                        <td>Médio</td>
+                        <td><span class="badge badge-neutral">Pendente</span></td>
+                        <td class="cell-nowrap">18/09/2026</td>
+                        <td class="col-actions">
+                            <a href="#" class="btn-icon" aria-label="Ver Brilho Total Indústria"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+
+                            <button type="button" class="btn-icon" aria-label="Editar Brilho Total Indústria" popovertarget="editar-company-2"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
+
+                            <button type="button" class="btn-icon" aria-label="Excluir Brilho Total Indústria" popovertarget="excluir-company-2"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <nav class="pagination" aria-label="Paginação">
+            <a href="#" aria-label="Página anterior"><img src="../../static/icons/chevron-left.svg" th:src="@{/icons/chevron-left.svg}" alt=""></a>
+
+            <a href="#" aria-current="page">1</a>
+
+            <a href="#">2</a>
+
+            <a href="#" aria-label="Próxima página"><img src="../../static/icons/chevron-right.svg" th:src="@{/icons/chevron-right.svg}" alt=""></a>
+        </nav>
+    </main>
+
+    <!-- ========== POPUPS ========== -->
+    <!-- Sem JavaScript: um botão com popovertarget="x" abre o elemento
+         que tem id="x" e o atributo popover. -->
+
+    <!-- Nova empresa -->
+    <dialog class="modal" id="novo-company" popover aria-labelledby="novo-company-titulo">
+        <header class="modal-header">
+            <div>
+                <h2 id="novo-company-titulo">Nova empresa</h2>
+                <p>Preencha os dados da empresa. Campos com * são obrigatórios.</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="novo-company" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{/companies/save}">
+            <div class="field">
+                <label for="novo-nome">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="novo-nome" name="name" placeholder="Razão social" maxlength="150" required autofocus>
+            </div>
+
+            <div class="field">
+                <label for="novo-cnpj">CNPJ <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="novo-cnpj" name="cnpj" placeholder="Somente números" maxlength="14" required>
+            </div>
+
+            <div class="field">
+                <label for="novo-email">Email <span class="required" aria-hidden="true">*</span></label>
+                <input type="email" id="novo-email" name="email" placeholder="contato@empresa.com" maxlength="150" required>
+            </div>
+
+            <div class="field">
+                <label for="novo-senha">Senha <span class="required" aria-hidden="true">*</span></label>
+                <input type="password" id="novo-senha" name="password" autocomplete="new-password" required>
+            </div>
+
+            <div class="field">
+                <label for="novo-porte">Porte</label>
+                <select id="novo-porte" name="size">
+                    <option value="MICRO">Micro</option>
+                    <option value="PEQUENO">Pequeno</option>
+                    <option value="MEDIO">Médio</option>
+                    <option value="GRANDE">Grande</option>
+                    <option value="DESCONHECIDO">Desconhecido</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="novo-status">Status</label>
+                <select id="novo-status" name="status">
+                    <option value="ATIVO">Ativo</option>
+                    <option value="INATIVO">Inativo</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="BLOQUEADO">Bloqueado</option>
+                    <option value="DESATIVADO">Desativado</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="novo-foto">URL da foto</label>
+                <input type="text" id="novo-foto" name="photoUrl" placeholder="https://...">
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="novo-company" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <!-- Editar e excluir: um par de popups para cada linha da tabela,
+         já com os dados daquela linha. O número no id (1, 2...) é o id
+         do registro e liga cada botão da tabela ao seu popup. -->
+
+    <!-- Linha 1: Limpa Bem Química Ltda -->
+    <dialog class="modal" id="editar-company-1" popover aria-labelledby="editar-company-1-titulo">
+        <header class="modal-header">
+            <div>
+                <h2 id="editar-company-1-titulo">Editar empresa</h2>
+                <p>ID 1 · Cadastrada em 02/09/2026</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-company-1" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{/companies/save}">
+            <input type="hidden" name="id" value="1">
+
+            <div class="field">
+                <label for="editar-nome-1">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-nome-1" name="name" value="Limpa Bem Química Ltda" maxlength="150" required autofocus>
+            </div>
+
+            <div class="field">
+                <label for="editar-cnpj-1">CNPJ <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-cnpj-1" name="cnpj" value="12345678000190" maxlength="14" required>
+            </div>
+
+            <div class="field">
+                <label for="editar-email-1">Email <span class="required" aria-hidden="true">*</span></label>
+                <input type="email" id="editar-email-1" name="email" value="contato@limpabem.com.br" maxlength="150" required>
+            </div>
+
+            <div class="field">
+                <label for="editar-senha-1">Nova senha</label>
+                <input type="password" id="editar-senha-1" name="password" autocomplete="new-password" aria-describedby="editar-senha-1-dica">
+                <p class="field-hint" id="editar-senha-1-dica">Deixe em branco para manter a senha atual.</p>
+            </div>
+
+            <div class="field">
+                <label for="editar-porte-1">Porte</label>
+                <select id="editar-porte-1" name="size">
+                    <option value="MICRO">Micro</option>
+                    <option value="PEQUENO" selected>Pequeno</option>
+                    <option value="MEDIO">Médio</option>
+                    <option value="GRANDE">Grande</option>
+                    <option value="DESCONHECIDO">Desconhecido</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="editar-status-1">Status</label>
+                <select id="editar-status-1" name="status">
+                    <option value="ATIVO" selected>Ativo</option>
+                    <option value="INATIVO">Inativo</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="BLOQUEADO">Bloqueado</option>
+                    <option value="DESATIVADO">Desativado</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="editar-foto-1">URL da foto</label>
+                <input type="text" id="editar-foto-1" name="photoUrl" placeholder="https://...">
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="editar-company-1" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog class="modal modal-confirm" id="excluir-company-1" popover aria-labelledby="excluir-company-1-titulo">
+        <form class="modal-form" method="post" action="#" th:action="@{/companies/1/delete}">
+            <div class="confirm">
+                <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
+                <div>
+                    <h2 id="excluir-company-1-titulo">Excluir empresa?</h2>
+                    <p>Tem certeza de que deseja excluir <strong>“Limpa Bem Química Ltda”</strong>? Essa ação não poderá ser desfeita.</p>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="excluir-company-1" popovertargetaction="hide" autofocus>Cancelar</button>
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <!-- Linha 2: Brilho Total Indústria -->
+    <dialog class="modal" id="editar-company-2" popover aria-labelledby="editar-company-2-titulo">
+        <header class="modal-header">
+            <div>
+                <h2 id="editar-company-2-titulo">Editar empresa</h2>
+                <p>ID 2 · Cadastrada em 18/09/2026</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-company-2" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{/companies/save}">
+            <input type="hidden" name="id" value="2">
+
+            <div class="field">
+                <label for="editar-nome-2">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-nome-2" name="name" value="Brilho Total Indústria" maxlength="150" required autofocus>
+            </div>
+
+            <div class="field">
+                <label for="editar-cnpj-2">CNPJ <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-cnpj-2" name="cnpj" value="98765432000110" maxlength="14" required>
+            </div>
+
+            <div class="field">
+                <label for="editar-email-2">Email <span class="required" aria-hidden="true">*</span></label>
+                <input type="email" id="editar-email-2" name="email" value="sac@brilhototal.com.br" maxlength="150" required>
+            </div>
+
+            <div class="field">
+                <label for="editar-senha-2">Nova senha</label>
+                <input type="password" id="editar-senha-2" name="password" autocomplete="new-password" aria-describedby="editar-senha-2-dica">
+                <p class="field-hint" id="editar-senha-2-dica">Deixe em branco para manter a senha atual.</p>
+            </div>
+
+            <div class="field">
+                <label for="editar-porte-2">Porte</label>
+                <select id="editar-porte-2" name="size">
+                    <option value="MICRO">Micro</option>
+                    <option value="PEQUENO">Pequeno</option>
+                    <option value="MEDIO" selected>Médio</option>
+                    <option value="GRANDE">Grande</option>
+                    <option value="DESCONHECIDO">Desconhecido</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="editar-status-2">Status</label>
+                <select id="editar-status-2" name="status">
+                    <option value="ATIVO">Ativo</option>
+                    <option value="INATIVO">Inativo</option>
+                    <option value="PENDENTE" selected>Pendente</option>
+                    <option value="BLOQUEADO">Bloqueado</option>
+                    <option value="DESATIVADO">Desativado</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="editar-foto-2">URL da foto</label>
+                <input type="text" id="editar-foto-2" name="photoUrl" placeholder="https://...">
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="editar-company-2" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog class="modal modal-confirm" id="excluir-company-2" popover aria-labelledby="excluir-company-2-titulo">
+        <form class="modal-form" method="post" action="#" th:action="@{/companies/2/delete}">
+            <div class="confirm">
+                <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
+                <div>
+                    <h2 id="excluir-company-2-titulo">Excluir empresa?</h2>
+                    <p>Tem certeza de que deseja excluir <strong>“Brilho Total Indústria”</strong>? Essa ação não poderá ser desfeita.</p>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="excluir-company-2" popovertargetaction="hide" autofocus>Cancelar</button>
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </footer>
+        </form>
+    </dialog>
+</body>
+</html>
