@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Avisos de sucesso e de erro enviados pelos controllers depois de salvar ou excluir (flash "message" e "error"). -->
+    <div th:fragment="alerts" th:remove="tag">
+        <p class="alert alert-success" role="status" th:if="${message != null}" th:text="${message}">Registro criado com sucesso.</p>
+        <p class="alert alert-error" role="alert" th:if="${error != null}" th:text="${error}">Não foi possível concluir a operação.</p>
+    </div>
+</body>
+</html>
