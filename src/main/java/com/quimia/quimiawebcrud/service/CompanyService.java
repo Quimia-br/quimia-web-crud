@@ -6,10 +6,10 @@ import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.CompanyMapper;
 import com.quimia.quimiawebcrud.model.Company;
 import com.quimia.quimiawebcrud.repository.CompanyRepository;
+import com.quimia.quimiawebcrud.security.PasswordHasher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.mindrot.jbcrypt.BCrypt;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +17,7 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
 
     private final CompanyRepository repository;
     private final CompanyMapper mapper;
+    private final PasswordHasher passwordHasher;
 
     @Override
     protected CompanyRepository getRepository() {
@@ -35,7 +36,7 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
             throw new InvalidDataException("A senha é obrigatória.");
         }
         Company entity = mapper.toEntity(request);
-        entity.setPasswordHash(hashPassword(request.getPassword()));
+        entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
         return mapper.toResponse(repository.save(entity));
     }
 
@@ -45,13 +46,9 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
         Company entity = getEntity(id);
         mapper.updateEntity(entity, request);
         if (hasText(request.getPassword())) {
-            entity.setPasswordHash(hashPassword(request.getPassword()));
+            entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
         }
         return mapper.toResponse(entity);
-    }
-
-    private String hashPassword(String originalPassword) {
-        return BCrypt.hashpw(originalPassword, BCrypt.gensalt());
     }
 
     private boolean hasText(String value) {
