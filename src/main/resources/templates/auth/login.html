@@ -20,6 +20,9 @@
     <main class="auth-card">
         <h1>Acessar conta</h1>
 
+        <p class="auth-message auth-message-error" role="alert" hidden th:hidden="${param.error == null}">E-mail ou senha inválidos.</p>
+        <p class="auth-message" role="status" hidden th:hidden="${param.logout == null}">Você saiu do painel.</p>
+
         <form class="auth-form" method="post" action="#" th:action="@{/login}">
             <label class="auth-field">
                 <img src="../../static/icons/field-mail.svg" th:src="@{/icons/field-mail.svg}" alt="">
