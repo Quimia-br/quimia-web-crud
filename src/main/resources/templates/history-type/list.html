@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipos de histórico | Quimia</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
+
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <aside class="sidebar">
+        <a href="../admin/list.html" th:href="@{/admins}" class="sidebar-logo">
+            <img src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+        </a>
+
+        <div class="sidebar-search">
+            <label for="busca-menu" class="sr-only">Pesquisar no menu</label>
+            <input type="search" id="busca-menu" placeholder="Pesquisar...">
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Menu principal">
+            <ul>
+                <li><a href="../admin/list.html" th:href="@{/admins}" class="nav-link"><img src="../../static/icons/admin.svg" th:src="@{/icons/admin.svg}" alt="">Administradores</a></li>
+                <li><a href="../company/list.html" th:href="@{/companies}" class="nav-link"><img src="../../static/icons/company.svg" th:src="@{/icons/company.svg}" alt="">Empresas</a></li>
+                <li><a href="../user/list.html" th:href="@{/users}" class="nav-link"><img src="../../static/icons/user.svg" th:src="@{/icons/user.svg}" alt="">Usuários</a></li>
+                <li><a href="../product/list.html" th:href="@{/products}" class="nav-link"><img src="../../static/icons/product.svg" th:src="@{/icons/product.svg}" alt="">Produtos</a></li>
+                <li><a href="../disposal/list.html" th:href="@{/disposals}" class="nav-link"><img src="../../static/icons/disposal.svg" th:src="@{/icons/disposal.svg}" alt="">Descarte</a></li>
+                <li><a href="../location/list.html" th:href="@{/locations}" class="nav-link"><img src="../../static/icons/location.svg" th:src="@{/icons/location.svg}" alt="">Localização</a></li>
+                <li><a href="../shelf/list.html" th:href="@{/shelves}" class="nav-link"><img src="../../static/icons/shelf.svg" th:src="@{/icons/shelf.svg}" alt="">Estante</a></li>
+                <li><a href="../history-type/list.html" th:href="@{/history-types}" class="nav-link" aria-current="page"><img src="../../static/icons/history-type.svg" th:src="@{/icons/history-type.svg}" alt="">Tipo histórico</a></li>
+
+                <li>
+                    <details class="nav-group">
+                        <summary class="nav-link"><img src="../../static/icons/report.svg" th:src="@{/icons/report.svg}" alt="">Relatórios</summary>
+                        <ul>
+                            <li><a href="../history/list.html" th:href="@{/histories}" class="nav-link">Usuários</a></li>
+                            <li><a href="../admin-log/list.html" th:href="@{/admin-logs}" class="nav-link">Administradores</a></li>
+                        </ul>
+                    </details>
+                </li>
+            </ul>
+        </nav>
+
+        <a href="#" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</a>
+    </aside>
+
+    <main class="content">
+        <header class="page-header">
+            <h1>Tipos de histórico</h1>
+        </header>
+
+        <form class="toolbar" method="get">
+            <div class="toolbar-search">
+                <label for="busca" class="sr-only">Buscar por nome</label>
+                <input type="search" id="busca" name="busca" placeholder="Buscar por nome...">
+            </div>
+            <button type="submit" class="btn btn-secondary">Filtrar</button>
+            <button type="button" class="btn btn-primary" popovertarget="novo-history-type">Novo tipo</button>
+        </form>
+
+        <section class="card" aria-label="Lista de tipos de histórico">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col" class="col-actions">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Limpeza de ambiente</td>
+                        <td class="col-actions">
+                            <a href="#" class="btn-icon" aria-label="Ver tipo Limpeza de ambiente"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+
+                            <button type="button" class="btn-icon" aria-label="Editar tipo Limpeza de ambiente" popovertarget="editar-history-type-1"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
+
+                            <button type="button" class="btn-icon" aria-label="Excluir tipo Limpeza de ambiente" popovertarget="excluir-history-type-1"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>Descarte de embalagem</td>
+                        <td class="col-actions">
+                            <a href="#" class="btn-icon" aria-label="Ver tipo Descarte de embalagem"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+
+                            <button type="button" class="btn-icon" aria-label="Editar tipo Descarte de embalagem" popovertarget="editar-history-type-2"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
+
+                            <button type="button" class="btn-icon" aria-label="Excluir tipo Descarte de embalagem" popovertarget="excluir-history-type-2"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <nav class="pagination" aria-label="Paginação">
+            <a href="#" aria-label="Página anterior"><img src="../../static/icons/chevron-left.svg" th:src="@{/icons/chevron-left.svg}" alt=""></a>
+
+            <a href="#" aria-current="page">1</a>
+
+            <a href="#">2</a>
+
+            <a href="#" aria-label="Próxima página"><img src="../../static/icons/chevron-right.svg" th:src="@{/icons/chevron-right.svg}" alt=""></a>
+        </nav>
+    </main>
+
+    <!-- ========== POPUPS ========== -->
+    <!-- Sem JavaScript: um botão com popovertarget="x" abre o elemento
+         que tem id="x" e o atributo popover. -->
+
+    <!-- Novo tipo de histórico -->
+    <dialog class="modal" id="novo-history-type" popover aria-labelledby="novo-history-type-titulo">
+        <header class="modal-header">
+            <div>
+                <h2 id="novo-history-type-titulo">Novo tipo de histórico</h2>
+                <p>Preencha o nome do tipo. Campos com * são obrigatórios.</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="novo-history-type" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{/history-types/save}">
+            <div class="field">
+                <label for="novo-nome">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="novo-nome" name="name" placeholder="Ex.: Limpeza de ambiente" maxlength="150" required autofocus>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="novo-history-type" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <!-- Editar e excluir: um par de popups para cada linha da tabela,
+         já com os dados daquela linha. O número no id (1, 2...) é o id
+         do registro e liga cada botão da tabela ao seu popup. -->
+
+    <!-- Linha 1: Limpeza de ambiente -->
+    <dialog class="modal" id="editar-history-type-1" popover aria-labelledby="editar-history-type-1-titulo">
+        <header class="modal-header">
+            <div>
+                <h2 id="editar-history-type-1-titulo">Editar tipo de histórico</h2>
+                <p>ID 1</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-history-type-1" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{/history-types/save}">
+            <input type="hidden" name="id" value="1">
+
+            <div class="field">
+                <label for="editar-nome-1">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-nome-1" name="name" value="Limpeza de ambiente" maxlength="150" required autofocus>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="editar-history-type-1" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog class="modal modal-confirm" id="excluir-history-type-1" popover aria-labelledby="excluir-history-type-1-titulo">
+        <form class="modal-form" method="post" action="#" th:action="@{/history-types/1/delete}">
+            <div class="confirm">
+                <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
+                <div>
+                    <h2 id="excluir-history-type-1-titulo">Excluir tipo de histórico?</h2>
+                    <p>Tem certeza de que deseja excluir <strong>“Limpeza de ambiente”</strong>? Essa ação não poderá ser desfeita.</p>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="excluir-history-type-1" popovertargetaction="hide" autofocus>Cancelar</button>
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <!-- Linha 2: Descarte de embalagem -->
+    <dialog class="modal" id="editar-history-type-2" popover aria-labelledby="editar-history-type-2-titulo">
+        <header class="modal-header">
+            <div>
+                <h2 id="editar-history-type-2-titulo">Editar tipo de histórico</h2>
+                <p>ID 2</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-history-type-2" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{/history-types/save}">
+            <input type="hidden" name="id" value="2">
+
+            <div class="field">
+                <label for="editar-nome-2">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-nome-2" name="name" value="Descarte de embalagem" maxlength="150" required autofocus>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="editar-history-type-2" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog class="modal modal-confirm" id="excluir-history-type-2" popover aria-labelledby="excluir-history-type-2-titulo">
+        <form class="modal-form" method="post" action="#" th:action="@{/history-types/2/delete}">
+            <div class="confirm">
+                <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
+                <div>
+                    <h2 id="excluir-history-type-2-titulo">Excluir tipo de histórico?</h2>
+                    <p>Tem certeza de que deseja excluir <strong>“Descarte de embalagem”</strong>? Essa ação não poderá ser desfeita.</p>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="excluir-history-type-2" popovertargetaction="hide" autofocus>Cancelar</button>
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </footer>
+        </form>
+    </dialog>
+</body>
+</html>
