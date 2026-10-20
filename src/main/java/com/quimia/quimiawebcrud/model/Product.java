@@ -28,7 +28,7 @@ public class Product extends Model {
     @Column(name = "marca", nullable = false, length = 150)
     private String brand;
 
-    @Column(name = "instrucoes_de_uso", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "instrucao_de_uso", nullable = false, columnDefinition = "TEXT")
     private String instructions;
 
     @Column(name = "dosagem_tecnica", nullable = false, columnDefinition = "TEXT")

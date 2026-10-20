@@ -32,7 +32,7 @@ public class AdminLog extends Model {
     @Column(name = "acao", nullable = false, length = 50)
     private AdminAction action;
 
-    @Column(name = "dados_anteriores", columnDefinition = "TEXT")
+    @Column(name = "dado_anterior", columnDefinition = "TEXT")
     private String previousData;
 
     @Column(name = "data_edicao", nullable = false)
