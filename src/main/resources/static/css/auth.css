@@ -181,3 +181,18 @@
     border-radius: 1.65rem;
   }
 }
+
+.auth-message {
+  margin: -1.5rem 0 1.5rem;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.auth-message[hidden] {
+  display: none;
+}
+
+.auth-message-error {
+  color: var(--color-danger);
+  font-weight: 700;
+}
