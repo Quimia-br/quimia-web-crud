@@ -9,6 +9,8 @@
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
     <link rel="stylesheet" href="../../static/css/auth.css" th:href="@{/css/auth.css}">
+
+    <script src="../../static/js/password-toggle.js" th:src="@{/js/password-toggle.js}" defer></script>
 </head>
 
 <body>
@@ -34,6 +36,7 @@
                 <img src="../../static/icons/field-password.svg" th:src="@{/icons/field-password.svg}" alt="">
                 <span class="sr-only">Senha</span>
                 <input type="password" name="password" placeholder="Senha" autocomplete="current-password" required>
+                <button type="button" class="btn-icon password-toggle" data-password-toggle aria-pressed="false" aria-label="Mostrar senha"><img class="icon-eye" src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""><img class="icon-eye-off" src="../../static/icons/eye-off.svg" th:src="@{/icons/eye-off.svg}" alt=""></button>
             </label>
 
             <button type="submit" class="btn btn-primary auth-submit">Entrar</button>
