@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/photo.css" th:href="@{/css/photo.css}">
 </head>
 
 <body>
@@ -135,7 +136,7 @@
             <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="novo-user" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
         </header>
 
-        <form class="modal-form" method="post" action="#" th:action="@{/users/save}">
+        <form class="modal-form" method="post" action="#" th:action="@{/users/save}" enctype="multipart/form-data">
             <div class="field">
                 <label for="novo-nome">Nome <span class="required" aria-hidden="true">*</span></label>
                 <input type="text" id="novo-nome" name="userName" placeholder="Nome completo" maxlength="150" required autofocus>
@@ -168,8 +169,9 @@
             </div>
 
             <div class="field">
-                <label for="novo-foto">URL da foto</label>
-                <input type="text" id="novo-foto" name="photoUrl" placeholder="https://...">
+                <label for="novo-foto">Foto</label>
+                <input type="file" id="novo-foto" name="photo" accept="image/jpeg,image/png">
+                <p class="field-hint">JPEG ou PNG, até 2 MB.</p>
             </div>
 
             <footer class="modal-footer">
@@ -191,7 +193,7 @@
             <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|editar-user-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
         </header>
 
-        <form class="modal-form" method="post" action="#" th:action="@{/users/save}">
+        <form class="modal-form" method="post" action="#" th:action="@{/users/save}" enctype="multipart/form-data">
             <input type="hidden" name="id" th:value="${item.id}">
 
             <div class="field">
@@ -227,8 +229,10 @@
             </div>
 
             <div class="field">
-                <label th:attr="for=|editar-foto-${item.id}|">URL da foto</label>
-                <input type="text" name="photoUrl" placeholder="https://..." th:value="${item.photoUrl}" th:attr="id=|editar-foto-${item.id}|">
+                <label th:attr="for=|editar-foto-${item.id}|">Foto</label>
+                <img class="field-photo" th:if="${@photoUrlPolicy.isSafe(item.photoUrl)}" th:src="${item.photoUrl}" referrerpolicy="no-referrer" alt="Foto atual" width="64" height="64">
+                <input type="file" name="photo" accept="image/jpeg,image/png" th:attr="id=|editar-foto-${item.id}|">
+                <p class="field-hint">JPEG ou PNG, até 2 MB. Deixe em branco para manter a foto atual.</p>
             </div>
 
             <footer class="modal-footer">
