@@ -1,0 +1,15 @@
+<!-- Fundo das telas de login e cadastro: faixa em degradê com a borda direita curva.
+     Exportado do protótipo. preserveAspectRatio="none" deixa o CSS esticar o desenho. -->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 998.4 1080"
+  preserveAspectRatio="none"
+>
+  <defs>
+    <linearGradient id="degrade" gradientUnits="userSpaceOnUse" x1="99.2" y1="0" x2="888.2" y2="0">
+      <stop stop-color="#2AADB9" />
+      <stop offset="1" stop-color="#32BBCA" stop-opacity="0.54" />
+    </linearGradient>
+  </defs>
+  <path d="M0 0H998.4C914.3 450.9 916.3 687.2 998.4 1080H0Z" fill="url(#degrade)" />
+</svg>
