@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários | Quimia</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
+
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <aside class="sidebar">
+        <a href="../admin/list.html" th:href="@{/admins}" class="sidebar-logo">
+            <img src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+        </a>
+
+        <div class="sidebar-search">
+            <label for="busca-menu" class="sr-only">Pesquisar no menu</label>
+            <input type="search" id="busca-menu" placeholder="Pesquisar...">
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Menu principal">
+            <ul>
+                <li><a href="../admin/list.html" th:href="@{/admins}" class="nav-link"><img src="../../static/icons/admin.svg" th:src="@{/icons/admin.svg}" alt="">Administradores</a></li>
+                <li><a href="../company/list.html" th:href="@{/companies}" class="nav-link"><img src="../../static/icons/company.svg" th:src="@{/icons/company.svg}" alt="">Empresas</a></li>
+                <li><a href="../user/list.html" th:href="@{/users}" class="nav-link" aria-current="page"><img src="../../static/icons/user.svg" th:src="@{/icons/user.svg}" alt="">Usuários</a></li>
+                <li><a href="../product/list.html" th:href="@{/products}" class="nav-link"><img src="../../static/icons/product.svg" th:src="@{/icons/product.svg}" alt="">Produtos</a></li>
+                <li><a href="../disposal/list.html" th:href="@{/disposals}" class="nav-link"><img src="../../static/icons/disposal.svg" th:src="@{/icons/disposal.svg}" alt="">Descarte</a></li>
+                <li><a href="../location/list.html" th:href="@{/locations}" class="nav-link"><img src="../../static/icons/location.svg" th:src="@{/icons/location.svg}" alt="">Localização</a></li>
+                <li><a href="../shelf/list.html" th:href="@{/shelves}" class="nav-link"><img src="../../static/icons/shelf.svg" th:src="@{/icons/shelf.svg}" alt="">Estante</a></li>
+                <li><a href="../history-type/list.html" th:href="@{/history-types}" class="nav-link"><img src="../../static/icons/history-type.svg" th:src="@{/icons/history-type.svg}" alt="">Tipo histórico</a></li>
+
+                <li>
+                    <details class="nav-group">
+                        <summary class="nav-link"><img src="../../static/icons/report.svg" th:src="@{/icons/report.svg}" alt="">Relatórios</summary>
+                        <ul>
+                            <li><a href="../history/list.html" th:href="@{/histories}" class="nav-link">Usuários</a></li>
+                            <li><a href="../admin-log/list.html" th:href="@{/admin-logs}" class="nav-link">Administradores</a></li>
+                        </ul>
+                    </details>
+                </li>
+            </ul>
+        </nav>
+
+        <a href="#" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</a>
+    </aside>
+
+    <main class="content">
+        <header class="page-header">
+            <h1>Usuários</h1>
+        </header>
+
+        <form class="toolbar" method="get">
+            <div class="toolbar-search">
+                <label for="busca" class="sr-only">Buscar por nome ou e-mail</label>
+                <input type="search" id="busca" name="busca" placeholder="Buscar por nome ou e-mail...">
+            </div>
+            <div class="toolbar-filter">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="">Todos</option>
+                    <option value="ATIVO">Ativo</option>
+                    <option value="INATIVO">Inativo</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="BLOQUEADO">Bloqueado</option>
+                    <option value="DESATIVADO">Desativado</option>
+                </select>
+            </div>
+            <div class="toolbar-filter">
+                <label for="cadastrode">Cadastro de</label>
+                <input type="date" id="cadastrode" name="cadastroDe">
+                <label for="cadastroate">até</label>
+                <input type="date" id="cadastroate" name="cadastroAte">
+            </div>
+            <button type="submit" class="btn btn-secondary">Filtrar</button>
+            <button type="button" class="btn btn-primary" popovertarget="novo-user">Novo usuário</button>
+        </form>
+
+        <section class="card" aria-label="Lista de usuários">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Nascimento</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Cadastro</th>
+                        <th scope="col" class="col-actions">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Lucas Almeida</td>
+                        <td>lucas.almeida@email.com</td>
+                        <td class="cell-nowrap">14/03/1998</td>
+                        <td><span class="badge badge-success">Ativo</span></td>
+                        <td class="cell-nowrap">05/09/2026</td>
+                        <td class="col-actions">
+                            <a href="#" class="btn-icon" aria-label="Ver Lucas Almeida"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+
+                            <button type="button" class="btn-icon" aria-label="Editar Lucas Almeida" popovertarget="editar-user-1"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
+
+                            <button type="button" class="btn-icon" aria-label="Excluir Lucas Almeida" popovertarget="excluir-user-1"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td>Mariana Castro</td>
+                        <td>mariana.castro@email.com</td>
+                        <td class="cell-nowrap">22/11/2001</td>
+                        <td><span class="badge badge-neutral">Inativo</span></td>
+                        <td class="cell-nowrap">12/09/2026</td>
+                        <td class="col-actions">
+                            <a href="#" class="btn-icon" aria-label="Ver Mariana Castro"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+
+                            <button type="button" class="btn-icon" aria-label="Editar Mariana Castro" popovertarget="editar-user-2"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
+
+                            <button type="button" class="btn-icon" aria-label="Excluir Mariana Castro" popovertarget="excluir-user-2"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <nav class="pagination" aria-label="Paginação">
+            <a href="#" aria-label="Página anterior"><img src="../../static/icons/chevron-left.svg" th:src="@{/icons/chevron-left.svg}" alt=""></a>
+
+            <a href="#" aria-current="page">1</a>
+
+            <a href="#">2</a>
+
+            <a href="#" aria-label="Próxima página"><img src="../../static/icons/chevron-right.svg" th:src="@{/icons/chevron-right.svg}" alt=""></a>
+        </nav>
+    </main>
+
+    <!-- ========== POPUPS ========== -->
+    <!-- Sem JavaScript: um botão com popovertarget="x" abre o elemento
+         que tem id="x" e o atributo popover. -->
+
+    <!-- Novo usuário -->
+    <dialog class="modal" id="novo-user" popover aria-labelledby="novo-user-titulo">
+        <header class="modal-header">
+            <div>
+                <h2 id="novo-user-titulo">Novo usuário</h2>
+                <p>Preencha os dados do usuário. Campos com * são obrigatórios.</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="novo-user" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{/users/save}">
+            <div class="field">
+                <label for="novo-nome">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="novo-nome" name="userName" placeholder="Nome completo" maxlength="150" required autofocus>
+            </div>
+
+            <div class="field">
+                <label for="novo-nascimento">Data de nascimento</label>
+                <input type="date" id="novo-nascimento" name="birthDate">
+            </div>
+
+            <div class="field">
+                <label for="novo-email">Email <span class="required" aria-hidden="true">*</span></label>
+                <input type="email" id="novo-email" name="email" placeholder="nome@email.com" maxlength="150" required>
+            </div>
+
+            <div class="field">
+                <label for="novo-senha">Senha <span class="required" aria-hidden="true">*</span></label>
+                <input type="password" id="novo-senha" name="password" autocomplete="new-password" required>
+            </div>
+
+            <div class="field">
+                <label for="novo-status">Status</label>
+                <select id="novo-status" name="status">
+                    <option value="ATIVO">Ativo</option>
+                    <option value="INATIVO">Inativo</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="BLOQUEADO">Bloqueado</option>
+                    <option value="DESATIVADO">Desativado</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="novo-foto">URL da foto</label>
+                <input type="text" id="novo-foto" name="photoUrl" placeholder="https://...">
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="novo-user" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <!-- Editar e excluir: um par de popups para cada linha da tabela,
+         já com os dados daquela linha. O número no id (1, 2...) é o id
+         do registro e liga cada botão da tabela ao seu popup. -->
+
+    <!-- Linha 1: Lucas Almeida -->
+    <dialog class="modal" id="editar-user-1" popover aria-labelledby="editar-user-1-titulo">
+        <header class="modal-header">
+            <div>
+                <h2 id="editar-user-1-titulo">Editar usuário</h2>
+                <p>ID 1 · Cadastrado em 05/09/2026</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-user-1" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{/users/save}">
+            <input type="hidden" name="id" value="1">
+
+            <div class="field">
+                <label for="editar-nome-1">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-nome-1" name="userName" value="Lucas Almeida" maxlength="150" required autofocus>
+            </div>
+
+            <div class="field">
+                <label for="editar-nascimento-1">Data de nascimento</label>
+                <input type="date" id="editar-nascimento-1" name="birthDate" value="1998-03-14">
+            </div>
+
+            <div class="field">
+                <label for="editar-email-1">Email <span class="required" aria-hidden="true">*</span></label>
+                <input type="email" id="editar-email-1" name="email" value="lucas.almeida@email.com" maxlength="150" required>
+            </div>
+
+            <div class="field">
+                <label for="editar-senha-1">Nova senha</label>
+                <input type="password" id="editar-senha-1" name="password" autocomplete="new-password" aria-describedby="editar-senha-1-dica">
+                <p class="field-hint" id="editar-senha-1-dica">Deixe em branco para manter a senha atual.</p>
+            </div>
+
+            <div class="field">
+                <label for="editar-status-1">Status</label>
+                <select id="editar-status-1" name="status">
+                    <option value="ATIVO" selected>Ativo</option>
+                    <option value="INATIVO">Inativo</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="BLOQUEADO">Bloqueado</option>
+                    <option value="DESATIVADO">Desativado</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="editar-foto-1">URL da foto</label>
+                <input type="text" id="editar-foto-1" name="photoUrl" placeholder="https://...">
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="editar-user-1" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog class="modal modal-confirm" id="excluir-user-1" popover aria-labelledby="excluir-user-1-titulo">
+        <form class="modal-form" method="post" action="#" th:action="@{/users/1/delete}">
+            <div class="confirm">
+                <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
+                <div>
+                    <h2 id="excluir-user-1-titulo">Excluir usuário?</h2>
+                    <p>Tem certeza de que deseja excluir <strong>“Lucas Almeida”</strong>? Essa ação não poderá ser desfeita.</p>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="excluir-user-1" popovertargetaction="hide" autofocus>Cancelar</button>
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <!-- Linha 2: Mariana Castro -->
+    <dialog class="modal" id="editar-user-2" popover aria-labelledby="editar-user-2-titulo">
+        <header class="modal-header">
+            <div>
+                <h2 id="editar-user-2-titulo">Editar usuário</h2>
+                <p>ID 2 · Cadastrado em 12/09/2026</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-user-2" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{/users/save}">
+            <input type="hidden" name="id" value="2">
+
+            <div class="field">
+                <label for="editar-nome-2">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="editar-nome-2" name="userName" value="Mariana Castro" maxlength="150" required autofocus>
+            </div>
+
+            <div class="field">
+                <label for="editar-nascimento-2">Data de nascimento</label>
+                <input type="date" id="editar-nascimento-2" name="birthDate" value="2001-11-22">
+            </div>
+
+            <div class="field">
+                <label for="editar-email-2">Email <span class="required" aria-hidden="true">*</span></label>
+                <input type="email" id="editar-email-2" name="email" value="mariana.castro@email.com" maxlength="150" required>
+            </div>
+
+            <div class="field">
+                <label for="editar-senha-2">Nova senha</label>
+                <input type="password" id="editar-senha-2" name="password" autocomplete="new-password" aria-describedby="editar-senha-2-dica">
+                <p class="field-hint" id="editar-senha-2-dica">Deixe em branco para manter a senha atual.</p>
+            </div>
+
+            <div class="field">
+                <label for="editar-status-2">Status</label>
+                <select id="editar-status-2" name="status">
+                    <option value="ATIVO">Ativo</option>
+                    <option value="INATIVO" selected>Inativo</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="BLOQUEADO">Bloqueado</option>
+                    <option value="DESATIVADO">Desativado</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="editar-foto-2">URL da foto</label>
+                <input type="text" id="editar-foto-2" name="photoUrl" placeholder="https://...">
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="editar-user-2" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog class="modal modal-confirm" id="excluir-user-2" popover aria-labelledby="excluir-user-2-titulo">
+        <form class="modal-form" method="post" action="#" th:action="@{/users/2/delete}">
+            <div class="confirm">
+                <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
+                <div>
+                    <h2 id="excluir-user-2-titulo">Excluir usuário?</h2>
+                    <p>Tem certeza de que deseja excluir <strong>“Mariana Castro”</strong>? Essa ação não poderá ser desfeita.</p>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="excluir-user-2" popovertargetaction="hide" autofocus>Cancelar</button>
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </footer>
+        </form>
+    </dialog>
+</body>
+</html>

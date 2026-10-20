@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="auth" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar | Quimia</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap">
+
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/auth.css" th:href="@{/css/auth.css}">
+</head>
+
+<body>
+    <header class="auth-brand">
+        <img class="auth-logo" src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+        <p class="auth-welcome">Bem-vindo!</p>
+    </header>
+
+    <main class="auth-card">
+        <h1>Acessar conta</h1>
+
+        <form class="auth-form" method="post" action="#" th:action="@{/login}">
+            <label class="auth-field">
+                <img src="../../static/icons/field-mail.svg" th:src="@{/icons/field-mail.svg}" alt="">
+                <span class="sr-only">Email</span>
+                <input type="email" name="email" placeholder="Email" autocomplete="username" maxlength="150" required autofocus>
+            </label>
+
+            <label class="auth-field">
+                <img src="../../static/icons/field-password.svg" th:src="@{/icons/field-password.svg}" alt="">
+                <span class="sr-only">Senha</span>
+                <input type="password" name="password" placeholder="Senha" autocomplete="current-password" required>
+            </label>
+
+            <button type="submit" class="btn btn-primary auth-submit">Entrar</button>
+        </form>
+
+        <p class="auth-switch">Ainda não tem conta? <a href="register.html" th:href="@{/register}">Cadastre-se</a></p>
+    </main>
+</body>
+</html>
