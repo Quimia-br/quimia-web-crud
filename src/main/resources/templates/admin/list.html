@@ -68,24 +68,24 @@
         <form class="toolbar" method="get">
             <div class="toolbar-search">
                 <label for="busca" class="sr-only">Buscar por nome ou e-mail</label>
-                <input type="search" id="busca" name="busca" placeholder="Buscar por nome ou e-mail...">
+                <input type="search" id="busca" name="busca" placeholder="Buscar por nome ou e-mail..." th:value="${filters['busca']}">
             </div>
             <div class="toolbar-filter">
                 <label for="status">Status</label>
                 <select id="status" name="status">
                     <option value="">Todos</option>
-                    <option value="ATIVO">Ativo</option>
-                    <option value="INATIVO">Inativo</option>
-                    <option value="PENDENTE">Pendente</option>
-                    <option value="BLOQUEADO">Bloqueado</option>
-                    <option value="DESATIVADO">Desativado</option>
+                    <option value="ATIVO" th:selected="${filters['status'] == 'ATIVO'}">Ativo</option>
+                    <option value="INATIVO" th:selected="${filters['status'] == 'INATIVO'}">Inativo</option>
+                    <option value="PENDENTE" th:selected="${filters['status'] == 'PENDENTE'}">Pendente</option>
+                    <option value="BLOQUEADO" th:selected="${filters['status'] == 'BLOQUEADO'}">Bloqueado</option>
+                    <option value="DESATIVADO" th:selected="${filters['status'] == 'DESATIVADO'}">Desativado</option>
                 </select>
             </div>
             <div class="toolbar-filter">
                 <label for="cadastro-de">Cadastro de</label>
-                <input type="date" id="cadastro-de" name="cadastroDe">
+                <input type="date" id="cadastro-de" name="cadastroDe" th:value="${filters['cadastroDe']}">
                 <label for="cadastro-ate">até</label>
-                <input type="date" id="cadastro-ate" name="cadastroAte">
+                <input type="date" id="cadastro-ate" name="cadastroAte" th:value="${filters['cadastroAte']}">
             </div>
             <button type="submit" class="btn btn-secondary">Filtrar</button>
             <button type="button" class="btn btn-primary" popovertarget="novo-admin">Novo administrador</button>
@@ -136,6 +136,7 @@
         </nav>
 
 
+        <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
 
     <!-- ========== POPUPS ========== -->

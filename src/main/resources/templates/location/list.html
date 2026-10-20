@@ -59,22 +59,21 @@
         <form class="toolbar" method="get">
             <div class="toolbar-search">
                 <label for="cep" class="sr-only">Buscar por CEP</label>
-                <input type="search" id="cep" name="cep" placeholder="Buscar por CEP...">
+                <input type="search" id="cep" name="cep" placeholder="Buscar por CEP..." th:value="${filters['cep']}">
             </div>
             <div class="toolbar-filter">
                 <label for="usuario">Usuário</label>
                 <select id="usuario" name="usuario">
                     <option value="">Todos</option>
-                    <option value="1">Lucas Almeida</option>
-                    <option value="2">Mariana Castro</option>
+                    <option th:each="o : ${usersById.values()}" th:value="${o.id}" th:text="${o.userName}" th:selected="${filters['usuario'] == #strings.toString(o.id)}">Opção</option>
                 </select>
             </div>
             <div class="toolbar-filter">
                 <label for="coordenadas">Coordenadas</label>
                 <select id="coordenadas" name="coordenadas">
                     <option value="">Todas</option>
-                    <option value="COM">Com coordenadas</option>
-                    <option value="SEM">Sem coordenadas</option>
+                    <option value="COM" th:selected="${filters['coordenadas'] == 'COM'}">Com coordenadas</option>
+                    <option value="SEM" th:selected="${filters['coordenadas'] == 'SEM'}">Sem coordenadas</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-secondary">Filtrar</button>
@@ -110,15 +109,7 @@
             </table>
         </section>
 
-        <nav class="pagination" aria-label="Paginação">
-            <a href="#" aria-label="Página anterior"><img src="../../static/icons/chevron-left.svg" th:src="@{/icons/chevron-left.svg}" alt=""></a>
-
-            <a href="#" aria-current="page">1</a>
-
-            <a href="#">2</a>
-
-            <a href="#" aria-label="Próxima página"><img src="../../static/icons/chevron-right.svg" th:src="@{/icons/chevron-right.svg}" alt=""></a>
-        </nav>
+        <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
 </body>
 </html>
