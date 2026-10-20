@@ -6,38 +6,28 @@ import com.quimia.quimiawebcrud.mapper.AdminMapper;
 import com.quimia.quimiawebcrud.model.Admin;
 import com.quimia.quimiawebcrud.repository.AdminRepository;
 import lombok.RequiredArgsConstructor;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import org.mindrot.jbcrypt.BCrypt;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class AdminService {
+public class AdminService extends CrudService<Admin, Integer, AdminRequestDTO, AdminResponseDTO> {
 
     private final AdminRepository repository;
     private final AdminMapper mapper;
 
-    private String hashPassword(String originalPassword) {
-        return BCrypt.hashpw(originalPassword, BCrypt.gensalt());
+    @Override
+    protected AdminRepository getRepository() {
+        return repository;
     }
 
-    private boolean hasText(String value) {
-        return value != null && !value.isBlank();
+    @Override
+    protected AdminMapper getMapper() {
+        return mapper;
     }
 
-    public List<AdminResponseDTO> readAll() {
-        return repository.findAll().stream()
-                .map(mapper::toResponse)
-                .toList();
-    }
-
-    public AdminResponseDTO findById(Integer id) {
-        return mapper.toResponse(getEntity(id));
-    }
-
+    @Override
     @Transactional
     public AdminResponseDTO create(AdminRequestDTO request) {
         if (!hasText(request.getPassword())) {
@@ -48,6 +38,7 @@ public class AdminService {
         return mapper.toResponse(repository.save(entity));
     }
 
+    @Override
     @Transactional
     public AdminResponseDTO update(Integer id, AdminRequestDTO request) {
         Admin entity = getEntity(id);
@@ -58,13 +49,11 @@ public class AdminService {
         return mapper.toResponse(entity);
     }
 
-    @Transactional
-    public void delete(Integer id) {
-        repository.delete(getEntity(id));
+    private String hashPassword(String originalPassword) {
+        return BCrypt.hashpw(originalPassword, BCrypt.gensalt());
     }
 
-    private Admin getEntity(Integer id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Registro nao encontrado com o ID: " + id));
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 }
