@@ -32,17 +32,7 @@ public class CompanyController extends GenericController<Company, Integer, Compa
     }
 
     @Override
-    protected String getSingularName() {
-        return "company";
-    }
-
-    @Override
     protected String getPluralName() {
         return "companies";
-    }
-
-    @Override
-    protected CompanyResponseDTO newResponse() {
-        return new CompanyResponseDTO();
     }
 }

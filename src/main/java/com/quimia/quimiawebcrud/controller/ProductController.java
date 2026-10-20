@@ -35,22 +35,12 @@ public class ProductController extends GenericController<Product, Integer, Produ
     }
 
     @Override
-    protected String getSingularName() {
-        return "product";
-    }
-
-    @Override
     protected String getPluralName() {
         return "products";
     }
 
     @Override
-    protected ProductResponseDTO newResponse() {
-        return new ProductResponseDTO();
-    }
-
-    @Override
-    protected void addFormAttributes(Model model) {
-        model.addAttribute("companies", companyService.readAll());
+    protected void addListAttributes(Model model) {
+        model.addAttribute("companiesById", Lookups.byId(companyService.readAll()));
     }
 }
