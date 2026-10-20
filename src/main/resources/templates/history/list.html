@@ -59,21 +59,20 @@
         <form class="toolbar" method="get">
             <div class="toolbar-search">
                 <label for="busca" class="sr-only">Buscar por usuário</label>
-                <input type="search" id="busca" name="busca" placeholder="Buscar por usuário...">
+                <input type="search" id="busca" name="busca" placeholder="Buscar por usuário..." th:value="${filters['busca']}">
             </div>
             <div class="toolbar-filter">
                 <label for="tipo">Tipo</label>
                 <select id="tipo" name="tipo">
                     <option value="">Todos</option>
-                    <option value="1">Limpeza de ambiente</option>
-                    <option value="2">Descarte de embalagem</option>
+                    <option th:each="o : ${historyTypesById.values()}" th:value="${o.id}" th:text="${o.name}" th:selected="${filters['tipo'] == #strings.toString(o.id)}">Opção</option>
                 </select>
             </div>
             <div class="toolbar-filter">
                 <label for="execucaode">Execução de</label>
-                <input type="date" id="execucaode" name="execucaoDe">
+                <input type="date" id="execucaode" name="execucaoDe" th:value="${filters['execucaoDe']}">
                 <label for="execucaoate">até</label>
-                <input type="date" id="execucaoate" name="execucaoAte">
+                <input type="date" id="execucaoate" name="execucaoAte" th:value="${filters['execucaoAte']}">
             </div>
             <button type="submit" class="btn btn-secondary">Filtrar</button>
         </form>
@@ -110,15 +109,7 @@
             </table>
         </section>
 
-        <nav class="pagination" aria-label="Paginação">
-            <a href="#" aria-label="Página anterior"><img src="../../static/icons/chevron-left.svg" th:src="@{/icons/chevron-left.svg}" alt=""></a>
-
-            <a href="#" aria-current="page">1</a>
-
-            <a href="#">2</a>
-
-            <a href="#" aria-label="Próxima página"><img src="../../static/icons/chevron-right.svg" th:src="@{/icons/chevron-right.svg}" alt=""></a>
-        </nav>
+        <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
 </body>
 </html>

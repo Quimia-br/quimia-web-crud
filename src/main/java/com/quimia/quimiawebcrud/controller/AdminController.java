@@ -7,7 +7,11 @@ import com.quimia.quimiawebcrud.service.AdminService;
 import com.quimia.quimiawebcrud.service.CrudService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Map;
+import java.util.function.Predicate;
 
 @Controller
 @RequestMapping("/admins")
@@ -34,5 +38,12 @@ public class AdminController extends GenericController<Admin, Integer, AdminResp
     @Override
     protected String getPluralName() {
         return "admins";
+    }
+
+    @Override
+    protected Predicate<AdminResponseDTO> filterBy(Map<String, String> params, Model model) {
+        return admin -> Filters.matchesText(params.get("busca"), admin.getUserName(), admin.getEmail())
+                && Filters.sameEnum(admin.getStatus(), params.get("status"))
+                && Filters.inDateRange(admin.getSignUpDate(), params.get("cadastroDe"), params.get("cadastroAte"));
     }
 }

@@ -2,7 +2,9 @@ package com.quimia.quimiawebcrud.controller;
 
 import com.quimia.quimiawebcrud.dto.DisposalRequestDTO;
 import com.quimia.quimiawebcrud.dto.DisposalResponseDTO;
+import com.quimia.quimiawebcrud.dto.ProductResponseDTO;
 import com.quimia.quimiawebcrud.model.Disposal;
+import com.quimia.quimiawebcrud.service.CompanyService;
 import com.quimia.quimiawebcrud.service.CrudService;
 import com.quimia.quimiawebcrud.service.DisposalService;
 import com.quimia.quimiawebcrud.service.ProductService;
@@ -11,6 +13,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Map;
+import java.util.function.Predicate;
+
 @Controller
 @RequestMapping("/disposals")
 @RequiredArgsConstructor
@@ -18,6 +23,7 @@ public class DisposalController extends GenericController<Disposal, Integer, Dis
 
     private final DisposalService disposalService;
     private final ProductService productService;
+    private final CompanyService companyService;
 
     @Override
     protected CrudService<Disposal, Integer, DisposalRequestDTO, DisposalResponseDTO> getService() {
@@ -42,5 +48,20 @@ public class DisposalController extends GenericController<Disposal, Integer, Dis
     @Override
     protected void addListAttributes(Model model) {
         model.addAttribute("productsById", Lookups.byId(productService.readAll()));
+        model.addAttribute("companiesById", Lookups.byId(companyService.readAll()));
+    }
+
+    @Override
+    protected Predicate<DisposalResponseDTO> filterBy(Map<String, String> params, Model model) {
+        Map<Integer, ProductResponseDTO> productsById = Lookups.fromModel(model, "productsById");
+        String method = params.get("metodo");
+        return disposal -> {
+            ProductResponseDTO product = productsById.get(disposal.getProductId());
+            boolean hasMethod = disposal.getProductDisposalMethod() != null && !disposal.getProductDisposalMethod().isBlank();
+            return Filters.matchesText(params.get("busca"),
+                            product == null ? null : product.getName(), product == null ? null : product.getCasNumber())
+                    && Filters.sameId(product == null ? null : product.getCompanyId(), params.get("empresa"))
+                    && (method == null || method.isBlank() || ("PREENCHIDO".equals(method) == hasMethod));
+        };
     }
 }

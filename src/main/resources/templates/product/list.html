@@ -59,19 +59,18 @@
         <form class="toolbar" method="get">
             <div class="toolbar-search">
                 <label for="busca" class="sr-only">Buscar por nome ou número CAS</label>
-                <input type="search" id="busca" name="busca" placeholder="Buscar por nome ou número CAS...">
+                <input type="search" id="busca" name="busca" placeholder="Buscar por nome ou número CAS..." th:value="${filters['busca']}">
             </div>
             <div class="toolbar-filter">
                 <label for="empresa">Empresa</label>
                 <select id="empresa" name="empresa">
                     <option value="">Todas</option>
-                    <option value="1">Limpa Bem Química Ltda</option>
-                    <option value="2">Brilho Total Indústria</option>
+                    <option th:each="o : ${companiesById.values()}" th:value="${o.id}" th:text="${o.name}" th:selected="${filters['empresa'] == #strings.toString(o.id)}">Opção</option>
                 </select>
             </div>
             <div class="toolbar-filter">
                 <label for="marca">Marca</label>
-                <input type="text" id="marca" name="marca" placeholder="Qualquer marca">
+                <input type="text" id="marca" name="marca" placeholder="Qualquer marca" th:value="${filters['marca']}">
             </div>
             <button type="submit" class="btn btn-secondary">Filtrar</button>
             <button type="button" class="btn btn-primary" popovertarget="novo-product">Novo produto</button>
@@ -111,15 +110,7 @@
             </table>
         </section>
 
-        <nav class="pagination" aria-label="Paginação">
-            <a href="#" aria-label="Página anterior"><img src="../../static/icons/chevron-left.svg" th:src="@{/icons/chevron-left.svg}" alt=""></a>
-
-            <a href="#" aria-current="page">1</a>
-
-            <a href="#">2</a>
-
-            <a href="#" aria-label="Próxima página"><img src="../../static/icons/chevron-right.svg" th:src="@{/icons/chevron-right.svg}" alt=""></a>
-        </nav>
+        <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
 
     <!-- ========== POPUPS ========== -->
