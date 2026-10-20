@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
 </head>
 
 <body>
@@ -116,7 +117,7 @@
                         <td>#[[${item.recordId}]]</td>
                         <td class="cell-nowrap">[[${item.editDate != null ? #temporals.format(item.editDate, 'dd/MM/yyyy HH:mm') : ''}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver registro ${item.id} do log|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Ver registro ${item.id} do log|,popovertarget=|ver-admin-log-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(adminLogs)}">
@@ -128,5 +129,33 @@
 
         <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
+
+    <!-- Detalhes de cada registro (somente leitura) -->
+    <th:block th:each="item : ${adminLogs}">
+    <dialog class="modal" popover th:attr="id=|ver-admin-log-${item.id}|,aria-labelledby=|ver-admin-log-${item.id}-titulo|">
+        <header class="modal-header">
+            <div>
+                <h2 th:attr="id=|ver-admin-log-${item.id}-titulo|">Alteração</h2>
+                <p>ID [[${item.id}]]</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|ver-admin-log-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <div class="modal-form">
+            <dl class="detail-list">
+                <div><dt>Administrador</dt><dd th:text="${adminsById[item.adminId]?.userName != null and !#strings.isEmpty(adminsById[item.adminId]?.userName) ? adminsById[item.adminId]?.userName : '—'}">valor</dd></div>
+                <div><dt>Ação</dt><dd><span th:replace="~{fragments/badges :: action(${item.action})}"></span></dd></div>
+                <div><dt>Tabela</dt><dd th:text="${item.affectedTable != null and !#strings.isEmpty(item.affectedTable) ? item.affectedTable : '—'}">valor</dd></div>
+                <div><dt>Registro</dt><dd th:text="${item.recordId != null and !#strings.isEmpty(item.recordId) ? item.recordId : '—'}">valor</dd></div>
+                <div><dt>Data</dt><dd th:text="${item.editDate != null ? #temporals.format(item.editDate, 'dd/MM/yyyy HH:mm') : '—'}">01/01/2026 10:00</dd></div>
+                <div><dt>Dados anteriores</dt><dd><pre class="detail-pre" th:if="${item.previousData != null and !#strings.isEmpty(item.previousData)}" th:text="${item.previousData}">{}</pre><span th:unless="${item.previousData != null and !#strings.isEmpty(item.previousData)}">—</span></dd></div>
+            </dl>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|ver-admin-log-${item.id}|">Fechar</button>
+            </footer>
+        </div>
+    </dialog>
+    </th:block>
 </body>
 </html>

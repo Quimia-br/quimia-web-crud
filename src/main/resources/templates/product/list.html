@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
 </head>
 
 <body>
@@ -96,7 +97,7 @@
                         <td>[[${item.brand}]]</td>
                         <td>[[${companiesById[item.companyId]?.name}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver ${item.name}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Ver ${item.name}|,popovertarget=|ver-product-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
 
                             <button type="button" class="btn-icon" th:attr="aria-label=|Editar ${item.name}|,popovertarget=|editar-product-${item.id}|"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
 
@@ -171,6 +172,31 @@
     <!-- Editar e excluir: um par de popups para cada registro da lista. -->
 
     <th:block th:each="item : ${products}">
+    <dialog class="modal" popover th:attr="id=|ver-product-${item.id}|,aria-labelledby=|ver-product-${item.id}-titulo|">
+        <header class="modal-header">
+            <div>
+                <h2 th:attr="id=|ver-product-${item.id}-titulo|">Produto</h2>
+                <p>ID [[${item.id}]]</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|ver-product-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <div class="modal-form">
+            <dl class="detail-list">
+                <div><dt>Nome</dt><dd th:text="${item.name != null and !#strings.isEmpty(item.name) ? item.name : '—'}">valor</dd></div>
+                <div><dt>Nº CAS</dt><dd th:text="${item.casNumber != null and !#strings.isEmpty(item.casNumber) ? item.casNumber : '—'}">valor</dd></div>
+                <div><dt>Marca</dt><dd th:text="${item.brand != null and !#strings.isEmpty(item.brand) ? item.brand : '—'}">valor</dd></div>
+                <div><dt>Empresa</dt><dd th:text="${companiesById[item.companyId]?.name != null and !#strings.isEmpty(companiesById[item.companyId]?.name) ? companiesById[item.companyId]?.name : '—'}">valor</dd></div>
+                <div><dt>Instruções de uso</dt><dd th:text="${item.instructions != null and !#strings.isEmpty(item.instructions) ? item.instructions : '—'}">valor</dd></div>
+                <div><dt>Dosagem técnica</dt><dd th:text="${item.dosage != null and !#strings.isEmpty(item.dosage) ? item.dosage : '—'}">valor</dd></div>
+            </dl>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|ver-product-${item.id}|">Fechar</button>
+            </footer>
+        </div>
+    </dialog>
+
         <dialog class="modal" popover th:attr="id=|editar-product-${item.id}|,aria-labelledby=|editar-product-${item.id}-titulo|">
         <header class="modal-header">
             <div>

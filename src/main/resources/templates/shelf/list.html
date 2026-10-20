@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
 </head>
 
 <body>
@@ -94,7 +95,7 @@
                         <td>[[${item.room}]]</td>
                         <td>[[${usersById[item.userId]?.userName}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver estante ${item.room} de ${usersById[item.userId]?.userName}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Ver estante ${item.room} de ${usersById[item.userId]?.userName}|,popovertarget=|ver-shelf-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(shelves)}">
@@ -106,5 +107,29 @@
 
         <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
+
+    <!-- Detalhes de cada registro (somente leitura) -->
+    <th:block th:each="item : ${shelves}">
+    <dialog class="modal" popover th:attr="id=|ver-shelf-${item.id}|,aria-labelledby=|ver-shelf-${item.id}-titulo|">
+        <header class="modal-header">
+            <div>
+                <h2 th:attr="id=|ver-shelf-${item.id}-titulo|">Estante</h2>
+                <p>ID [[${item.id}]]</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|ver-shelf-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <div class="modal-form">
+            <dl class="detail-list">
+                <div><dt>Cômodo</dt><dd th:text="${item.room != null and !#strings.isEmpty(item.room) ? item.room : '—'}">valor</dd></div>
+                <div><dt>Usuário</dt><dd th:text="${usersById[item.userId]?.userName != null and !#strings.isEmpty(usersById[item.userId]?.userName) ? usersById[item.userId]?.userName : '—'}">valor</dd></div>
+            </dl>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|ver-shelf-${item.id}|">Fechar</button>
+            </footer>
+        </div>
+    </dialog>
+    </th:block>
 </body>
 </html>

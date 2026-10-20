@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
 </head>
 
 <body>
@@ -99,7 +100,7 @@
                         <td class="cell-nowrap">[[${item.executionDate != null ? #temporals.format(item.executionDate, 'dd/MM/yyyy HH:mm') : ''}]]</td>
                         <td class="cell-truncate">[[${item.resultDescription}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver registro ${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Ver registro ${item.id}|,popovertarget=|ver-history-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(histories)}">
@@ -111,5 +112,32 @@
 
         <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
+
+    <!-- Detalhes de cada registro (somente leitura) -->
+    <th:block th:each="item : ${histories}">
+    <dialog class="modal" popover th:attr="id=|ver-history-${item.id}|,aria-labelledby=|ver-history-${item.id}-titulo|">
+        <header class="modal-header">
+            <div>
+                <h2 th:attr="id=|ver-history-${item.id}-titulo|">Registro de uso</h2>
+                <p>ID [[${item.id}]]</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|ver-history-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <div class="modal-form">
+            <dl class="detail-list">
+                <div><dt>Usuário</dt><dd th:text="${usersById[item.userId]?.userName != null and !#strings.isEmpty(usersById[item.userId]?.userName) ? usersById[item.userId]?.userName : '—'}">valor</dd></div>
+                <div><dt>Tipo</dt><dd th:text="${historyTypesById[item.historyTypeId]?.name != null and !#strings.isEmpty(historyTypesById[item.historyTypeId]?.name) ? historyTypesById[item.historyTypeId]?.name : '—'}">valor</dd></div>
+                <div><dt>Estante</dt><dd th:text="${shelvesById[item.shelfId]?.room != null and !#strings.isEmpty(shelvesById[item.shelfId]?.room) ? shelvesById[item.shelfId]?.room : '—'}">valor</dd></div>
+                <div><dt>Execução</dt><dd th:text="${item.executionDate != null ? #temporals.format(item.executionDate, 'dd/MM/yyyy HH:mm') : '—'}">01/01/2026 10:00</dd></div>
+                <div><dt>Resultado</dt><dd th:text="${item.resultDescription != null and !#strings.isEmpty(item.resultDescription) ? item.resultDescription : '—'}">valor</dd></div>
+            </dl>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|ver-history-${item.id}|">Fechar</button>
+            </footer>
+        </div>
+    </dialog>
+    </th:block>
 </body>
 </html>
