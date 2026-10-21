@@ -566,6 +566,7 @@ body {
   background: transparent;
   font: inherit;
   text-align: left;
+}
 
 /* Avisos de sucesso e erro no topo das listas */
 .alert {
@@ -583,6 +584,7 @@ body {
 .alert-error {
   background: var(--color-danger-bg);
   color: var(--color-danger);
+}
 
 /* ---------- Campo de senha com botão de olho ---------- */
 .password-field {
