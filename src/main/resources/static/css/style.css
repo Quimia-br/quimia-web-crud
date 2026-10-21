@@ -116,11 +116,6 @@ body {
   height: 56px;
 }
 
-.sidebar-search input {
-  width: 100%;
-  border: 0;
-}
-
 .sidebar-nav {
   flex: 1;
   min-height: 0;
