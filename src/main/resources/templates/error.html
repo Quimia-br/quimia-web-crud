@@ -1,36 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Erro')}"></head>
-<body>
-<div class="app">
-  <aside th:replace="~{fragments/layout :: sidebar('')}"></aside>
-  <div class="main">
-    <header th:replace="~{fragments/layout :: topbar('Erro', null, null)}"></header>
-    <main class="content">
-      <!--
-        Standard error page
-        Model:   "details" -> ErrorDetails (status, error, message, path, timestamp)
-        Used by: GlobalExceptionHandler
-      -->
-      <div class="page-head">
-        <div>
-          <h1 class="h1" th:text="${details.status} + ' · ' + ${details.error}">500 · Internal Server Error</h1>
-          <p>Não foi possível concluir a operação.</p>
-        </div>
-        <a class="btn btn-primary" th:href="@{/}">Voltar ao início</a>
-      </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erro | Quimia</title>
 
-      <div class="alert alert-error" role="alert">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span th:text="${details.message}">Ocorreu um erro inesperado.</span>
-      </div>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
-      <section class="card form-card">
-        <p>Endereço: <span class="code" th:text="${details.path}">/exemplo</span></p>
-        <p>Data e hora: <span th:text="${#temporals.format(details.timestamp, 'dd/MM/yyyy HH:mm:ss')}">01/01/2026 00:00:00</span></p>
-      </section>
+    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../static/css/error.css" th:href="@{/css/error.css}">
+</head>
+
+<body class="error-page">
+    <!--
+        Página de erro padrão, usada pelo GlobalExceptionHandler.
+        Modelo: "details" (ErrorDetails: status, error, message, path, timestamp).
+        Quando o erro vem direto do servidor (sem "details"), usa os dados padrão do Spring Boot.
+    -->
+    <main class="error-card card">
+        <a href="login.html" th:href="@{/}" class="error-logo">
+            <img src="../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+        </a>
+
+        <p class="error-code" th:text="${details != null ? details.status : (status != null ? status : 500)}">500</p>
+        <h1 th:text="${details != null ? details.error : (error != null ? error : 'Erro')}">Internal Server Error</h1>
+        <p class="error-message" role="alert" th:text="${details != null ? details.message : 'Não foi possível concluir a operação.'}">Ocorreu um erro inesperado.</p>
+
+        <p class="error-meta" th:if="${details != null}">
+            <span th:text="${details.path}">/exemplo</span>
+            ·
+            <time th:text="${#temporals.format(details.timestamp, 'dd/MM/yyyy HH:mm:ss')}">01/01/2026 00:00:00</time>
+        </p>
+
+        <a class="btn btn-primary" href="login.html" th:href="@{/}">Voltar ao início</a>
     </main>
-  </div>
-</div>
-<script th:replace="~{fragments/layout :: scripts}"></script>
 </body>
 </html>

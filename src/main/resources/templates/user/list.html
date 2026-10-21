@@ -16,7 +16,7 @@
 
 <body>
     <aside class="sidebar">
-        <a href="../admin/list.html" th:href="@{/admins}" class="sidebar-logo">
+        <a href="../dashboard/index.html" th:href="@{/}" class="sidebar-logo">
             <img src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
         </a>
 
@@ -27,6 +27,7 @@
 
         <nav class="sidebar-nav" aria-label="Menu principal">
             <ul>
+                <li><a href="../dashboard/index.html" th:href="@{/}" class="nav-link"><img src="../../static/icons/chart-column.svg" th:src="@{/icons/chart-column.svg}" alt="">Dashboard</a></li>
                 <li><a href="../admin/list.html" th:href="@{/admins}" class="nav-link"><img src="../../static/icons/admin.svg" th:src="@{/icons/admin.svg}" alt="">Administradores</a></li>
                 <li><a href="../company/list.html" th:href="@{/companies}" class="nav-link"><img src="../../static/icons/company.svg" th:src="@{/icons/company.svg}" alt="">Empresas</a></li>
                 <li><a href="../user/list.html" th:href="@{/users}" class="nav-link" aria-current="page"><img src="../../static/icons/user.svg" th:src="@{/icons/user.svg}" alt="">Usuários</a></li>
