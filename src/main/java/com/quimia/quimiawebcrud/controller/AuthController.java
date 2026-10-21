@@ -15,6 +15,6 @@ public class AuthController {
     public String login(Authentication authentication) {
         boolean loggedIn = authentication != null && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken);
-        return loggedIn ? "redirect:/admins" : "auth/login";
+        return loggedIn ? "redirect:/" : "auth/login";
     }
 }
