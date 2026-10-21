@@ -195,6 +195,7 @@
 .auth-message-error {
   color: var(--color-danger);
   font-weight: 700;
+}
 
 /* Botão de olho dentro do campo de senha do login */
 .auth-field .password-toggle {
