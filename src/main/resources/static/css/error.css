@@ -1,0 +1,51 @@
+/* Página de erro (centralizada, sem menu lateral). Usa as cores e medidas do style.css. */
+
+.error-page {
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.error-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.error-logo img {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 8px;
+}
+
+.error-code {
+  margin: 0;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-primary);
+}
+
+.error-card h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.error-message {
+  margin: 8px 0;
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.error-meta {
+  margin: 0 0 16px;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}

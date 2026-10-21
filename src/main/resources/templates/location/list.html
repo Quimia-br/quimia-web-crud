@@ -8,11 +8,12 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
 </head>
 
 <body>
     <aside class="sidebar">
-        <a href="../admin/list.html" th:href="@{/admins}" class="sidebar-logo">
+        <a href="../dashboard/index.html" th:href="@{/}" class="sidebar-logo">
             <img src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
         </a>
 
@@ -23,6 +24,7 @@
 
         <nav class="sidebar-nav" aria-label="Menu principal">
             <ul>
+                <li><a href="../dashboard/index.html" th:href="@{/}" class="nav-link"><img src="../../static/icons/chart-column.svg" th:src="@{/icons/chart-column.svg}" alt="">Dashboard</a></li>
                 <li><a href="../admin/list.html" th:href="@{/admins}" class="nav-link"><img src="../../static/icons/admin.svg" th:src="@{/icons/admin.svg}" alt="">Administradores</a></li>
                 <li><a href="../company/list.html" th:href="@{/companies}" class="nav-link"><img src="../../static/icons/company.svg" th:src="@{/icons/company.svg}" alt="">Empresas</a></li>
                 <li><a href="../user/list.html" th:href="@{/users}" class="nav-link"><img src="../../static/icons/user.svg" th:src="@{/icons/user.svg}" alt="">Usuários</a></li>
@@ -99,7 +101,7 @@
                         <td>[[${item.latitude}]]</td>
                         <td>[[${item.longitude}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver localização de ${usersById[item.userId]?.userName}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Ver localização de ${usersById[item.userId]?.userName}|,popovertarget=|ver-location-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(locations)}">
@@ -111,5 +113,31 @@
 
         <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
+
+    <!-- Detalhes de cada registro (somente leitura) -->
+    <th:block th:each="item : ${locations}">
+    <dialog class="modal" popover th:attr="id=|ver-location-${item.id}|,aria-labelledby=|ver-location-${item.id}-titulo|">
+        <header class="modal-header">
+            <div>
+                <h2 th:attr="id=|ver-location-${item.id}-titulo|">Localização</h2>
+                <p>ID [[${item.id}]]</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|ver-location-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <div class="modal-form">
+            <dl class="detail-list">
+                <div><dt>Usuário</dt><dd th:text="${usersById[item.userId]?.userName != null and !#strings.isEmpty(usersById[item.userId]?.userName) ? usersById[item.userId]?.userName : '—'}">valor</dd></div>
+                <div><dt>CEP</dt><dd th:text="${item.zipCode != null and !#strings.isEmpty(item.zipCode) ? item.zipCode : '—'}">valor</dd></div>
+                <div><dt>Latitude</dt><dd th:text="${item.latitude != null and !#strings.isEmpty(item.latitude) ? item.latitude : '—'}">valor</dd></div>
+                <div><dt>Longitude</dt><dd th:text="${item.longitude != null and !#strings.isEmpty(item.longitude) ? item.longitude : '—'}">valor</dd></div>
+            </dl>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|ver-location-${item.id}|">Fechar</button>
+            </footer>
+        </div>
+    </dialog>
+    </th:block>
 </body>
 </html>
