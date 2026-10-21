@@ -283,7 +283,7 @@
                 <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
                 <div>
                     <h2 th:attr="id=|excluir-user-${item.id}-titulo|">Excluir usuário?</h2>
-                    <p>Tem certeza de que deseja excluir <strong>“[[${item.userName}]]”</strong>? Essa ação não poderá ser desfeita.</p>
+                    <p>Tem certeza de que deseja excluir <strong>“[[${item.userName}]]”</strong>? O histórico, as estantes e a localização dele também serão apagados. Os dados do usuário ficam registrados no log de edições, e essa ação não poderá ser desfeita.</p>
                 </div>
             </div>
 
