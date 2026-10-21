@@ -92,7 +92,7 @@
                         <td>[[${item.id}]]</td>
                         <td>[[${usersById[item.userId]?.userName}]]</td>
                         <td>[[${historyTypesById[item.historyTypeId]?.name}]]</td>
-                        <td>[[${shelvesById[item.shelfId]?.room}]]</td>
+                        <td>[[${shelvesById.get(item.shelfId)?.room}]]</td>
                         <td class="cell-nowrap">[[${item.executionDate != null ? #temporals.format(item.executionDate, 'dd/MM/yyyy HH:mm') : ''}]]</td>
                         <td class="cell-truncate">[[${item.resultDescription}]]</td>
                         <td class="col-actions">
@@ -124,7 +124,7 @@
             <dl class="detail-list">
                 <div><dt>Usuário</dt><dd th:text="${usersById[item.userId]?.userName != null and !#strings.isEmpty(usersById[item.userId]?.userName) ? usersById[item.userId]?.userName : '—'}">valor</dd></div>
                 <div><dt>Tipo</dt><dd th:text="${historyTypesById[item.historyTypeId]?.name != null and !#strings.isEmpty(historyTypesById[item.historyTypeId]?.name) ? historyTypesById[item.historyTypeId]?.name : '—'}">valor</dd></div>
-                <div><dt>Estante</dt><dd th:text="${shelvesById[item.shelfId]?.room != null and !#strings.isEmpty(shelvesById[item.shelfId]?.room) ? shelvesById[item.shelfId]?.room : '—'}">valor</dd></div>
+                <div><dt>Estante</dt><dd th:text="${shelvesById.get(item.shelfId)?.room != null and !#strings.isEmpty(shelvesById.get(item.shelfId)?.room) ? shelvesById.get(item.shelfId)?.room : '—'}">valor</dd></div>
                 <div><dt>Execução</dt><dd th:text="${item.executionDate != null ? #temporals.format(item.executionDate, 'dd/MM/yyyy HH:mm') : '—'}">01/01/2026 10:00</dd></div>
                 <div><dt>Resultado</dt><dd th:text="${item.resultDescription != null and !#strings.isEmpty(item.resultDescription) ? item.resultDescription : '—'}">valor</dd></div>
             </dl>
