@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
 </head>
 
 <body>
@@ -101,7 +102,7 @@
                         <td class="cell-truncate">[[${item.productDisposalMethod}]]</td>
                         <td class="cell-truncate">[[${item.environmentalPrecautions}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver descarte de ${productsById[item.productId]?.name}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Ver descarte de ${productsById[item.productId]?.name}|,popovertarget=|ver-disposal-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
 
                             <button type="button" class="btn-icon" th:attr="aria-label=|Editar descarte de ${productsById[item.productId]?.name}|,popovertarget=|editar-disposal-${item.id}|"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
 
@@ -171,6 +172,31 @@
     <!-- Editar e excluir: um par de popups para cada registro da lista. -->
 
     <th:block th:each="item : ${disposals}">
+    <dialog class="modal" popover th:attr="id=|ver-disposal-${item.id}|,aria-labelledby=|ver-disposal-${item.id}-titulo|">
+        <header class="modal-header">
+            <div>
+                <h2 th:attr="id=|ver-disposal-${item.id}-titulo|">Ficha de descarte</h2>
+                <p>ID [[${item.id}]]</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|ver-disposal-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <div class="modal-form">
+            <dl class="detail-list">
+                <div><dt>Produto</dt><dd th:text="${productsById[item.productId]?.name != null and !#strings.isEmpty(productsById[item.productId]?.name) ? productsById[item.productId]?.name : '—'}">valor</dd></div>
+                <div><dt>Nº CAS</dt><dd th:text="${productsById[item.productId]?.casNumber != null and !#strings.isEmpty(productsById[item.productId]?.casNumber) ? productsById[item.productId]?.casNumber : '—'}">valor</dd></div>
+                <div><dt>Descarte do produto</dt><dd th:text="${item.productDisposalMethod != null and !#strings.isEmpty(item.productDisposalMethod) ? item.productDisposalMethod : '—'}">valor</dd></div>
+                <div><dt>Descarte da embalagem</dt><dd th:text="${item.packagingDisposalMethod != null and !#strings.isEmpty(item.packagingDisposalMethod) ? item.packagingDisposalMethod : '—'}">valor</dd></div>
+                <div><dt>Restrições</dt><dd th:text="${item.disposalRestrictions != null and !#strings.isEmpty(item.disposalRestrictions) ? item.disposalRestrictions : '—'}">valor</dd></div>
+                <div><dt>Precauções ambientais</dt><dd th:text="${item.environmentalPrecautions != null and !#strings.isEmpty(item.environmentalPrecautions) ? item.environmentalPrecautions : '—'}">valor</dd></div>
+            </dl>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|ver-disposal-${item.id}|">Fechar</button>
+            </footer>
+        </div>
+    </dialog>
+
         <dialog class="modal" popover th:attr="id=|editar-disposal-${item.id}|,aria-labelledby=|editar-disposal-${item.id}-titulo|">
         <header class="modal-header">
             <div>

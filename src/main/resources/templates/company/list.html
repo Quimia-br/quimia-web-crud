@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
     <link rel="stylesheet" href="../../static/css/photo.css" th:href="@{/css/photo.css}">
 
     <script src="../../static/js/password-toggle.js" th:src="@{/js/password-toggle.js}" defer></script>
@@ -115,7 +116,7 @@
                         <td><span th:replace="~{fragments/badges :: status(${item.status})}"></span></td>
                         <td class="cell-nowrap">[[${item.signUpDate != null ? #temporals.format(item.signUpDate, 'dd/MM/yyyy') : ''}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver ${item.name}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Ver ${item.name}|,popovertarget=|ver-company-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
 
                             <button type="button" class="btn-icon" th:attr="aria-label=|Editar ${item.name}|,popovertarget=|editar-company-${item.id}|"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
 
@@ -208,6 +209,32 @@
     <!-- Editar e excluir: um par de popups para cada registro da lista. -->
 
     <th:block th:each="item : ${companies}">
+    <dialog class="modal" popover th:attr="id=|ver-company-${item.id}|,aria-labelledby=|ver-company-${item.id}-titulo|">
+        <header class="modal-header">
+            <div>
+                <h2 th:attr="id=|ver-company-${item.id}-titulo|">Empresa</h2>
+                <p>ID [[${item.id}]]</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|ver-company-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <div class="modal-form">
+            <dl class="detail-list">
+                <div><dt>Nome</dt><dd th:text="${item.name != null and !#strings.isEmpty(item.name) ? item.name : '—'}">valor</dd></div>
+                <div><dt>CNPJ</dt><dd th:text="${item.cnpj != null and !#strings.isEmpty(item.cnpj) ? item.cnpj : '—'}">valor</dd></div>
+                <div><dt>E-mail</dt><dd th:text="${item.email != null and !#strings.isEmpty(item.email) ? item.email : '—'}">valor</dd></div>
+                <div><dt>Porte</dt><dd th:text="${item.size != null and !#strings.isEmpty(item.size) ? item.size : '—'}">valor</dd></div>
+                <div><dt>Status</dt><dd><span th:replace="~{fragments/badges :: status(${item.status})}"></span></dd></div>
+                <div><dt>Cadastro</dt><dd th:text="${item.signUpDate != null ? #temporals.format(item.signUpDate, 'dd/MM/yyyy HH:mm') : '—'}">01/01/2026 10:00</dd></div>
+                <div><dt>Foto</dt><dd><img class="detail-photo" th:if="${@photoUrlPolicy.isSafe(item.photoUrl)}" th:src="${item.photoUrl}" referrerpolicy="no-referrer" alt="Foto" width="64" height="64"><span th:unless="${@photoUrlPolicy.isSafe(item.photoUrl)}">—</span></dd></div>
+            </dl>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|ver-company-${item.id}|">Fechar</button>
+            </footer>
+        </div>
+    </dialog>
+
         <dialog class="modal" popover th:attr="id=|editar-company-${item.id}|,aria-labelledby=|editar-company-${item.id}-titulo|">
         <header class="modal-header">
             <div>

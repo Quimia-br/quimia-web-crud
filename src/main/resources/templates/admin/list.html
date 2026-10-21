@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
 
     <script src="../../static/js/password-toggle.js" th:src="@{/js/password-toggle.js}" defer></script>
 </head>
@@ -114,7 +115,7 @@
                         <td><span th:replace="~{fragments/badges :: status(${item.status})}"></span></td>
                         <td>[[${item.signUpDate != null ? #temporals.format(item.signUpDate, 'dd/MM/yyyy') : ''}]]</td>
                         <td class = "col-actions">
-                            <a href="#" class="btn-icon" th:attr="aria-label=|Ver ${item.userName}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Ver ${item.userName}|,popovertarget=|ver-admin-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
                             
                             <button type="button" class="btn-icon" th:attr="aria-label=|Editar ${item.userName}|,popovertarget=|editar-admin-${item.id}|"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
 
@@ -196,6 +197,29 @@
     <!-- Editar e excluir: um par de popups para cada registro da lista. -->
 
     <th:block th:each="item : ${admins}">
+    <dialog class="modal" popover th:attr="id=|ver-admin-${item.id}|,aria-labelledby=|ver-admin-${item.id}-titulo|">
+        <header class="modal-header">
+            <div>
+                <h2 th:attr="id=|ver-admin-${item.id}-titulo|">Administrador</h2>
+                <p>ID [[${item.id}]]</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|ver-admin-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <div class="modal-form">
+            <dl class="detail-list">
+                <div><dt>Nome</dt><dd th:text="${item.userName != null and !#strings.isEmpty(item.userName) ? item.userName : '—'}">valor</dd></div>
+                <div><dt>E-mail</dt><dd th:text="${item.email != null and !#strings.isEmpty(item.email) ? item.email : '—'}">valor</dd></div>
+                <div><dt>Status</dt><dd><span th:replace="~{fragments/badges :: status(${item.status})}"></span></dd></div>
+                <div><dt>Cadastro</dt><dd th:text="${item.signUpDate != null ? #temporals.format(item.signUpDate, 'dd/MM/yyyy HH:mm') : '—'}">01/01/2026 10:00</dd></div>
+            </dl>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|ver-admin-${item.id}|">Fechar</button>
+            </footer>
+        </div>
+    </dialog>
+
         <dialog class="modal" popover th:attr="id=|editar-admin-${item.id}|,aria-labelledby=|editar-admin-${item.id}-titulo|">
         <header class="modal-header">
             <div>
