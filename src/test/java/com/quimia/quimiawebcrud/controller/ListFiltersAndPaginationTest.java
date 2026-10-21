@@ -203,6 +203,14 @@ class ListFiltersAndPaginationTest {
     }
 
     @Test
+    void listsWithASinglePageShowNoPaginationAtAll() throws Exception {
+        for (String path : new String[]{"/admins", "/companies", "/products", "/disposals", "/shelves",
+                "/histories", "/history-types", "/locations", "/admin-logs"}) {
+            assertFalse(page(path).contains("class=\"pagination\"") || page(path).contains("class = \"pagination\""), path);
+        }
+    }
+
+    @Test
     void everyListOpensWithoutFilters() throws Exception {
         for (String path : new String[]{"/users", "/admins", "/companies", "/products", "/disposals", "/shelves",
                 "/histories", "/history-types", "/locations", "/admin-logs"}) {
