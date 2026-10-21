@@ -1,5 +1,7 @@
 package com.quimia.quimiawebcrud.service;
 
+import com.quimia.quimiawebcrud.model.enums.AdminAction;
+
 import java.util.Optional;
 
 /**
@@ -7,6 +9,9 @@ import java.util.Optional;
  * completa (JSON) usada para restaurar o registro. A tela só mostra o resumo.
  */
 public final class RemovalLogFormat {
+
+    /** Começo do texto das linhas de restauração: o banco só aceita INSERT/UPDATE/DELETE, então é assim que se reconhece. */
+    static final String RESTORE_PREFIX = "Restaurado a partir do registro #";
 
     static final String MARKER = "\n---dados-para-restaurar---\n";
 
@@ -36,5 +41,15 @@ public final class RemovalLogFormat {
 
     public static boolean hasPayload(String stored) {
         return payloadOf(stored).isPresent();
+    }
+
+    /** Texto da linha do log que registra uma restauração (gravada como INSERT). */
+    public static String restoreNote(Integer restoredLogId, String alsoRestored) {
+        return RESTORE_PREFIX + restoredLogId + " do log. Voltaram junto: " + alsoRestored + ".";
+    }
+
+    /** Linha de restauração: gravada como INSERT, mas com o texto de {@link #restoreNote}. */
+    public static boolean isRestore(AdminAction action, String stored) {
+        return action == AdminAction.INSERT && stored != null && stored.startsWith(RESTORE_PREFIX);
     }
 }

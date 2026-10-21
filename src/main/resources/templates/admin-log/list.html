@@ -68,6 +68,7 @@
                 <select id="acao" name="acao">
                     <option value="">Todas</option>
                     <option value="INSERT" th:selected="${filters['acao'] == 'INSERT'}">Inclusão</option>
+                    <option value="RESTORE" th:selected="${filters['acao'] == 'RESTORE'}">Restauração</option>
                     <option value="UPDATE" th:selected="${filters['acao'] == 'UPDATE'}">Alteração</option>
                     <option value="DELETE" th:selected="${filters['acao'] == 'DELETE'}">Exclusão</option>
                 </select>
@@ -113,7 +114,7 @@
                     <tr th:each="item : ${adminLogs}">
                         <td>[[${item.id}]]</td>
                         <td>[[${adminsById[item.adminId]?.userName}]]</td>
-                        <td><span th:replace="~{fragments/badges :: action(${item.action})}"></span></td>
+                        <td><span th:replace="~{fragments/badges :: logAction(${item})}"></span></td>
                         <td>[[${item.affectedTable}]]</td>
                         <td>#[[${item.recordId}]]</td>
                         <td class="cell-nowrap">[[${item.editDate != null ? #temporals.format(item.editDate, 'dd/MM/yyyy HH:mm') : ''}]]</td>
@@ -146,7 +147,7 @@
         <div class="modal-form">
             <dl class="detail-list">
                 <div><dt>Administrador</dt><dd th:text="${adminsById[item.adminId]?.userName != null and !#strings.isEmpty(adminsById[item.adminId]?.userName) ? adminsById[item.adminId]?.userName : '—'}">valor</dd></div>
-                <div><dt>Ação</dt><dd><span th:replace="~{fragments/badges :: action(${item.action})}"></span></dd></div>
+                <div><dt>Ação</dt><dd><span th:replace="~{fragments/badges :: logAction(${item})}"></span></dd></div>
                 <div><dt>Tabela</dt><dd th:text="${item.affectedTable != null and !#strings.isEmpty(item.affectedTable) ? item.affectedTable : '—'}">valor</dd></div>
                 <div><dt>Registro</dt><dd th:text="${item.recordId != null and !#strings.isEmpty(item.recordId) ? item.recordId : '—'}">valor</dd></div>
                 <div><dt>Data</dt><dd th:text="${item.editDate != null ? #temporals.format(item.editDate, 'dd/MM/yyyy HH:mm') : '—'}">01/01/2026 10:00</dd></div>

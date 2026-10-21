@@ -70,6 +70,26 @@ class RestoreFromLogTest {
     }
 
     @Test
+    void aRestoreShowsTheRestorationBadgeAndHasItsOwnFilter() throws Exception {
+        when(adminService.readAll()).thenReturn(new ArrayList<>());
+        AdminLogResponseDTO restore = AdminLogResponseDTO.builder().id(8).adminId(1).affectedTable("usuarios").recordId(7)
+                .action(AdminAction.INSERT).restore(true).editDate(LocalDateTime.of(2026, 10, 21, 11, 0)).build();
+        AdminLogResponseDTO creation = log(7, AdminAction.INSERT);
+        when(adminLogService.readAllNewestFirst()).thenReturn(new ArrayList<>(List.of(restore, creation, log(6, AdminAction.DELETE))));
+        when(adminLogService.restorableIds()).thenReturn(Set.of());
+
+        String all = mvc.perform(get("/admin-logs")).andReturn().getResponse().getContentAsString();
+        String onlyRestores = mvc.perform(get("/admin-logs").param("acao", "RESTORE")).andReturn().getResponse().getContentAsString();
+        String onlyCreations = mvc.perform(get("/admin-logs").param("acao", "INSERT")).andReturn().getResponse().getContentAsString();
+
+        assertTrue(all.contains(">Restauração</span>") && all.contains(">Criação</span>") && all.contains(">Exclusão</span>"));
+        assertTrue(onlyRestores.contains(">Restauração</span>") && !onlyRestores.contains(">Criação</span>")
+                && !onlyRestores.contains(">Exclusão</span>"), "o filtro de restauração mostra só restaurações");
+        assertTrue(onlyCreations.contains(">Criação</span>") && !onlyCreations.contains(">Restauração</span>"),
+                "o filtro de inclusão não traz as restaurações");
+    }
+
+    @Test
     void restoringShowsASuccessMessageAndGoesBackToTheLog() throws Exception {
         mvc.perform(post("/admin-logs/5/restore"))
                 .andExpect(redirectedUrl("/admin-logs"))

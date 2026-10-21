@@ -66,6 +66,21 @@ class RestorableLogTest {
     }
 
     @Test
+    void aRestoreLineIsStoredAsInsertButRecognisedAsARestore() {
+        String note = RemovalLogFormat.restoreNote(11, "2 em historicos");
+        AdminLog restore = AdminLog.builder().id(2).affectedTable("usuarios").recordId(7)
+                .action(AdminAction.INSERT).previousData(note).build();
+        AdminLog creation = AdminLog.builder().id(3).affectedTable("usuarios").recordId(8)
+                .action(AdminAction.INSERT).previousData("Criado pelo painel").build();
+        AdminLog deletion = AdminLog.builder().id(4).affectedTable("usuarios").recordId(7)
+                .action(AdminAction.DELETE).previousData(note).build();
+
+        assertTrue(new AdminLogMapper().toResponse(restore).isRestore());
+        assertFalse(new AdminLogMapper().toResponse(creation).isRestore());
+        assertFalse(new AdminLogMapper().toResponse(deletion).isRestore(), "só INSERT com o texto próprio conta");
+    }
+
+    @Test
     void formatHelpersHandleTextWithoutACopy() {
         assertEquals("texto antigo", RemovalLogFormat.summaryOf("texto antigo"));
         assertFalse(RemovalLogFormat.hasPayload("texto antigo"));

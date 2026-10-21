@@ -3,6 +3,7 @@ package com.quimia.quimiawebcrud.controller;
 import com.quimia.quimiawebcrud.dto.AdminLogResponseDTO;
 import com.quimia.quimiawebcrud.dto.AdminResponseDTO;
 import com.quimia.quimiawebcrud.exception.BusinessException;
+import com.quimia.quimiawebcrud.model.enums.AdminAction;
 import com.quimia.quimiawebcrud.service.RecordRestoreService;
 import com.quimia.quimiawebcrud.service.AdminLogService;
 import com.quimia.quimiawebcrud.service.AdminService;
@@ -66,7 +67,7 @@ public class AdminLogController extends ListController<AdminLogResponseDTO> {
         return log -> {
             AdminResponseDTO admin = adminsById.get(log.getAdminId());
             return Filters.matchesText(params.get("busca"), admin == null ? null : admin.getUserName())
-                    && Filters.sameEnum(log.getAction(), params.get("acao"))
+                    && matchesAction(log, params.get("acao"))
                     && Filters.sameText(log.getAffectedTable(), params.get("tabela"))
                     && Filters.inDateRange(log.getEditDate(), params.get("dataDe"), params.get("dataAte"));
         };
@@ -85,5 +86,16 @@ public class AdminLogController extends ListController<AdminLogResponseDTO> {
                     + "(por exemplo, o mesmo e-mail) ou algo de que ele depende foi apagado depois. Restaure antes o que falta.");
         }
         return "redirect:" + getBasePath();
+    }
+
+    /** "Restauração" não existe no banco (é um INSERT com texto próprio); "Inclusão" não inclui as restaurações. */
+    private static boolean matchesAction(AdminLogResponseDTO log, String wanted) {
+        if ("RESTORE".equals(wanted)) {
+            return log.isRestore();
+        }
+        if ("INSERT".equals(wanted)) {
+            return log.getAction() == AdminAction.INSERT && !log.isRestore();
+        }
+        return Filters.sameEnum(log.getAction(), wanted);
     }
 }

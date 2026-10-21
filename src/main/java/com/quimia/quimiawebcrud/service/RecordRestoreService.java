@@ -88,8 +88,7 @@ public class RecordRestoreService {
                 .affectedTable(entry.getAffectedTable())
                 .recordId(entry.getRecordId())
                 .action(AdminAction.INSERT)
-                .previousData("Restaurado a partir do registro #" + logId + " do log. Voltaram junto: "
-                        + (restored.isEmpty() ? "nada" : String.join(", ", restored)) + ".")
+                .previousData(RemovalLogFormat.restoreNote(logId, restored.isEmpty() ? "nada" : String.join(", ", restored)))
                 .build());
     }
 

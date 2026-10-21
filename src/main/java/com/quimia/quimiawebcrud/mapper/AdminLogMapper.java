@@ -39,6 +39,7 @@ public class AdminLogMapper implements Mapper<AdminLog, AdminLogRequestDTO, Admi
                 .recordId(entity.getRecordId())
                 .action(entity.getAction())
                 .previousData(RemovalLogFormat.summaryOf(entity.getPreviousData()))
+                .restore(RemovalLogFormat.isRestore(entity.getAction(), entity.getPreviousData()))
                 .editDate(entity.getEditDate())
                 .build();
     }

@@ -89,6 +89,7 @@ class RecordRestoreServiceTest {
         verify(logs).save(saved.capture());
         AdminLog log = saved.getValue();
         assertEquals(AdminAction.INSERT, log.getAction());
+        assertTrue(RemovalLogFormat.isRestore(log.getAction(), log.getPreviousData()), "reconhecida como restauração");
         assertEquals("usuarios", log.getAffectedTable());
         assertEquals(7, log.getRecordId());
         assertEquals(author, log.getAdmin());
