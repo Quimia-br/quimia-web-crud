@@ -60,7 +60,7 @@ class CrudControllerTest {
 
     @Test
     void saveWithIdUpdatesAndDeleteRemoves() throws Exception {
-        mvc.perform(post("/users/save").param("id", "7").param("userName", "Ana"))
+        mvc.perform(post("/users/save").param("id", "7").param("userName", "Ana").param("email", "ana@email.com").param("status", "ATIVO"))
                 .andExpect(redirectedUrl("/users"))
                 .andExpect(flash().attribute("message", "Registro atualizado com sucesso."));
         verify(userService).update(org.mockito.ArgumentMatchers.eq(7), any(UserRequestDTO.class));
@@ -76,7 +76,7 @@ class CrudControllerTest {
         when(userService.create(any())).thenThrow(new DuplicateResourceException("O e-mail já está cadastrado."));
         doThrow(new ResourceNotFoundException("Registro não encontrado com o ID: 9")).when(userService).delete(9);
 
-        mvc.perform(post("/users/save").param("userName", "Ana"))
+        mvc.perform(post("/users/save").param("userName", "Ana").param("email", "ana@email.com").param("status", "ATIVO"))
                 .andExpect(redirectedUrl("/users"))
                 .andExpect(flash().attribute("error", "O e-mail já está cadastrado."));
         mvc.perform(post("/users/9/delete"))
@@ -97,7 +97,7 @@ class CrudControllerTest {
     void savingADuplicateRecordShowsAFriendlyMessage() throws Exception {
         when(userService.create(any())).thenThrow(new DataIntegrityViolationException("duplicate key value violates unique constraint \"usuarios_email_key\""));
 
-        mvc.perform(post("/users/save").param("userName", "Ana"))
+        mvc.perform(post("/users/save").param("userName", "Ana").param("email", "ana@email.com").param("status", "ATIVO"))
                 .andExpect(redirectedUrl("/users"))
                 .andExpect(flash().attribute("error",
                         "Não foi possível salvar: já existe um registro com esses dados ou algum dado relacionado é inválido."));
@@ -107,7 +107,7 @@ class CrudControllerTest {
     void unexpectedErrorsGoToTheErrorPageInsteadOfLeakingTheirMessage() throws Exception {
         when(userService.create(any())).thenThrow(new IllegalStateException("detalhe interno"));
 
-        mvc.perform(post("/users/save").param("userName", "Ana"))
+        mvc.perform(post("/users/save").param("userName", "Ana").param("email", "ana@email.com").param("status", "ATIVO"))
                 .andExpect(status().isInternalServerError());
     }
 }
