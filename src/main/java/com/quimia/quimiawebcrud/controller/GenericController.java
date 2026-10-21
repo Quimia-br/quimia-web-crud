@@ -1,10 +1,13 @@
 package com.quimia.quimiawebcrud.controller;
 
+import com.quimia.quimiawebcrud.exception.BusinessException;
 import com.quimia.quimiawebcrud.service.CrudService;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +21,10 @@ import java.util.stream.Collectors;
 
 /**
  * Telas de cadastro: além da lista, têm as rotas de salvar e excluir usadas pelos popups.
+ * Erros de regra de negócio viram aviso na própria tela; erros do banco ganham uma mensagem amigável;
+ * qualquer outro erro sobe para o tratador global (página de erro).
  */
+@Slf4j
 public abstract class GenericController<T, ID, Res, Req> extends ListController<Res> {
 
     private static final int MAX_MESSAGES = 3;
@@ -47,8 +53,12 @@ public abstract class GenericController<T, ID, Res, Req> extends ListController<
                 getService().update(id, request);
                 redirect.addFlashAttribute("message", "Registro atualizado com sucesso.");
             }
-        } catch (RuntimeException e) {
+        } catch (BusinessException e) {
             redirect.addFlashAttribute("error", e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            log.warn("Violação de integridade ao salvar em {}", getBasePath(), e);
+            redirect.addFlashAttribute("error",
+                    "Não foi possível salvar: já existe um registro com esses dados ou algum dado relacionado é inválido.");
         }
         return redirectToList();
     }
@@ -58,8 +68,12 @@ public abstract class GenericController<T, ID, Res, Req> extends ListController<
         try {
             getService().delete(id);
             redirect.addFlashAttribute("message", "Registro excluído com sucesso.");
-        } catch (RuntimeException e) {
+        } catch (BusinessException e) {
             redirect.addFlashAttribute("error", e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            log.warn("Violação de integridade ao excluir em {}", getBasePath(), e);
+            redirect.addFlashAttribute("error",
+                    "Não foi possível excluir: este registro está em uso por outros dados.");
         }
         return redirectToList();
     }

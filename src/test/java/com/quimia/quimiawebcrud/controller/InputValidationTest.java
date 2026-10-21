@@ -128,7 +128,8 @@ class InputValidationTest {
 
     @Test
     void productNeedsCompanyCasInNumericFormatAndTexts() throws Exception {
-        mvc.perform(post("/products/save").param("name", "Cloro").param("casNumber", "abc").param("brand", "LB"))
+        mvc.perform(post("/products/save").param("name", "Cloro").param("casNumber", "abc").param("brand", "LB")
+                        .param("instructions", "Diluir").param("dosage", "1 ml"))
                 .andExpect(redirectedUrl("/products"))
                 .andExpect(errorContains("Selecione a empresa."))
                 .andExpect(errorContains("O número CAS deve ter o formato 0000-00-0."));
