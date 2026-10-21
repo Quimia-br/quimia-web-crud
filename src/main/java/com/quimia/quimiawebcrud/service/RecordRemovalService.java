@@ -11,14 +11,13 @@ import com.quimia.quimiawebcrud.model.Product;
 import com.quimia.quimiawebcrud.model.User;
 import com.quimia.quimiawebcrud.model.enums.AdminAction;
 import com.quimia.quimiawebcrud.repository.AdminLogRepository;
-import com.quimia.quimiawebcrud.repository.AdminRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,72 +25,82 @@ import java.util.stream.Stream;
 
 /**
  * Exclusão de um registro junto com tudo que depende dele (o banco não deixa apagar quem ainda é referenciado).
- * Cada tipo tem um plano: consultas que apagam os dependentes, na ordem em que as chaves permitem. Os dados do
- * registro ficam no log de edições, com o administrador que fez a exclusão. Tudo acontece em uma transação:
- * se algo falhar, nada é apagado.
+ * <p>
+ * Cada tipo tem um plano: a lista de tabelas afetadas, na ordem em que as linhas podem ser reinseridas
+ * (o próprio registro primeiro, depois quem depende dele). Antes de apagar, uma cópia de todas as linhas é
+ * guardada no log de edições, junto com o administrador que fez a exclusão; é essa cópia que permite restaurar.
+ * As linhas são apagadas na ordem inversa. Tudo acontece em uma transação: se algo falhar, nada é apagado.
  */
 @Service
 @RequiredArgsConstructor
 public class RecordRemovalService {
 
-    record Step(String label, String query) {
+    /** Tabela afetada e quais das suas linhas pertencem ao registro excluído ({@code :id}). */
+    record Part(String label, String table, String where) {
     }
 
-    private static final String COMPANY_PRODUCTS = "(select p.id from Product p where p.company.id = :id)";
+    private static final String COPY_ROWS = "select cast(coalesce(jsonb_agg(to_jsonb(t)), cast('[]' as jsonb)) as text) "
+            + "from %s t where %s";
 
-    static final List<Step> USER_STEPS = List.of(
-            new Step("itens de histórico",
-                    "delete from HistoryProduct hp where hp.history.id in "
-                            + "(select h.id from History h where h.user.id = :id "
-                            + "or h.shelf.id in (select s.id from Shelf s where s.user.id = :id)) "
-                            + "or hp.userProduct.id.userId = :id"),
-            new Step("históricos",
-                    "delete from History h where h.user.id = :id "
-                            + "or h.shelf.id in (select s.id from Shelf s where s.user.id = :id)"),
-            new Step("produtos nas estantes",
-                    "delete from ShelfProduct sp where sp.id.shelfId in (select s.id from Shelf s where s.user.id = :id)"),
-            new Step("estantes", "delete from Shelf s where s.user.id = :id"),
-            new Step("produtos do usuário", "delete from UserProduct up where up.id.userId = :id"),
-            new Step("localizações", "delete from Location l where l.user.id = :id"));
+    private static final String USER_SHELVES = "(select id_estante from estantes where id_usuario = :id)";
+    private static final String USER_HISTORIES = "(select id_historico from historicos where id_usuario = :id "
+            + "or id_estante in " + USER_SHELVES + ")";
+    private static final String COMPANY_PRODUCTS = "(select id_produto from produtos where id_usuario_empresa = :id)";
 
-    static final List<Step> PRODUCT_STEPS = List.of(
-            new Step("itens de histórico", "delete from HistoryProduct hp where hp.userProduct.id.productId = :id"),
-            new Step("produtos nas estantes", "delete from ShelfProduct sp where sp.id.productId = :id"),
-            new Step("produtos dos usuários", "delete from UserProduct up where up.id.productId = :id"),
-            new Step("fichas de descarte", "delete from Disposal d where d.product.id = :id"));
+    static final List<Part> USER_PARTS = List.of(
+            new Part("usuário", "usuarios", "id_usuario = :id"),
+            new Part("localizações", "localizacoes", "id_usuario = :id"),
+            new Part("estantes", "estantes", "id_usuario = :id"),
+            new Part("produtos do usuário", "produtos_usuarios", "id_usuario = :id"),
+            new Part("produtos nas estantes", "produtos_estantes", "id_estante in " + USER_SHELVES),
+            new Part("históricos", "historicos",
+                    "id_usuario = :id or id_estante in " + USER_SHELVES),
+            new Part("itens de histórico", "historicos_produtos",
+                    "id_usuario = :id or id_historico in " + USER_HISTORIES));
 
-    static final List<Step> COMPANY_STEPS = List.of(
-            new Step("itens de histórico",
-                    "delete from HistoryProduct hp where hp.userProduct.id.productId in " + COMPANY_PRODUCTS),
-            new Step("produtos nas estantes", "delete from ShelfProduct sp where sp.id.productId in " + COMPANY_PRODUCTS),
-            new Step("produtos dos usuários", "delete from UserProduct up where up.id.productId in " + COMPANY_PRODUCTS),
-            new Step("fichas de descarte", "delete from Disposal d where d.product.id in " + COMPANY_PRODUCTS),
-            new Step("produtos", "delete from Product p where p.company.id = :id"));
+    static final List<Part> COMPANY_PARTS = List.of(
+            new Part("empresa", "usuarios_empresas", "id_usuario_empresa = :id"),
+            new Part("produtos", "produtos", "id_usuario_empresa = :id"),
+            new Part("fichas de descarte", "descartes_fds", "id_produto in " + COMPANY_PRODUCTS),
+            new Part("produtos dos usuários", "produtos_usuarios", "id_produto in " + COMPANY_PRODUCTS),
+            new Part("produtos nas estantes", "produtos_estantes", "id_produto in " + COMPANY_PRODUCTS),
+            new Part("itens de histórico", "historicos_produtos", "id_produto in " + COMPANY_PRODUCTS));
 
-    static final List<Step> HISTORY_TYPE_STEPS = List.of(
-            new Step("itens de histórico",
-                    "delete from HistoryProduct hp where hp.history.id in "
-                            + "(select h.id from History h where h.historyType.id = :id)"),
-            new Step("históricos", "delete from History h where h.historyType.id = :id"));
+    static final List<Part> PRODUCT_PARTS = List.of(
+            new Part("produto", "produtos", "id_produto = :id"),
+            new Part("fichas de descarte", "descartes_fds", "id_produto = :id"),
+            new Part("produtos dos usuários", "produtos_usuarios", "id_produto = :id"),
+            new Part("produtos nas estantes", "produtos_estantes", "id_produto = :id"),
+            new Part("itens de histórico", "historicos_produtos", "id_produto = :id"));
 
-    static final List<Step> ADMIN_STEPS = List.of(
-            new Step("registros do log", "delete from AdminLog l where l.admin.id = :id"));
+    static final List<Part> HISTORY_TYPE_PARTS = List.of(
+            new Part("tipo de histórico", "tipos_historicos", "id_tipo_historico = :id"),
+            new Part("históricos", "historicos", "id_tipo_historico = :id"),
+            new Part("itens de histórico", "historicos_produtos",
+                    "id_historico in (select id_historico from historicos where id_tipo_historico = :id)"));
 
-    static final List<Step> DISPOSAL_STEPS = List.of();
+    static final List<Part> DISPOSAL_PARTS = List.of(
+            new Part("ficha de descarte", "descartes_fds", "id_descarte_fds = :id"));
 
-    /** Todas as consultas, para o teste que as compila contra o modelo. */
-    static List<Step> allSteps() {
-        return Stream.of(USER_STEPS, PRODUCT_STEPS, COMPANY_STEPS, HISTORY_TYPE_STEPS, ADMIN_STEPS, DISPOSAL_STEPS)
+    static final List<Part> ADMIN_PARTS = List.of(
+            new Part("administrador", "admins", "id_admin = :id"),
+            new Part("registros do log", "admin_log_edicoes", "id_admin = :id"));
+
+    /** Todos os planos, para os testes conferirem as tabelas e colunas contra o modelo. */
+    static List<Part> allParts() {
+        return Stream.of(USER_PARTS, COMPANY_PARTS, PRODUCT_PARTS, HISTORY_TYPE_PARTS, DISPOSAL_PARTS, ADMIN_PARTS)
                 .flatMap(List::stream).toList();
     }
 
+    static final JsonMapper JSON = JsonMapper.builder().build();
+
     private final EntityManager entityManager;
-    private final AdminRepository admins;
+    private final CurrentAdmin currentAdmin;
     private final AdminLogRepository logs;
 
     @Transactional
     public void removeUser(User user) {
-        remove(user, "usuarios", USER_STEPS, List.of(
+        remove(user, USER_PARTS, List.of(
                 field("Nome", user.getUserName()), field("E-mail", user.getEmail()), field("Status", user.getStatus()),
                 field("Nascimento", user.getBirthDate()), field("Cadastro", user.getSignUpDate()),
                 field("Foto", user.getPhotoUrl())));
@@ -99,7 +108,7 @@ public class RecordRemovalService {
 
     @Transactional
     public void removeCompany(Company company) {
-        remove(company, "usuarios_empresas", COMPANY_STEPS, List.of(
+        remove(company, COMPANY_PARTS, List.of(
                 field("Nome", company.getName()), field("CNPJ", company.getCnpj()), field("E-mail", company.getEmail()),
                 field("Porte", company.getSize()), field("Status", company.getStatus()),
                 field("Cadastro", company.getSignUpDate()), field("Foto", company.getPhotoUrl())));
@@ -107,7 +116,7 @@ public class RecordRemovalService {
 
     @Transactional
     public void removeProduct(Product product) {
-        remove(product, "produtos", PRODUCT_STEPS, List.of(
+        remove(product, PRODUCT_PARTS, List.of(
                 field("Nome", product.getName()), field("CAS", product.getCasNumber()), field("Marca", product.getBrand()),
                 field("Empresa", product.getCompany() == null ? null : product.getCompany().getName()),
                 field("Instruções", product.getInstructions()), field("Dosagem", product.getDosage())));
@@ -115,7 +124,7 @@ public class RecordRemovalService {
 
     @Transactional
     public void removeDisposal(Disposal disposal) {
-        remove(disposal, "descartes_fds", DISPOSAL_STEPS, List.of(
+        remove(disposal, DISPOSAL_PARTS, List.of(
                 field("Produto", disposal.getProduct() == null ? null : disposal.getProduct().getName()),
                 field("Descarte do produto", disposal.getProductDisposalMethod()),
                 field("Descarte da embalagem", disposal.getPackagingDisposalMethod()),
@@ -125,46 +134,66 @@ public class RecordRemovalService {
 
     @Transactional
     public void removeHistoryType(HistoryType historyType) {
-        remove(historyType, "tipos_historicos", HISTORY_TYPE_STEPS, List.of(field("Nome", historyType.getName())));
+        remove(historyType, HISTORY_TYPE_PARTS, List.of(field("Nome", historyType.getName())));
     }
 
-    /** Quem exclui um administrador não pode ser ele mesmo; o log das ações dele é apagado junto. */
+    /** Quem exclui um administrador não pode ser ele mesmo; o log das ações dele é apagado (e vai na cópia). */
     @Transactional
     public void removeAdmin(Admin admin) {
-        remove(admin, "admins", ADMIN_STEPS, List.of(
+        remove(admin, ADMIN_PARTS, List.of(
                 field("Nome", admin.getUserName()), field("E-mail", admin.getEmail()), field("Status", admin.getStatus()),
                 field("Cadastro", admin.getSignUpDate())));
     }
 
-    private void remove(Model record, String table, List<Step> steps, List<String> details) {
-        Admin author = currentAdmin();
+    private void remove(Model record, List<Part> parts, List<String> details) {
+        Admin author = currentAdmin.require();
         if (record instanceof Admin && record.getId().equals(author.getId())) {
             throw new InvalidDataException("Você não pode excluir a sua própria conta.");
         }
         Integer id = record.getId();
+        String table = parts.get(0).table();
+
+        String copy = copyOfRows(table, id, parts);
 
         List<String> removed = new ArrayList<>();
-        for (Step step : steps) {
-            int count = entityManager.createQuery(step.query()).setParameter("id", id).executeUpdate();
-            if (count > 0) {
-                removed.add(count + " " + step.label());
+        for (int i = parts.size() - 1; i >= 0; i--) {
+            Part part = parts.get(i);
+            int count = entityManager.createNativeQuery("delete from " + part.table() + " where " + part.where())
+                    .setParameter("id", id).executeUpdate();
+            if (i > 0 && count > 0) {
+                removed.add(count + " " + part.label());
             }
         }
+        entityManager.detach(record);
 
         logs.save(AdminLog.builder()
                 .admin(author)
                 .affectedTable(table)
                 .recordId(id)
                 .action(AdminAction.DELETE)
-                .previousData(snapshot(details, removed))
+                .previousData(RemovalLogFormat.compose(summary(details, removed), copy))
                 .build());
-
-        entityManager.remove(record);
-        entityManager.flush();
     }
 
-    /** Dados do registro no momento da exclusão. A senha nunca vai para o log. */
-    private String snapshot(List<String> details, List<String> removed) {
+    /** JSON com as linhas de cada tabela, na ordem do plano (a ordem em que podem ser reinseridas). */
+    private String copyOfRows(String table, Integer id, List<Part> parts) {
+        ObjectNode copy = JSON.createObjectNode();
+        copy.put("version", 1);
+        copy.put("table", table);
+        copy.put("id", id);
+        ArrayNode tables = copy.putArray("parts");
+        for (Part part : parts) {
+            String rows = (String) entityManager.createNativeQuery(COPY_ROWS.formatted(part.table(), part.where()))
+                    .setParameter("id", id).getSingleResult();
+            ObjectNode entry = tables.addObject();
+            entry.put("table", part.table());
+            entry.set("rows", JSON.readTree(rows));
+        }
+        return copy.toString();
+    }
+
+    /** Dados do registro no momento da exclusão. A senha nunca vai para o texto que aparece na tela. */
+    private String summary(List<String> details, List<String> removed) {
         List<String> lines = new ArrayList<>(details);
         lines.add("Apagados junto: " + (removed.isEmpty() ? "nada" : String.join(", ", removed)));
         return String.join("\n", lines);
@@ -172,15 +201,5 @@ public class RecordRemovalService {
 
     private static String field(String label, Object value) {
         return label + ": " + (value == null || value.toString().isBlank() ? "-" : value);
-    }
-
-    private Admin currentAdmin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication instanceof AnonymousAuthenticationToken
-                || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("Exclusão sem administrador autenticado.");
-        }
-        return admins.findByEmailIgnoreCase(authentication.getName())
-                .orElseThrow(() -> new IllegalStateException("Administrador da sessão não encontrado."));
     }
 }

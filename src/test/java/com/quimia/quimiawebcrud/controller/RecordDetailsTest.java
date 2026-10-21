@@ -11,6 +11,7 @@ import com.quimia.quimiawebcrud.service.AdminLogService;
 import com.quimia.quimiawebcrud.service.AdminService;
 import com.quimia.quimiawebcrud.service.CompanyService;
 import com.quimia.quimiawebcrud.service.PhotoUrlPolicy;
+import com.quimia.quimiawebcrud.service.RecordRestoreService;
 import com.quimia.quimiawebcrud.service.ProductService;
 import com.quimia.quimiawebcrud.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,8 @@ class RecordDetailsTest {
     @Autowired
     MockMvc mvc;
 
+    @MockitoBean
+    RecordRestoreService restoreService;
     @MockitoBean
     UserService userService;
     @MockitoBean

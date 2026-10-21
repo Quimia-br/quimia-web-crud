@@ -3,6 +3,7 @@ package com.quimia.quimiawebcrud.mapper;
 import com.quimia.quimiawebcrud.dto.AdminLogRequestDTO;
 import com.quimia.quimiawebcrud.dto.AdminLogResponseDTO;
 import com.quimia.quimiawebcrud.model.AdminLog;
+import com.quimia.quimiawebcrud.service.RemovalLogFormat;
 import org.springframework.stereotype.Component;
 
 import static com.quimia.quimiawebcrud.mapper.References.admin;
@@ -37,7 +38,7 @@ public class AdminLogMapper implements Mapper<AdminLog, AdminLogRequestDTO, Admi
                 .affectedTable(entity.getAffectedTable())
                 .recordId(entity.getRecordId())
                 .action(entity.getAction())
-                .previousData(entity.getPreviousData())
+                .previousData(RemovalLogFormat.summaryOf(entity.getPreviousData()))
                 .editDate(entity.getEditDate())
                 .build();
     }
