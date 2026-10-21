@@ -214,7 +214,7 @@ class ApplicationIntegrationTest {
         // 7. attacks: no csrf, disguised file, traversal
         assertEquals(403, multipart(c, "/users/save", Map.of("userName", "X", "email", "x@x.com", "password", "p", "status", "ATIVO"), "a.png", "image/png", png()).statusCode(), "multipart without csrf -> 403");
         int before = userStore.size();
-        Map<String, String> evil = Map.of("userName", "Evil", "email", "e@x.com", "password", "p", "status", "ATIVO", "_csrf", csrf(get(c, "/users").body()));
+        Map<String, String> evil = Map.of("userName", "Evil", "email", "e@x.com", "password", "SenhaForte1", "status", "ATIVO", "_csrf", csrf(get(c, "/users").body()));
         r = multipart(c, "/users/save", evil, "x.jpg", "image/jpeg", "<html><script>alert(1)</script></html>".getBytes(StandardCharsets.UTF_8));
         assertEquals(302, r.statusCode());
         assertEquals(before, userStore.size(), "disguised file rejected, nothing saved");
