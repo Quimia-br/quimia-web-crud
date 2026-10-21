@@ -137,7 +137,7 @@
 
             <div class="field">
                 <label for="novo-cas">Nº CAS <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="novo-cas" name="casNumber" placeholder="0000000-00-0" maxlength="12" required>
+                <input type="text" id="novo-cas" name="casNumber" pattern="\d{2,7}-\d{2}-\d" title="Use o formato 0000000-00-0, por exemplo 7681-52-9." placeholder="0000000-00-0" maxlength="12" required>
             </div>
 
             <div class="field">
@@ -217,7 +217,7 @@
 
             <div class="field">
                 <label th:attr="for=|editar-cas-${item.id}|">Nº CAS <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" name="casNumber" maxlength="12" required th:value="${item.casNumber}" th:attr="id=|editar-cas-${item.id}|">
+                <input type="text" name="casNumber" pattern="\d{2,7}-\d{2}-\d" title="Use o formato 0000000-00-0, por exemplo 7681-52-9." maxlength="12" required th:value="${item.casNumber}" th:attr="id=|editar-cas-${item.id}|">
             </div>
 
             <div class="field">

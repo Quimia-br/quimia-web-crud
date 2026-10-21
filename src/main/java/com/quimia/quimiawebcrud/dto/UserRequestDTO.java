@@ -25,10 +25,10 @@ public class UserRequestDTO {
     @Past(message = "A data de nascimento deve estar no passado.")
     private LocalDate birthDate;
     @NotBlank(message = "Informe o e-mail.")
-    @Email(message = "Informe um e-mail válido.")
+    @Email(regexp = FormPatterns.EMAIL, message = "Informe um e-mail completo, como nome@dominio.com.")
     @Size(max = 150, message = "O e-mail deve ter no máximo 150 caracteres.")
     private String email;
-    @Pattern(regexp = "^$|.{8,72}", message = "A senha deve ter de 8 a 72 caracteres.")
+    @Pattern(regexp = FormPatterns.PASSWORD, message = "A senha deve ter de 8 a 72 caracteres.")
     private String password;
     @NotNull(message = "Selecione o status.")
     private Status status;

@@ -18,16 +18,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class CompanyRequestDTO {
 
     @NotBlank(message = "Informe o CNPJ.")
-    @Pattern(regexp = "\\d{14}", message = "O CNPJ deve ter 14 números.")
+    @Pattern(regexp = FormPatterns.CNPJ, message = "O CNPJ deve ter 14 números.")
     private String cnpj;
     @NotBlank(message = "Informe o nome.")
     @Size(max = 150, message = "O nome deve ter no máximo 150 caracteres.")
     private String name;
     @NotBlank(message = "Informe o e-mail.")
-    @Email(message = "Informe um e-mail válido.")
+    @Email(regexp = FormPatterns.EMAIL, message = "Informe um e-mail completo, como nome@dominio.com.")
     @Size(max = 150, message = "O e-mail deve ter no máximo 150 caracteres.")
     private String email;
-    @Pattern(regexp = "^$|.{8,72}", message = "A senha deve ter de 8 a 72 caracteres.")
+    @Pattern(regexp = FormPatterns.PASSWORD, message = "A senha deve ter de 8 a 72 caracteres.")
     private String password;
     @NotNull(message = "Selecione o porte.")
     private CompanySize size;

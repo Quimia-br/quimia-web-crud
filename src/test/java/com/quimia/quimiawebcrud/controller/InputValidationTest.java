@@ -65,8 +65,26 @@ class InputValidationTest {
         mvc.perform(post("/users/save").param("userName", " ").param("email", "isso-nao-e-email").param("status", "ATIVO"))
                 .andExpect(redirectedUrl("/users"))
                 .andExpect(errorContains("Informe o nome."))
-                .andExpect(errorContains("Informe um e-mail válido."));
+                .andExpect(errorContains("Informe um e-mail completo, como nome@dominio.com."));
         verifyNoInteractions(userService);
+    }
+
+    @Test
+    void emailNeedsADomainWithADotInUsersAdminsAndCompanies() throws Exception {
+        for (String email : new String[]{"ana@x", "ana@gmail", "ana@gmail.c", "ana@.com", "a na@gmail.com"}) {
+            mvc.perform(post("/users/save").param("userName", "Ana").param("email", email).param("status", "ATIVO"))
+                    .andExpect(errorContains("e-mail completo"));
+            mvc.perform(post("/admins/save").param("userName", "Ana").param("email", email).param("status", "ATIVO"))
+                    .andExpect(errorContains("e-mail completo"));
+            mvc.perform(post("/companies/save").param("cnpj", "12345678000190").param("name", "Limpa Bem")
+                            .param("email", email).param("size", "MICRO").param("status", "ATIVO"))
+                    .andExpect(errorContains("e-mail completo"));
+        }
+        verifyNoInteractions(userService, adminService, companyService);
+
+        mvc.perform(post("/users/save").param("userName", "Ana").param("email", "ana.paula@mail.empresa.com.br")
+                        .param("password", "s3nha-forte").param("status", "ATIVO"))
+                .andExpect(flash().attribute("message", "Registro criado com sucesso."));
     }
 
     @Test
