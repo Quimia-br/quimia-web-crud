@@ -19,7 +19,7 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
     private final UserMapper mapper;
     private final PasswordHasher passwordHasher;
     private final PhotoStorageService photoStorage;
-    private final UserRemovalService userRemoval;
+    private final RecordRemovalService removal;
 
     @Override
     protected UserRepository getRepository() {
@@ -59,9 +59,9 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
     @Override
     @Transactional
     public void delete(Integer id) {
-        User user = getEntity(id);
-        String photoUrl = user.getPhotoUrl();
-        userRemoval.removeWithRecords(user);
+        User record = getEntity(id);
+        String photoUrl = record.getPhotoUrl();
+        removal.removeUser(record);
         photoStorage.release(photoUrl);
     }
 

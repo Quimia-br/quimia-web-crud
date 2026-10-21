@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
         "spring.jpa.hibernate.ddl-auto=none",
         "spring.jpa.properties.hibernate.boot.allow_jdbc_metadata_access=false",
         "spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect"})
-class UserRemovalQueriesTest {
+class RecordRemovalQueriesTest {
 
     @TestConfiguration
     static class NoDbTransactions {
@@ -52,7 +52,7 @@ class UserRemovalQueriesTest {
 
     @Test
     void everyDeletionQueryIsValidForTheEntityModel() {
-        for (UserRemovalService.Step step : UserRemovalService.STEPS) {
+        for (RecordRemovalService.Step step : RecordRemovalService.allSteps()) {
             assertNotNull(entityManager.createQuery(step.query()), step.label());
         }
     }

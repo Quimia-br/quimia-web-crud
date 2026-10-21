@@ -19,6 +19,7 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
     private final CompanyMapper mapper;
     private final PasswordHasher passwordHasher;
     private final PhotoStorageService photoStorage;
+    private final RecordRemovalService removal;
 
     @Override
     protected CompanyRepository getRepository() {
@@ -58,8 +59,9 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
     @Override
     @Transactional
     public void delete(Integer id) {
-        String photoUrl = getEntity(id).getPhotoUrl();
-        super.delete(id);
+        Company record = getEntity(id);
+        String photoUrl = record.getPhotoUrl();
+        removal.removeCompany(record);
         photoStorage.release(photoUrl);
     }
 
