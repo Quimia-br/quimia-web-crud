@@ -6,6 +6,8 @@ import com.quimia.quimiawebcrud.dto.CompanyResponseDTO;
 import com.quimia.quimiawebcrud.dto.DashboardDTO;
 import com.quimia.quimiawebcrud.dto.DashboardDTO.ActivityItem;
 import com.quimia.quimiawebcrud.dto.DashboardDTO.AlertItem;
+import com.quimia.quimiawebcrud.dto.DashboardDTO.Kpi;
+import com.quimia.quimiawebcrud.dto.DashboardDTO.LineChart;
 import com.quimia.quimiawebcrud.dto.DashboardDTO.RankItem;
 import com.quimia.quimiawebcrud.dto.HistoryResponseDTO;
 import com.quimia.quimiawebcrud.dto.HistoryTypeResponseDTO;
@@ -18,11 +20,14 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -70,28 +75,57 @@ public class DashboardService {
         List<HistoryResponseDTO> histories = historyService.readAll();
         List<HistoryTypeResponseDTO> types = historyTypeService.readAll();
 
+        LocalDate today = LocalDate.now(clock);
         List<AlertItem> alerts = alerts(users, companies, admins);
-        ActivityChart chart = chart(histories, period);
-        long periodTotal = chart.bars().stream().mapToLong(bar -> bar.getCount()).sum();
+        LineChart activity = activity(histories, today, period);
+        List<LocalDateTime> userDates = users.stream().map(UserResponseDTO::getSignUpDate).toList();
+        List<LocalDateTime> companyDates = companies.stream().map(CompanyResponseDTO::getSignUpDate).toList();
 
-        return new DashboardDTO(users.size(), companies.size(), products.size(), alerts.size(), period, periodTotal,
-                chart.bars(), chart.linePoints(), chart.max(),
+        List<Kpi> kpis = List.of(
+                signupsKpi("Usuários", users.size(), userDates, today, period, "/users", true),
+                signupsKpi("Empresas", companies.size(), companyDates, today, period, "/companies", false),
+                new Kpi("Consultas", activity.getCurrentTotal(), "registros de uso nos últimos " + period + " dias",
+                        activity.getTrendText(), activity.getTrend(), false, "/histories"),
+                new Kpi("Alertas", alerts.size(), "contas pendentes ou bloqueadas", null, DashboardDTO.Trend.FLAT,
+                        false, null));
+
+        return new DashboardDTO(todayLabel(today), period, users.size(), companies.size(), products.size(),
+                alerts.size(), activity.getCurrentTotal(), kpis, activity,
+                DonutChart.build(queriesByType(histories, types)),
+                SignupsChart.build(userDates, companyDates, YearMonth.from(today)),
                 latestActivities(histories, users, types, admins),
                 alerts.stream().limit(LIST_SIZE).toList(),
-                topProducts(products),
-                topQueries(histories, types));
+                topProducts(products));
     }
 
-    private ActivityChart chart(List<HistoryResponseDTO> histories, int period) {
-        LocalDate today = LocalDate.now(clock);
-        LocalDate firstDay = today.minusDays(period - 1L);
+    private LineChart activity(List<HistoryResponseDTO> histories, LocalDate today, int period) {
+        LocalDate firstDay = today.minusDays(2L * period - 1);
         Map<LocalDate, Long> countsByDay = histories.stream()
                 .map(HistoryResponseDTO::getExecutionDate)
                 .filter(date -> date != null)
                 .map(LocalDateTime::toLocalDate)
                 .filter(day -> !day.isBefore(firstDay) && !day.isAfter(today))
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-        return new ActivityChart(countsByDay, today, period);
+        return ActivityChart.build(countsByDay, countsByDay, today, period);
+    }
+
+    /** Cartão de total com a variação dos cadastros do período contra o período anterior. */
+    private Kpi signupsKpi(String label, long total, List<LocalDateTime> dates, LocalDate today, int period,
+                           String path, boolean highlight) {
+        long current = countBetween(dates, today.minusDays(period - 1L), today);
+        long previous = countBetween(dates, today.minusDays(2L * period - 1), today.minusDays(period));
+        return new Kpi(label, total, current + (current == 1 ? " novo" : " novos") + " nos últimos " + period + " dias",
+                ChartScale.trendText(current, previous), ChartScale.trend(current, previous), highlight, path);
+    }
+
+    private long countBetween(List<LocalDateTime> dates, LocalDate from, LocalDate to) {
+        return dates.stream().filter(date -> date != null).map(LocalDateTime::toLocalDate)
+                .filter(day -> !day.isBefore(from) && !day.isAfter(to)).count();
+    }
+
+    private String todayLabel(LocalDate today) {
+        String text = today.format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("pt-BR")));
+        return text.substring(0, 1).toUpperCase(Locale.forLanguageTag("pt-BR")) + text.substring(1);
     }
 
     /**
@@ -168,13 +202,13 @@ public class DashboardService {
     }
 
     /**
-     * Consultas mais frequentes: quantos históricos existem de cada tipo.
+     * Consultas por tipo: quantos históricos existem de cada tipo (a rosca mostra as maiores e agrupa o resto).
      */
-    private List<RankItem> topQueries(List<HistoryResponseDTO> histories, List<HistoryTypeResponseDTO> types) {
+    private Map<String, Long> queriesByType(List<HistoryResponseDTO> histories, List<HistoryTypeResponseDTO> types) {
         Map<Integer, String> names = types.stream().collect(Collectors.toMap(HistoryTypeResponseDTO::getId, HistoryTypeResponseDTO::getName, (a, b) -> a));
         Map<String, Long> byName = new LinkedHashMap<>();
         histories.forEach(history -> byName.merge(names.getOrDefault(history.getHistoryTypeId(), "Sem tipo"), 1L, Long::sum));
-        return ranking(byName);
+        return byName;
     }
 
     private List<RankItem> ranking(Map<String, Long> counts) {

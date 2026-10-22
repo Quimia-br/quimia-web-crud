@@ -78,12 +78,14 @@ class DashboardServiceTest {
 
         assertEquals(0, dashboard.getTotalUsers());
         assertEquals(0, dashboard.getTotalAlerts());
-        assertEquals(7, dashboard.getBars().size());
-        assertEquals(1, dashboard.getChartMax());
+        assertEquals(7, dashboard.getActivity().getDots().size());
+        assertEquals(4, dashboard.getActivity().getMax(), "sem registros a escala vai de 0 a 4");
+        assertEquals(4, dashboard.getKpis().size());
         assertTrue(dashboard.getLatestActivities().isEmpty());
         assertTrue(dashboard.getRecentAlerts().isEmpty());
         assertTrue(dashboard.getTopProducts().isEmpty());
-        assertTrue(dashboard.getTopQueries().isEmpty());
+        assertEquals(0, dashboard.getQueriesByType().getTotal());
+        assertTrue(dashboard.getQueriesByType().getSlices().isEmpty());
     }
 
     @Test
@@ -108,7 +110,7 @@ class DashboardServiceTest {
     }
 
     @Test
-    void chartCountsOnlyTheSelectedPeriodAndKeepsEmptyDays() {
+    void chartCountsOnlyTheSelectedPeriodAndComparesWithThePreviousOne() {
         when(histories.readAll()).thenReturn(List.of(
                 history(1, 1, 1, TODAY.atTime(9, 0)),
                 history(2, 1, 1, TODAY.atTime(15, 0)),
@@ -117,18 +119,77 @@ class DashboardServiceTest {
                 history(5, 1, 1, TODAY.plusDays(1).atTime(10, 0))));
 
         DashboardDTO week = service.build(7);
+        DashboardDTO.LineChart chart = week.getActivity();
 
-        assertEquals(7, week.getBars().size());
+        assertEquals(7, chart.getDots().size());
         assertEquals(3, week.getPeriodTotal(), "yesterday-7 and tomorrow are outside the window");
-        assertEquals(2, week.getBars().get(6).getCount(), "last bar is today");
-        assertEquals(1, week.getBars().get(0).getCount(), "first bar is six days ago");
-        assertEquals(0, week.getBars().get(3).getCount());
-        assertEquals(2, week.getChartMax());
-        assertEquals(180, week.getBars().get(6).getHeight(), "the tallest bar fills the plot");
-        assertEquals(90, week.getBars().get(0).getHeight());
+        assertEquals(3, chart.getCurrentTotal());
+        assertEquals(1, chart.getPreviousTotal(), "the record 7 days ago belongs to the previous period");
+        assertEquals("+200%", chart.getTrendText());
+        assertEquals(DashboardDTO.Trend.UP, chart.getTrend());
+        assertEquals(4, chart.getMax());
+        assertEquals("44.0", chart.getDots().get(0).getX(), "first day at the left edge");
+        assertEquals("628.0", chart.getDots().get(6).getX(), "today at the right edge");
+        assertEquals("133.0", chart.getDots().get(6).getY(), "two records: half of the 0..4 scale");
+        assertEquals("191.5", chart.getDots().get(0).getY());
+        assertEquals("250.0", chart.getDots().get(3).getY(), "a day without records sits on the baseline");
+        assertTrue(chart.getDots().get(6).getTitle().contains("2 registros"));
+        assertTrue(chart.getCurrentLine().startsWith("M44.0,191.5 C"));
+        assertTrue(chart.getCurrentArea().endsWith("Z"));
 
         assertEquals(4, service.build(30).getPeriodTotal());
-        assertEquals(30, service.build(30).getBars().size());
+        assertEquals(30, service.build(30).getActivity().getDots().size());
+    }
+
+    @Test
+    void cardsShowTotalsAndHowSignupsChangedAgainstThePreviousPeriod() {
+        when(users.readAll()).thenReturn(List.of(
+                user(1, "Ana", Status.ATIVO, 20), user(2, "Bia", Status.ATIVO, 18),   // 2 nos últimos 7 dias
+                user(3, "Caio", Status.ATIVO, 10),                                    // 1 no período anterior
+                user(4, "Davi", Status.ATIVO, 1)));
+        when(companies.readAll()).thenReturn(List.of(
+                CompanyResponseDTO.builder().id(1).name("Limpa Bem").status(Status.ATIVO)
+                        .signUpDate(LocalDateTime.of(2026, 10, 2, 8, 0)).build()));
+        when(histories.readAll()).thenReturn(List.of(history(1, 1, 1, TODAY.atTime(9, 0)),
+                history(2, 1, 1, TODAY.minusDays(8).atTime(9, 0)), history(3, 1, 1, TODAY.minusDays(9).atTime(9, 0))));
+
+        List<DashboardDTO.Kpi> kpis = service.build(7).getKpis();
+
+        assertEquals(List.of("Usuários", "Empresas", "Consultas", "Alertas"), kpis.stream().map(DashboardDTO.Kpi::getLabel).toList());
+        DashboardDTO.Kpi usersCard = kpis.get(0);
+        assertEquals(4, usersCard.getValue());
+        assertTrue(usersCard.isHighlight());
+        assertEquals("2 novos nos últimos 7 dias", usersCard.getCaption());
+        assertEquals("+100%", usersCard.getTrendText());
+        assertEquals(DashboardDTO.Trend.UP, usersCard.getTrend());
+        assertEquals(DashboardDTO.Trend.FLAT, kpis.get(1).getTrend(), "nenhuma empresa nova nos dois períodos");
+        assertEquals("0%", kpis.get(1).getTrendText());
+        DashboardDTO.Kpi queries = kpis.get(2);
+        assertEquals(1, queries.getValue());
+        assertEquals("-50%", queries.getTrendText());
+        assertEquals(DashboardDTO.Trend.DOWN, queries.getTrend());
+        assertEquals(null, kpis.get(3).getTrendText(), "alertas não têm variação");
+    }
+
+    @Test
+    void signupsChartCountsTheLastSixMonthsOfUsersAndCompanies() {
+        when(users.readAll()).thenReturn(List.of(user(1, "Ana", Status.ATIVO, 5), user(2, "Bia", Status.ATIVO, 6),
+                UserResponseDTO.builder().id(3).userName("Caio").status(Status.ATIVO).signUpDate(LocalDateTime.of(2026, 7, 3, 8, 0)).build(),
+                UserResponseDTO.builder().id(4).userName("Davi").status(Status.ATIVO).signUpDate(LocalDateTime.of(2025, 1, 3, 8, 0)).build()));
+        when(companies.readAll()).thenReturn(List.of(CompanyResponseDTO.builder().id(1).name("Limpa Bem").status(Status.ATIVO)
+                .signUpDate(LocalDateTime.of(2026, 10, 2, 8, 0)).build()));
+
+        DashboardDTO.MonthlyChart chart = service.build(7).getSignups();
+
+        assertEquals(6, chart.getMonths().size());
+        assertEquals(List.of("Mai", "Jun", "Jul", "Ago", "Set", "Out"), chart.getMonths().stream().map(DashboardDTO.MonthGroup::getLabel).toList());
+        DashboardDTO.MonthGroup october = chart.getMonths().get(5);
+        assertEquals(2, october.getUsers().getCount());
+        assertEquals(1, october.getCompanies().getCount());
+        assertEquals(1, chart.getMonths().get(2).getUsers().getCount());
+        assertEquals(4, chart.getMax());
+        assertEquals(117, october.getUsers().getHeight(), "dois usuários: metade da escala 0..4");
+        assertEquals(133, october.getUsers().getY());
     }
 
     @Test
@@ -141,7 +202,7 @@ class DashboardServiceTest {
     }
 
     @Test
-    void rankingsAreSortedAndScaledToTheLeader() {
+    void productRankingAndQueryDonutAreSortedAndScaled() {
         when(types.readAll()).thenReturn(List.of(
                 HistoryTypeResponseDTO.builder().id(1).name("Descarte").build(),
                 HistoryTypeResponseDTO.builder().id(2).name("Mistura").build()));
@@ -161,10 +222,11 @@ class DashboardServiceTest {
 
         DashboardDTO dashboard = service.build(7);
 
-        assertEquals("Descarte", dashboard.getTopQueries().get(0).getName());
-        assertEquals(4, dashboard.getTopQueries().get(0).getCount());
-        assertEquals(100, dashboard.getTopQueries().get(0).getPercent());
-        assertEquals(50, dashboard.getTopQueries().get(1).getPercent());
+        assertEquals(6, dashboard.getQueriesByType().getTotal());
+        assertEquals("Descarte", dashboard.getQueriesByType().getSlices().get(0).getName());
+        assertEquals(4, dashboard.getQueriesByType().getSlices().get(0).getCount());
+        assertEquals(67, dashboard.getQueriesByType().getSlices().get(0).getPercent());
+        assertEquals(33, dashboard.getQueriesByType().getSlices().get(1).getPercent());
         assertEquals("Cloro", dashboard.getTopProducts().get(0).getName());
         assertEquals(4, dashboard.getTopProducts().get(0).getCount(), "user lists + shelf + history");
         assertEquals(25, dashboard.getTopProducts().get(1).getPercent());
