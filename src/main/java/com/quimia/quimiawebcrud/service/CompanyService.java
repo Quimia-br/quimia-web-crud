@@ -2,6 +2,7 @@ package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.dto.CompanyRequestDTO;
 import com.quimia.quimiawebcrud.dto.CompanyResponseDTO;
+import com.quimia.quimiawebcrud.exception.DuplicateResourceException;
 import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.CompanyMapper;
 import com.quimia.quimiawebcrud.model.Company;
@@ -20,6 +21,7 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
     private final PasswordHasher passwordHasher;
     private final PhotoStorageService photoStorage;
     private final RecordRemovalService removal;
+    private final EditLog editLog;
 
     @Override
     protected CompanyRepository getRepository() {
@@ -32,28 +34,45 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
     }
 
     @Override
-    @Transactional
-    public CompanyResponseDTO create(CompanyRequestDTO request) {
-        if (!hasText(request.getPassword())) {
-            throw new InvalidDataException("A senha é obrigatória.");
-        }
-        Company entity = mapper.toEntity(request);
-        entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
-        entity.setPhotoUrl(photoStorage.replace(request.getPhoto(), null));
-        return mapper.toResponse(repository.save(entity));
+    protected EditLog getEditLog() {
+        return editLog;
     }
 
     @Override
-    @Transactional
-    public CompanyResponseDTO update(Integer id, CompanyRequestDTO request) {
-        Company entity = getEntity(id);
+    protected void validate(CompanyRequestDTO request, Integer id) {
+        if (id == null && !Passwords.present(request.getPassword())) {
+            throw new InvalidDataException("A senha é obrigatória.");
+        }
+        boolean emailTaken = id == null
+                ? repository.existsByEmailIgnoreCase(request.getEmail())
+                : repository.existsByEmailIgnoreCaseAndIdNot(request.getEmail(), id);
+        if (emailTaken) {
+            throw new DuplicateResourceException("Já existe uma empresa com este e-mail.");
+        }
+        boolean cnpjTaken = id == null
+                ? repository.existsByCnpj(request.getCnpj())
+                : repository.existsByCnpjAndIdNot(request.getCnpj(), id);
+        if (cnpjTaken) {
+            throw new DuplicateResourceException("Já existe uma empresa com este CNPJ.");
+        }
+    }
+
+    @Override
+    protected Company newEntity(CompanyRequestDTO request) {
+        Company entity = mapper.toEntity(request);
+        entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
+        entity.setPhotoUrl(photoStorage.replace(request.getPhoto(), null));
+        return entity;
+    }
+
+    @Override
+    protected void applyChanges(Company entity, CompanyRequestDTO request) {
         String currentPhoto = entity.getPhotoUrl();
         mapper.updateEntity(entity, request);
         entity.setPhotoUrl(photoStorage.replace(request.getPhoto(), currentPhoto));
-        if (hasText(request.getPassword())) {
+        if (Passwords.present(request.getPassword())) {
             entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
         }
-        return mapper.toResponse(entity);
     }
 
     @Override
@@ -63,9 +82,5 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
         String photoUrl = record.getPhotoUrl();
         removal.removeCompany(record);
         photoStorage.release(photoUrl);
-    }
-
-    private boolean hasText(String value) {
-        return value != null && !value.isBlank();
     }
 }

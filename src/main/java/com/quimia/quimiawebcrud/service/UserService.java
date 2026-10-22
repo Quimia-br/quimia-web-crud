@@ -2,6 +2,7 @@ package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.dto.UserRequestDTO;
 import com.quimia.quimiawebcrud.dto.UserResponseDTO;
+import com.quimia.quimiawebcrud.exception.DuplicateResourceException;
 import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.UserMapper;
 import com.quimia.quimiawebcrud.model.User;
@@ -20,6 +21,7 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
     private final PasswordHasher passwordHasher;
     private final PhotoStorageService photoStorage;
     private final RecordRemovalService removal;
+    private final EditLog editLog;
 
     @Override
     protected UserRepository getRepository() {
@@ -32,28 +34,39 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
     }
 
     @Override
-    @Transactional
-    public UserResponseDTO create(UserRequestDTO request) {
-        if (!hasText(request.getPassword())) {
-            throw new InvalidDataException("A senha é obrigatória.");
-        }
-        User entity = mapper.toEntity(request);
-        entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
-        entity.setPhotoUrl(photoStorage.replace(request.getPhoto(), null));
-        return mapper.toResponse(repository.save(entity));
+    protected EditLog getEditLog() {
+        return editLog;
     }
 
     @Override
-    @Transactional
-    public UserResponseDTO update(Integer id, UserRequestDTO request) {
-        User entity = getEntity(id);
+    protected void validate(UserRequestDTO request, Integer id) {
+        if (id == null && !Passwords.present(request.getPassword())) {
+            throw new InvalidDataException("A senha é obrigatória.");
+        }
+        boolean emailTaken = id == null
+                ? repository.existsByEmailIgnoreCase(request.getEmail())
+                : repository.existsByEmailIgnoreCaseAndIdNot(request.getEmail(), id);
+        if (emailTaken) {
+            throw new DuplicateResourceException("Já existe um usuário com este e-mail.");
+        }
+    }
+
+    @Override
+    protected User newEntity(UserRequestDTO request) {
+        User entity = mapper.toEntity(request);
+        entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
+        entity.setPhotoUrl(photoStorage.replace(request.getPhoto(), null));
+        return entity;
+    }
+
+    @Override
+    protected void applyChanges(User entity, UserRequestDTO request) {
         String currentPhoto = entity.getPhotoUrl();
         mapper.updateEntity(entity, request);
         entity.setPhotoUrl(photoStorage.replace(request.getPhoto(), currentPhoto));
-        if (hasText(request.getPassword())) {
+        if (Passwords.present(request.getPassword())) {
             entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
         }
-        return mapper.toResponse(entity);
     }
 
     @Override
@@ -63,9 +76,5 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
         String photoUrl = record.getPhotoUrl();
         removal.removeUser(record);
         photoStorage.release(photoUrl);
-    }
-
-    private boolean hasText(String value) {
-        return value != null && !value.isBlank();
     }
 }

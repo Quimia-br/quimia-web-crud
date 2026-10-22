@@ -100,53 +100,38 @@ public class RecordRemovalService {
 
     @Transactional
     public void removeUser(User user) {
-        remove(user, USER_PARTS, List.of(
-                field("Nome", user.getUserName()), field("E-mail", user.getEmail()), field("Status", user.getStatus()),
-                field("Nascimento", user.getBirthDate()), field("Cadastro", user.getSignUpDate()),
-                field("Foto", user.getPhotoUrl())));
+        remove(user, USER_PARTS);
     }
 
     @Transactional
     public void removeCompany(Company company) {
-        remove(company, COMPANY_PARTS, List.of(
-                field("Nome", company.getName()), field("CNPJ", company.getCnpj()), field("E-mail", company.getEmail()),
-                field("Porte", company.getSize()), field("Status", company.getStatus()),
-                field("Cadastro", company.getSignUpDate()), field("Foto", company.getPhotoUrl())));
+        remove(company, COMPANY_PARTS);
     }
 
     @Transactional
     public void removeProduct(Product product) {
-        remove(product, PRODUCT_PARTS, List.of(
-                field("Nome", product.getName()), field("CAS", product.getCasNumber()), field("Marca", product.getBrand()),
-                field("Empresa", product.getCompany() == null ? null : product.getCompany().getName()),
-                field("Instruções", product.getInstructions()), field("Dosagem", product.getDosage())));
+        remove(product, PRODUCT_PARTS);
     }
 
     @Transactional
     public void removeDisposal(Disposal disposal) {
-        remove(disposal, DISPOSAL_PARTS, List.of(
-                field("Produto", disposal.getProduct() == null ? null : disposal.getProduct().getName()),
-                field("Descarte do produto", disposal.getProductDisposalMethod()),
-                field("Descarte da embalagem", disposal.getPackagingDisposalMethod()),
-                field("Restrições", disposal.getDisposalRestrictions()),
-                field("Precauções ambientais", disposal.getEnvironmentalPrecautions())));
+        remove(disposal, DISPOSAL_PARTS);
     }
 
     @Transactional
     public void removeHistoryType(HistoryType historyType) {
-        remove(historyType, HISTORY_TYPE_PARTS, List.of(field("Nome", historyType.getName())));
+        remove(historyType, HISTORY_TYPE_PARTS);
     }
 
     /** Quem exclui um administrador não pode ser ele mesmo; o log das ações dele é apagado (e vai na cópia). */
     @Transactional
     public void removeAdmin(Admin admin) {
-        remove(admin, ADMIN_PARTS, List.of(
-                field("Nome", admin.getUserName()), field("E-mail", admin.getEmail()), field("Status", admin.getStatus()),
-                field("Cadastro", admin.getSignUpDate())));
+        remove(admin, ADMIN_PARTS);
     }
 
-    private void remove(Model record, List<Part> parts, List<String> details) {
+    private void remove(Model record, List<Part> parts) {
         Admin author = currentAdmin.require();
+        List<String> details = RecordSummary.fields(record);
         if (record instanceof Admin && record.getId().equals(author.getId())) {
             throw new InvalidDataException("Você não pode excluir a sua própria conta.");
         }
@@ -197,9 +182,5 @@ public class RecordRemovalService {
         List<String> lines = new ArrayList<>(details);
         lines.add("Apagados junto: " + (removed.isEmpty() ? "nada" : String.join(", ", removed)));
         return String.join("\n", lines);
-    }
-
-    private static String field(String label, Object value) {
-        return label + ": " + (value == null || value.toString().isBlank() ? "-" : value);
     }
 }

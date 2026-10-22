@@ -10,4 +10,8 @@ import java.util.Optional;
 public interface AdminRepository extends JpaRepository<Admin, Integer> {
 
     Optional<Admin> findByEmailIgnoreCase(String email);
+
+    boolean existsByEmailIgnoreCase(String email);
+
+    boolean existsByEmailIgnoreCaseAndIdNot(String email, Integer id);
 }
