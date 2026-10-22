@@ -63,6 +63,7 @@
                 <select id="acao" name="acao">
                     <option value="">Todas</option>
                     <option value="INSERT" th:selected="${filters['acao'] == 'INSERT'}">Inclusão</option>
+                    <option value="RESTORE" th:selected="${filters['acao'] == 'RESTORE'}">Restauração</option>
                     <option value="UPDATE" th:selected="${filters['acao'] == 'UPDATE'}">Alteração</option>
                     <option value="DELETE" th:selected="${filters['acao'] == 'DELETE'}">Exclusão</option>
                 </select>
@@ -108,12 +109,13 @@
                     <tr th:each="item : ${adminLogs}">
                         <td>[[${item.id}]]</td>
                         <td>[[${adminsById[item.adminId]?.userName}]]</td>
-                        <td><span th:replace="~{fragments/badges :: action(${item.action})}"></span></td>
+                        <td><span th:replace="~{fragments/badges :: logAction(${item})}"></span></td>
                         <td>[[${item.affectedTable}]]</td>
                         <td>#[[${item.recordId}]]</td>
                         <td class="cell-nowrap">[[${item.editDate != null ? #temporals.format(item.editDate, 'dd/MM/yyyy HH:mm') : ''}]]</td>
                         <td class="col-actions">
                             <button type="button" class="btn-icon" th:attr="aria-label=|Ver registro ${item.id} do log|,popovertarget=|ver-admin-log-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
+                            <button type="button" class="btn-icon" th:if="${restorableIds.contains(item.id)}" th:attr="aria-label=|Restaurar registro ${item.id} do log|,popovertarget=|restaurar-admin-log-${item.id}|"><img src="../../static/icons/undo.svg" th:src="@{/icons/undo.svg}" alt=""></button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(adminLogs)}">
@@ -140,7 +142,7 @@
         <div class="modal-form">
             <dl class="detail-list">
                 <div><dt>Administrador</dt><dd th:text="${adminsById[item.adminId]?.userName != null and !#strings.isEmpty(adminsById[item.adminId]?.userName) ? adminsById[item.adminId]?.userName : '—'}">valor</dd></div>
-                <div><dt>Ação</dt><dd><span th:replace="~{fragments/badges :: action(${item.action})}"></span></dd></div>
+                <div><dt>Ação</dt><dd><span th:replace="~{fragments/badges :: logAction(${item})}"></span></dd></div>
                 <div><dt>Tabela</dt><dd th:text="${item.affectedTable != null and !#strings.isEmpty(item.affectedTable) ? item.affectedTable : '—'}">valor</dd></div>
                 <div><dt>Registro</dt><dd th:text="${item.recordId != null and !#strings.isEmpty(item.recordId) ? item.recordId : '—'}">valor</dd></div>
                 <div><dt>Data</dt><dd th:text="${item.editDate != null ? #temporals.format(item.editDate, 'dd/MM/yyyy HH:mm') : '—'}">01/01/2026 10:00</dd></div>
@@ -151,6 +153,22 @@
                 <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|ver-admin-log-${item.id}|">Fechar</button>
             </footer>
         </div>
+    </dialog>
+    <dialog class="modal modal-confirm" popover th:if="${restorableIds.contains(item.id)}" th:attr="id=|restaurar-admin-log-${item.id}|,aria-labelledby=|restaurar-admin-log-${item.id}-titulo|">
+        <form class="modal-form" method="post" action="#" th:action="@{/admin-logs/{id}/restore(id=${item.id})}">
+            <div class="confirm">
+                <span class="confirm-icon"><img src="../../static/icons/undo.svg" th:src="@{/icons/undo.svg}" alt=""></span>
+                <div>
+                    <h2 th:attr="id=|restaurar-admin-log-${item.id}-titulo|">Restaurar registro?</h2>
+                    <p>Restaurar o registro <strong>#[[${item.recordId}]]</strong> de <strong>[[${item.affectedTable}]]</strong>? Ele volta com os mesmos dados e com tudo que foi apagado junto. Se tinha foto enviada, ela não volta.</p>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" autofocus th:attr="popovertarget=|restaurar-admin-log-${item.id}|">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Restaurar</button>
+            </footer>
+        </form>
     </dialog>
     </th:block>
 </body>

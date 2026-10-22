@@ -370,6 +370,11 @@ body {
   color: var(--color-text-muted);
 }
 
+.badge-info {
+  background: rgba(15, 107, 120, 0.12);
+  color: var(--color-primary);
+}
+
 .badge-danger {
   background: var(--color-danger-bg);
   color: var(--color-danger);

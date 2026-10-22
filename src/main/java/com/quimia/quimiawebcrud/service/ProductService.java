@@ -7,6 +7,7 @@ import com.quimia.quimiawebcrud.model.Product;
 import com.quimia.quimiawebcrud.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,6 +15,7 @@ public class ProductService extends CrudService<Product, Integer, ProductRequest
 
     private final ProductRepository repository;
     private final ProductMapper mapper;
+    private final RecordRemovalService removal;
 
     @Override
     protected ProductRepository getRepository() {
@@ -23,5 +25,11 @@ public class ProductService extends CrudService<Product, Integer, ProductRequest
     @Override
     protected ProductMapper getMapper() {
         return mapper;
+    }
+
+    @Override
+    @Transactional
+    public void delete(Integer id) {
+        removal.removeProduct(getEntity(id));
     }
 }

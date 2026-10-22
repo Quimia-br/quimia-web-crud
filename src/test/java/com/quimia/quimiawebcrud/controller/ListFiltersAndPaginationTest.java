@@ -22,6 +22,7 @@ import com.quimia.quimiawebcrud.service.HistoryService;
 import com.quimia.quimiawebcrud.service.HistoryTypeService;
 import com.quimia.quimiawebcrud.service.LocationService;
 import com.quimia.quimiawebcrud.service.PhotoUrlPolicy;
+import com.quimia.quimiawebcrud.service.RecordRestoreService;
 import com.quimia.quimiawebcrud.service.ProductService;
 import com.quimia.quimiawebcrud.service.ShelfProductService;
 import com.quimia.quimiawebcrud.service.ShelfService;
@@ -62,6 +63,8 @@ class ListFiltersAndPaginationTest {
     @Autowired
     MockMvc mvc;
 
+    @MockitoBean
+    RecordRestoreService restoreService;
     @MockitoBean
     UserService userService;
     @MockitoBean

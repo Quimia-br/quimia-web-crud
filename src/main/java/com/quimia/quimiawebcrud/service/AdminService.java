@@ -18,6 +18,7 @@ public class AdminService extends CrudService<Admin, Integer, AdminRequestDTO, A
     private final AdminRepository repository;
     private final AdminMapper mapper;
     private final PasswordHasher passwordHasher;
+    private final RecordRemovalService removal;
 
     @Override
     protected AdminRepository getRepository() {
@@ -53,5 +54,11 @@ public class AdminService extends CrudService<Admin, Integer, AdminRequestDTO, A
 
     private boolean hasText(String value) {
         return value != null && !value.isBlank();
+    }
+
+    @Override
+    @Transactional
+    public void delete(Integer id) {
+        removal.removeAdmin(getEntity(id));
     }
 }

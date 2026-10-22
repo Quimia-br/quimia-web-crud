@@ -192,6 +192,15 @@ class DashboardServiceTest {
     }
 
     @Test
+    void aRestoreLineIsDescribedAsRestoredNotCreated() {
+        when(admins.readAll()).thenReturn(List.of(AdminResponseDTO.builder().id(1).userName("Adm").status(Status.ATIVO).build()));
+        when(adminLogs.readAll()).thenReturn(List.of(AdminLogResponseDTO.builder().id(1).adminId(1).affectedTable("usuarios")
+                .action(AdminAction.INSERT).restore(true).editDate(TODAY.atTime(23, 0)).build()));
+
+        assertEquals("Adm restaurou um registro em usuarios", service.build(7).getLatestActivities().get(0).getText());
+    }
+
+    @Test
     void usesTheInjectedClockForToday() {
         Instant other = LocalDate.of(2027, 1, 15).atTime(9, 0).atZone(ZONE).toInstant();
         DashboardService later = new DashboardService(users, companies, admins, products, histories, types, adminLogs,

@@ -143,6 +143,9 @@ public class DashboardService {
         if (log.getAction() == null) {
             return "alterou";
         }
+        if (log.isRestore()) {
+            return "restaurou";
+        }
         return switch (log.getAction()) {
             case INSERT -> "criou";
             case DELETE -> "excluiu";

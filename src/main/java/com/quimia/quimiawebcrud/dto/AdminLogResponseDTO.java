@@ -18,5 +18,7 @@ public class AdminLogResponseDTO extends BaseResponseDTO {
     private Integer recordId;
     private AdminAction action;
     private String previousData;
+    /** Linha que registra uma restauração (gravada como INSERT no banco). */
+    private boolean restore;
     private LocalDateTime editDate;
 }
