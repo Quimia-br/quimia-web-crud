@@ -10,6 +10,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
 
@@ -57,13 +58,7 @@ public class RecordRestoreService {
             throw new InvalidDataException("Este registro já foi restaurado ou não pode ser restaurado.");
         }
 
-        JsonNode parts = RecordRemovalService.JSON.readTree(copy).get("parts");
-        for (JsonNode part : parts) {
-            String table = part.get("table").asString();
-            if (!KNOWN_TABLES.contains(table)) {
-                throw new InvalidDataException("A cópia guardada no log tem uma tabela desconhecida: " + table);
-            }
-        }
+        JsonNode parts = partsOf(copy);
 
         List<String> restored = new ArrayList<>();
         boolean first = true;
@@ -90,6 +85,37 @@ public class RecordRestoreService {
                 .action(AdminAction.INSERT)
                 .previousData(RemovalLogFormat.restoreNote(logId, restored.isEmpty() ? "nada" : String.join(", ", restored)))
                 .build());
+    }
+
+    /**
+     * Lê a cópia e confere a estrutura antes de inserir qualquer coisa: cada parte tem uma tabela conhecida
+     * e uma lista de linhas.
+     */
+    private JsonNode partsOf(String copy) {
+        JsonNode parts;
+        try {
+            parts = RecordRemovalService.JSON.readTree(copy).get("parts");
+        } catch (JacksonException e) {
+            throw corruptedCopy();
+        }
+        if (parts == null || !parts.isArray()) {
+            throw corruptedCopy();
+        }
+        for (JsonNode part : parts) {
+            JsonNode table = part.get("table");
+            JsonNode rows = part.get("rows");
+            if (table == null || !table.isString() || rows == null || !rows.isArray()) {
+                throw corruptedCopy();
+            }
+            if (!KNOWN_TABLES.contains(table.asString())) {
+                throw new InvalidDataException("A cópia guardada no log tem uma tabela desconhecida: " + table.asString());
+            }
+        }
+        return parts;
+    }
+
+    private static InvalidDataException corruptedCopy() {
+        return new InvalidDataException("A cópia guardada no log está incompleta ou corrompida.");
     }
 
     private void dropStoredPhotos(JsonNode rows) {

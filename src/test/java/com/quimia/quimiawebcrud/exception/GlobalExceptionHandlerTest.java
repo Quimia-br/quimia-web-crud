@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
@@ -42,6 +43,16 @@ class GlobalExceptionHandlerTest {
         @GetMapping("/in-use")
         String inUse() {
             throw new DataIntegrityViolationException("violates foreign key constraint fk_secreta");
+        }
+
+        @GetMapping("/photo")
+        String photo() {
+            throw new PhotoException("Formato de imagem não aceito. Envie uma foto JPEG ou PNG.");
+        }
+
+        @GetMapping("/too-large")
+        String tooLarge() {
+            throw new MaxUploadSizeExceededException(5 * 1024 * 1024);
         }
 
         @GetMapping("/boom")
@@ -79,6 +90,20 @@ class GlobalExceptionHandlerTest {
                 .andExpect(status().isConflict())
                 .andExpect(content().string(not(containsString("fk_secreta"))))
                 .andExpect(content().string(containsString("está em uso")));
+    }
+
+    @Test
+    void otherBusinessErrorsShowTheirMessageInsteadOfAnUnexpectedError() throws Exception {
+        mvc.perform(get("/photo"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Envie uma foto JPEG ou PNG.")));
+    }
+
+    @Test
+    void fileAboveTheUploadLimitExplainsTheMaximumSize() throws Exception {
+        mvc.perform(get("/too-large"))
+                .andExpect(status().isPayloadTooLarge())
+                .andExpect(content().string(containsString("no máximo 2 MB")));
     }
 
     @Test
