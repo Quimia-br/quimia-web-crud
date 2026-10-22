@@ -150,18 +150,18 @@
 
             <div class="field">
                 <label for="novo-cnpj">CNPJ <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="novo-cnpj" name="cnpj" placeholder="Somente números" maxlength="14" required>
+                <input type="text" id="novo-cnpj" name="cnpj" pattern="\d{14}" inputmode="numeric" title="O CNPJ deve ter 14 números." placeholder="Somente números" maxlength="14" required>
             </div>
 
             <div class="field">
                 <label for="novo-email">Email <span class="required" aria-hidden="true">*</span></label>
-                <input type="email" id="novo-email" name="email" placeholder="contato@empresa.com" maxlength="150" required>
+                <input type="email" id="novo-email" name="email" pattern="[^@\s]+@[^@\s]+\.[A-Za-z]{2,}" title="Informe um e-mail completo, como nome@dominio.com" placeholder="contato@empresa.com" maxlength="150" required>
             </div>
 
             <div class="field">
                 <label for="novo-senha">Senha <span class="required" aria-hidden="true">*</span></label>
                 <div class="password-field">
-                    <input type="password" id="novo-senha" name="password" autocomplete="new-password" required>
+                    <input type="password" id="novo-senha" name="password" minlength="8" maxlength="72" autocomplete="new-password" required>
                     <button type="button" class="btn-icon password-toggle" data-password-toggle aria-pressed="false" aria-label="Mostrar senha"><img class="icon-eye" src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""><img class="icon-eye-off" src="../../static/icons/eye-off.svg" th:src="@{/icons/eye-off.svg}" alt=""></button>
                 </div>
             </div>
@@ -249,18 +249,18 @@
 
             <div class="field">
                 <label th:attr="for=|editar-cnpj-${item.id}|">CNPJ <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" name="cnpj" maxlength="14" required th:value="${item.cnpj}" th:attr="id=|editar-cnpj-${item.id}|">
+                <input type="text" name="cnpj" pattern="\d{14}" inputmode="numeric" title="O CNPJ deve ter 14 números." maxlength="14" required th:value="${item.cnpj}" th:attr="id=|editar-cnpj-${item.id}|">
             </div>
 
             <div class="field">
                 <label th:attr="for=|editar-email-${item.id}|">Email <span class="required" aria-hidden="true">*</span></label>
-                <input type="email" name="email" maxlength="150" required th:value="${item.email}" th:attr="id=|editar-email-${item.id}|">
+                <input type="email" name="email" pattern="[^@\s]+@[^@\s]+\.[A-Za-z]{2,}" title="Informe um e-mail completo, como nome@dominio.com" maxlength="150" required th:value="${item.email}" th:attr="id=|editar-email-${item.id}|">
             </div>
 
             <div class="field">
                 <label th:attr="for=|editar-senha-${item.id}|">Nova senha</label>
                 <div class="password-field">
-                    <input type="password" name="password" autocomplete="new-password" th:attr="id=|editar-senha-${item.id}|,aria-describedby=|editar-senha-${item.id}-dica|">
+                    <input type="password" name="password" minlength="8" maxlength="72" autocomplete="new-password" th:attr="id=|editar-senha-${item.id}|,aria-describedby=|editar-senha-${item.id}-dica|">
                     <button type="button" class="btn-icon password-toggle" data-password-toggle aria-pressed="false" aria-label="Mostrar senha"><img class="icon-eye" src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""><img class="icon-eye-off" src="../../static/icons/eye-off.svg" th:src="@{/icons/eye-off.svg}" alt=""></button>
                 </div>
                 <p class="field-hint" th:attr="id=|editar-senha-${item.id}-dica|">Deixe em branco para manter a senha atual.</p>

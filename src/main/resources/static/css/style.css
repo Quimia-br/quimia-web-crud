@@ -609,3 +609,11 @@ body {
 .password-toggle[aria-pressed="true"] .icon-eye {
   display: none;
 }
+
+/* Campo com valor inválido: borda vermelha depois que a pessoa mexeu nele */
+input:user-invalid,
+select:user-invalid,
+textarea:user-invalid {
+  border-color: var(--color-danger);
+  outline-color: var(--color-danger);
+}
