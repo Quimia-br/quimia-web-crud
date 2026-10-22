@@ -8,6 +8,7 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
@@ -34,6 +35,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidDataException.class)
     public ModelAndView handleInvalidData(InvalidDataException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    /**
+     * Demais regras de negócio (ex.: foto recusada) que chegam aqui sem um tratamento próprio.
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ModelAndView handleBusiness(BusinessException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    /**
+     * Arquivo acima do limite de upload do servidor: o pedido é recusado antes de chegar ao controller.
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ModelAndView handleMaxUploadSize(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.PAYLOAD_TOO_LARGE, "A foto deve ter no máximo 2 MB.", request);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)

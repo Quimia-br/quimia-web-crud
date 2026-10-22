@@ -142,6 +142,21 @@ class RecordRestoreServiceTest {
     }
 
     @Test
+    void refusesACorruptedCopyBeforeInsertingAnything() {
+        String[] corrupted = {"não é json", "{}", "{\"parts\":{}}", "{\"parts\":[{\"rows\":[]}]}",
+                "{\"parts\":[{\"table\":\"usuarios\"}]}"};
+        when(adminLogService.restorableIds()).thenReturn(Set.of(15));
+        for (String copy : corrupted) {
+            when(logs.findById(15)).thenReturn(Optional.of(deletion(15, AdminAction.DELETE, copy)));
+
+            InvalidDataException error = assertThrows(InvalidDataException.class, () -> service.restore(15), copy);
+            assertTrue(error.getMessage().contains("corrompida"), copy);
+        }
+
+        assertTrue(sql.isEmpty(), "nada é inserido");
+    }
+
+    @Test
     void unknownLogEntryIsNotFound() {
         assertThrows(ResourceNotFoundException.class, () -> service.restore(99));
     }

@@ -1,5 +1,6 @@
 package com.quimia.quimiawebcrud.service;
 
+import com.quimia.quimiawebcrud.exception.ResourceNotFoundException;
 import com.quimia.quimiawebcrud.model.Admin;
 import com.quimia.quimiawebcrud.repository.AdminRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class CurrentAdmin {
             throw new IllegalStateException("Ação sem administrador autenticado.");
         }
         return admins.findByEmailIgnoreCase(authentication.getName())
-                .orElseThrow(() -> new IllegalStateException("Administrador da sessão não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Sua conta de administrador não existe mais. Entre novamente."));
     }
 }
