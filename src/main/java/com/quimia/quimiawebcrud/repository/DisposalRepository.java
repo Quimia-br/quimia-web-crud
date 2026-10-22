@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DisposalRepository extends JpaRepository<Disposal, Integer> {
+
+    boolean existsByProductId(Integer productId);
+
+    boolean existsByProductIdAndIdNot(Integer productId, Integer id);
 }

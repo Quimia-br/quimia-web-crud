@@ -1,56 +1,52 @@
 package com.quimia.quimiawebcrud.service;
 
-import com.quimia.quimiawebcrud.exception.ResourceNotFoundException;
 import com.quimia.quimiawebcrud.mapper.Mapper;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.quimia.quimiawebcrud.model.Model;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * Cadastro de uma tabela que a tela cria, edita e exclui. Toda criação e edição é conferida
+ * ({@link #validate}) e registrada no log de edições; a exclusão fica a cargo de cada tabela,
+ * que apaga junto o que depende do registro (ver {@link RecordRemovalService}).
+ */
+public abstract class CrudService<E extends Model, ID, Req, Res> extends ReadService<E, ID, Res> {
 
-@Transactional(readOnly = true)
-public abstract class CrudService<E, ID, Req, Res> {
-
-    protected abstract JpaRepository<E, ID> getRepository();
-
+    @Override
     protected abstract Mapper<E, Req, Res> getMapper();
 
-    public List<Res> readAll() {
-        List<Res> all = new ArrayList<>();
-        for (E e : getRepository().findAll()) {
-            all.add(getMapper().toResponse(e));
-        }
-        return all;
-    }
-
-    public Res findById(ID id) {
-        return getMapper().toResponse(getEntity(id));
-    }
+    protected abstract EditLog getEditLog();
 
     @Transactional
     public Res create(Req request) {
-        E entity = getRepository().save(getMapper().toEntity(request));
+        validate(request, null);
+        E entity = getRepository().save(newEntity(request));
+        getEditLog().created(entity);
         return getMapper().toResponse(entity);
     }
 
     @Transactional
     public Res update(ID id, Req request) {
         E entity = getEntity(id);
-        getMapper().updateEntity(entity, request);
+        validate(request, id);
+        String before = RecordSummary.of(entity);
+        applyChanges(entity, request);
+        getEditLog().updated(entity, before);
         return getMapper().toResponse(entity);
     }
 
-    @Transactional
-    public void delete(ID id) {
-        getRepository().delete(getEntity(id));
+    public abstract void delete(ID id);
+
+    /**
+     * Regras que o pedido precisa cumprir antes de gravar; {@code id} é nulo na criação.
+     */
+    protected void validate(Req request, ID id) {
     }
 
-    protected E getEntity(ID id) {
-        return getRepository().findById(id)
-                .orElseThrow(() -> notFound(id));
+    protected E newEntity(Req request) {
+        return getMapper().toEntity(request);
     }
 
-    protected ResourceNotFoundException notFound(ID id) {
-        return new ResourceNotFoundException("Registro não encontrado com o ID: " + id);
+    protected void applyChanges(E entity, Req request) {
+        getMapper().updateEntity(entity, request);
     }
 }

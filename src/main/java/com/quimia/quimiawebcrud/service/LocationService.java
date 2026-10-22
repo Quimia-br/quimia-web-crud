@@ -1,6 +1,5 @@
 package com.quimia.quimiawebcrud.service;
 
-import com.quimia.quimiawebcrud.dto.LocationRequestDTO;
 import com.quimia.quimiawebcrud.dto.LocationResponseDTO;
 import com.quimia.quimiawebcrud.mapper.LocationMapper;
 import com.quimia.quimiawebcrud.model.Location;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class LocationService extends CrudService<Location, Integer, LocationRequestDTO, LocationResponseDTO> {
+public class LocationService extends ReadService<Location, Integer, LocationResponseDTO> {
 
     private final LocationRepository repository;
     private final LocationMapper mapper;
