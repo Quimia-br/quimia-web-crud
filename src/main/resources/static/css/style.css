@@ -12,18 +12,18 @@
   --color-text: #1B2420;
   --color-text-muted: #5C6963;
   --color-danger: #B42318;
-  --color-success-bg: #DDF5EB;
-  --color-success-text: #0B5D49;
-  
   --color-danger-hover: #8F1C13;
   --color-danger-bg: #FEE4E2;
+  --color-success-bg: #DDF5EB;
+  --color-success-text: #0B5D49;
   --color-backdrop: rgba(27, 36, 32, 0.5);
-  --radius-lg: 16px;
-  --shadow-modal: 0 24px 60px rgba(27, 36, 32, 0.28);
 
   --font-family: 'Nunito Sans', system-ui, sans-serif;
   --radius: 8px;
+  --radius-lg: 16px;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-modal: 0 24px 60px rgba(27, 36, 32, 0.28);
+  --transition: 150ms ease;
   --sidebar-width: 240px;
   --control-height: 44px;
 }
@@ -35,6 +35,8 @@
 }
 
 body {
+  display: flex;
+  min-height: 100vh;
   margin: 0;
   font-family: var(--font-family);
   font-size: 0.875rem;
@@ -72,11 +74,6 @@ select {
   white-space: nowrap;
 }
 
-body {
-  display: flex;
-  min-height: 100vh;
-}
-
 .sidebar {
   width: var(--sidebar-width);
   flex-shrink: 0;
@@ -109,11 +106,14 @@ body {
 
 .sidebar-logo {
   align-self: center;
+  margin-bottom: 12px;
 }
 
 .sidebar-logo img {
-  width: 56px;
-  height: 56px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(18, 52, 58, 0.25);
 }
 
 .sidebar-nav {
@@ -145,6 +145,7 @@ body {
   color: var(--color-sidebar-text);
   text-decoration: none;
   cursor: pointer;
+  transition: background-color var(--transition);
 }
 
 .nav-link img {
@@ -177,6 +178,7 @@ body {
   border-right: 2px solid currentColor;
   border-bottom: 2px solid currentColor;
   transform: rotate(45deg);
+  transition: transform var(--transition);
 }
 
 .nav-group[open] summary::after {
@@ -188,8 +190,13 @@ body {
   padding-left: 32px;
 }
 
-.sidebar-logout {
-  margin-top: auto;
+/* Título à esquerda e o botão de criar à direita */
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .page-header h1 {
@@ -234,6 +241,7 @@ body {
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
+  transition: background-color var(--transition);
 }
 
 .btn-primary {
@@ -275,6 +283,7 @@ body {
   border-radius: 50%;
   background: transparent;
   cursor: pointer;
+  transition: background-color var(--transition);
 }
 
 .btn-icon:hover {
@@ -330,6 +339,10 @@ body {
 
 .table tbody tr:last-child td {
   border-bottom: 0;
+}
+
+.table tbody tr {
+  transition: background-color var(--transition);
 }
 
 .table tbody tr:hover {
@@ -397,6 +410,7 @@ body {
   background: var(--color-surface);
   color: var(--color-text);
   text-decoration: none;
+  transition: background-color var(--transition);
 }
 
 .pagination a:hover {
@@ -536,6 +550,12 @@ body {
   height: 22px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition: 0s;
+  }
+}
+
 @media (max-width: 768px) {
   body {
     flex-direction: column;
@@ -564,7 +584,6 @@ body {
 
 .sidebar-logout-form .sidebar-logout {
   width: 100%;
-  margin-top: 0;
   border: 0;
   background: transparent;
   font: inherit;

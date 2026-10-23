@@ -1,0 +1,5 @@
+<!-- Textura da faixa turquesa do login: colmeia de hexágonos, como anéis de moléculas.
+     O desenho se repete lado a lado sem emenda. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="34.64" height="60" viewBox="0 0 34.64 60">
+  <path d="M17.32 0L34.64 10V30L17.32 40L0 30V10ZM17.32 40V60" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" />
+</svg>

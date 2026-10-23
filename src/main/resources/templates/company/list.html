@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Empresas | Quimia</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/icons/logo.svg" th:href="@{/icons/logo.svg}">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
@@ -17,7 +18,7 @@
 <body>
     <aside class="sidebar">
         <a href="../dashboard/index.html" th:href="@{/}" class="sidebar-logo">
-            <img src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+            <img src="../../static/icons/logo.svg" th:src="@{/icons/logo.svg}" alt="Quimia">
         </a>
 
         <nav class="sidebar-nav" aria-label="Menu principal">
@@ -52,6 +53,7 @@
     <main class="content">
         <header class="page-header">
             <h1>Empresas</h1>
+            <button type="button" class="btn btn-primary" popovertarget="novo-company">Nova empresa</button>
         </header>
 
         <div th:replace="~{fragments/alerts :: alerts}"></div>
@@ -84,7 +86,6 @@
                 </select>
             </div>
             <button type="submit" class="btn btn-secondary">Filtrar</button>
-            <button type="button" class="btn btn-primary" popovertarget="novo-company">Nova empresa</button>
         </form>
 
         <section class="card" aria-label="Lista de empresas">
