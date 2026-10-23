@@ -109,11 +109,14 @@ body {
 
 .sidebar-logo {
   align-self: center;
+  margin-bottom: 12px;
 }
 
 .sidebar-logo img {
-  width: 56px;
-  height: 56px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(18, 52, 58, 0.25);
 }
 
 .sidebar-nav {
