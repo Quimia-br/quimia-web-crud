@@ -190,6 +190,15 @@ select {
   padding-left: 32px;
 }
 
+/* Título à esquerda e o botão de criar à direita */
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .page-header h1 {
   margin: 0;
   font-size: 1.75rem;
