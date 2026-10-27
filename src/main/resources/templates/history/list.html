@@ -83,6 +83,7 @@
                         <th scope="col">Usuário</th>
                         <th scope="col">Tipo</th>
                         <th scope="col">Estante</th>
+                        <th scope="col">Produtos</th>
                         <th scope="col">Execução</th>
                         <th scope="col">Resultado</th>
                         <th scope="col" class="col-actions">Ações</th>
@@ -94,6 +95,7 @@
                         <td>[[${usersById[item.userId]?.userName}]]</td>
                         <td>[[${historyTypesById[item.historyTypeId]?.name}]]</td>
                         <td>[[${shelvesById.get(item.shelfId)?.room}]]</td>
+                        <td class="cell-truncate">[[${item.productNames != null ? #strings.listJoin(item.productNames, ', ') : ''}]]</td>
                         <td class="cell-nowrap">[[${item.executionDate != null ? #temporals.format(item.executionDate, 'dd/MM/yyyy HH:mm') : ''}]]</td>
                         <td class="cell-truncate">[[${item.resultDescription}]]</td>
                         <td class="col-actions">
@@ -101,7 +103,7 @@
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(histories)}">
-                        <td colspan="7">Nenhum registro encontrado.</td>
+                        <td colspan="8">Nenhum registro encontrado.</td>
                     </tr>
                 </tbody>
             </table>
@@ -126,6 +128,7 @@
                 <div><dt>Usuário</dt><dd th:text="${usersById[item.userId]?.userName != null and !#strings.isEmpty(usersById[item.userId]?.userName) ? usersById[item.userId]?.userName : '—'}">valor</dd></div>
                 <div><dt>Tipo</dt><dd th:text="${historyTypesById[item.historyTypeId]?.name != null and !#strings.isEmpty(historyTypesById[item.historyTypeId]?.name) ? historyTypesById[item.historyTypeId]?.name : '—'}">valor</dd></div>
                 <div><dt>Estante</dt><dd th:text="${shelvesById.get(item.shelfId)?.room != null and !#strings.isEmpty(shelvesById.get(item.shelfId)?.room) ? shelvesById.get(item.shelfId)?.room : '—'}">valor</dd></div>
+                <div><dt>Produtos</dt><dd th:text="${item.productNames != null and !#lists.isEmpty(item.productNames) ? #strings.listJoin(item.productNames, ', ') : '—'}">valor</dd></div>
                 <div><dt>Execução</dt><dd th:text="${item.executionDate != null ? #temporals.format(item.executionDate, 'dd/MM/yyyy HH:mm') : '—'}">01/01/2026 10:00</dd></div>
                 <div><dt>Resultado</dt><dd th:text="${item.resultDescription != null and !#strings.isEmpty(item.resultDescription) ? item.resultDescription : '—'}">valor</dd></div>
             </dl>
