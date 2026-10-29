@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,4 +18,5 @@ public class HistoryResponseDTO extends BaseResponseDTO {
     private Integer historyTypeId;
     private LocalDateTime executionDate;
     private String resultDescription;
+    private List<String> productNames;
 }
