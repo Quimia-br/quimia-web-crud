@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Botões "Atualizar por..." e "Apagar por..." do cabeçalho das telas de cadastro. As colunas vêm do controller
+         (columnFields: todas as que servem de filtro; updatableFields: as que também aceitam um novo valor). -->
+    <th:block th:fragment="buttons">
+        <button type="button" class="btn btn-secondary" popovertarget="atualizar-por" th:if="${!#lists.isEmpty(updatableFields)}">Atualizar por...</button>
+        <button type="button" class="btn btn-secondary" popovertarget="apagar-por" th:if="${!#lists.isEmpty(columnFields)}">Apagar por...</button>
+    </th:block>
+
+    <!-- Popups dos dois botões. Ficam junto dos outros popups da tela, no fim da página. -->
+    <th:block th:fragment="dialogs">
+    <dialog class="modal" id="atualizar-por" popover aria-labelledby="atualizar-por-titulo" th:if="${!#lists.isEmpty(updatableFields)}">
+        <header class="modal-header">
+            <div>
+                <h2 id="atualizar-por-titulo">Atualizar por...</h2>
+                <p>Altera um campo de todos os registros em que a coluna escolhida tem o valor informado.</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="atualizar-por" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <form class="modal-form" method="post" action="#" th:action="@{${basePath + '/update-by'}}">
+            <div class="field">
+                <label for="atualizar-por-coluna">Onde a coluna <span class="required" aria-hidden="true">*</span></label>
+                <select id="atualizar-por-coluna" name="filterColumn" required>
+                    <option value="">Selecione...</option>
+                    <option th:each="f : ${columnFields}" th:value="${f.column}" th:text="${f.label}">Coluna</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="atualizar-por-valor">For igual a</label>
+                <input type="text" id="atualizar-por-valor" name="filterValue" placeholder="Em branco: registros sem valor nessa coluna" maxlength="255">
+            </div>
+
+            <div class="field">
+                <label for="atualizar-por-campo">Alterar o campo <span class="required" aria-hidden="true">*</span></label>
+                <select id="atualizar-por-campo" name="changeColumn" required>
+                    <option value="">Selecione...</option>
+                    <option th:each="f : ${updatableFields}" th:value="${f.column}" th:text="${f.label}">Campo</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="atualizar-por-novo">Novo valor</label>
+                <input type="text" id="atualizar-por-novo" name="newValue" placeholder="Em branco: limpa o campo" maxlength="1000">
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="atualizar-por" popovertargetaction="hide">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Atualizar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog class="modal modal-confirm" id="apagar-por" popover aria-labelledby="apagar-por-titulo" th:if="${!#lists.isEmpty(columnFields)}">
+        <form class="modal-form" method="post" action="#" th:action="@{${basePath + '/delete-by'}}">
+            <div class="confirm">
+                <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
+                <div>
+                    <h2 id="apagar-por-titulo">Apagar por...</h2>
+                    <p>Todos os registros em que a coluna escolhida tem o valor informado serão excluídos, junto com o que depende deles. Os dados ficam registrados no log de edições, e essa ação não poderá ser desfeita.</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="apagar-por-coluna">Onde a coluna <span class="required" aria-hidden="true">*</span></label>
+                <select id="apagar-por-coluna" name="filterColumn" required>
+                    <option value="">Selecione...</option>
+                    <option th:each="f : ${columnFields}" th:value="${f.column}" th:text="${f.label}">Coluna</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="apagar-por-valor">For igual a</label>
+                <input type="text" id="apagar-por-valor" name="filterValue" placeholder="Em branco: registros sem valor nessa coluna" maxlength="255">
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertarget="apagar-por" popovertargetaction="hide" autofocus>Cancelar</button>
+                <button type="submit" class="btn btn-danger">Apagar</button>
+            </footer>
+        </form>
+    </dialog>
+    </th:block>
+</body>
+</html>

@@ -3,6 +3,7 @@ package com.quimia.quimiawebcrud.controller;
 import com.quimia.quimiawebcrud.dto.UserRequestDTO;
 import com.quimia.quimiawebcrud.dto.UserResponseDTO;
 import com.quimia.quimiawebcrud.model.User;
+import com.quimia.quimiawebcrud.model.enums.Status;
 import com.quimia.quimiawebcrud.service.CrudService;
 import com.quimia.quimiawebcrud.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -38,6 +40,15 @@ public class UserController extends GenericController<User, Integer, UserRespons
     @Override
     protected String getPluralName() {
         return "users";
+    }
+
+    @Override
+    protected List<ColumnField> getColumnFields() {
+        return List.of(
+                ColumnField.filter("nome", "Nome"),
+                ColumnField.filter("email", "E-mail"),
+                ColumnField.filter("data_nascimento", "Nascimento (AAAA-MM-DD)"),
+                ColumnField.editable("status", "Status (" + ColumnField.options(Status.values()) + ")"));
     }
 
     @Override

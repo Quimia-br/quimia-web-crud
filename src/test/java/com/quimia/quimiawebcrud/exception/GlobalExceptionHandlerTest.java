@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.stereotype.Controller;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,6 +58,26 @@ class GlobalExceptionHandlerTest {
             throw new MaxUploadSizeExceededException(5 * 1024 * 1024);
         }
 
+        @GetMapping("/db-down")
+        String dbDown() {
+            throw new DataAccessResourceFailureException("Connection refused: host=10.0.0.5 user=secreto");
+        }
+
+        @GetMapping("/db-busy")
+        String dbBusy() {
+            throw new CannotAcquireLockException("deadlock detected on tabela_secreta");
+        }
+
+        @GetMapping("/no-connection")
+        String noConnection() {
+            throw new CannotCreateTransactionException("HikariPool-1 - Connection is not available");
+        }
+
+        @GetMapping("/dashboard")
+        String dashboard() {
+            throw new DashboardUnavailableException("Não foi possível carregar o dashboard agora.");
+        }
+
         @GetMapping("/boom")
         String boom() {
             throw new IllegalStateException("detalhe interno secreto");
@@ -90,6 +113,24 @@ class GlobalExceptionHandlerTest {
                 .andExpect(status().isConflict())
                 .andExpect(content().string(not(containsString("fk_secreta"))))
                 .andExpect(content().string(containsString("está em uso")));
+    }
+
+    @Test
+    void databaseUnavailableOrBusyAsksToTryAgainWith503AndHidesTheDetail() throws Exception {
+        for (String path : new String[]{"/db-down", "/db-busy", "/no-connection"}) {
+            mvc.perform(get(path))
+                    .andExpect(status().isServiceUnavailable())
+                    .andExpect(content().string(containsString("Tente novamente em instantes.")))
+                    .andExpect(content().string(not(containsString("secreto"))))
+                    .andExpect(content().string(not(containsString("Hikari"))));
+        }
+    }
+
+    @Test
+    void dashboardUnavailableUses503InsteadOfTheGenericBusinessStatus() throws Exception {
+        mvc.perform(get("/dashboard"))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(content().string(containsString("Não foi possível carregar o dashboard agora.")));
     }
 
     @Test

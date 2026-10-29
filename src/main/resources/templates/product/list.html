@@ -50,7 +50,10 @@
     <main class="content">
         <header class="page-header">
             <h1>Produtos</h1>
-            <button type="button" class="btn btn-primary" popovertarget="novo-product">Novo produto</button>
+            <div class="page-actions">
+                <th:block th:replace="~{fragments/bulk-actions :: buttons}"></th:block>
+                <button type="button" class="btn btn-primary" popovertarget="novo-product">Novo produto</button>
+            </div>
         </header>
 
         <div th:replace="~{fragments/alerts :: alerts}"></div>
@@ -263,5 +266,6 @@
         </form>
     </dialog>
     </th:block>
+    <th:block th:replace="~{fragments/bulk-actions :: dialogs}"></th:block>
 </body>
 </html>

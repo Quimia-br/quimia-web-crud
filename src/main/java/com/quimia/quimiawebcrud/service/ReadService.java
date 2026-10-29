@@ -2,7 +2,7 @@ package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.exception.ResourceNotFoundException;
 import com.quimia.quimiawebcrud.mapper.ResponseMapper;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.quimia.quimiawebcrud.repository.ColumnFilterRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public abstract class ReadService<E, ID, Res> {
 
-    protected abstract JpaRepository<E, ID> getRepository();
+    protected abstract ColumnFilterRepository<E, ID> getRepository();
 
     protected abstract ResponseMapper<E, Res> getMapper();
 

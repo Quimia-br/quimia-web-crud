@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -45,6 +46,17 @@ public class ProductController extends GenericController<Product, Integer, Produ
     @Override
     protected void addListAttributes(Model model) {
         model.addAttribute("companiesById", Lookups.byId(companyService.readAll()));
+    }
+
+    @Override
+    protected List<ColumnField> getColumnFields() {
+        return List.of(
+                ColumnField.filter("nome", "Nome"),
+                ColumnField.filter("cas_number", "Nº CAS"),
+                ColumnField.editable("marca", "Marca"),
+                ColumnField.editable("id_usuario_empresa", "Empresa (ID)"),
+                ColumnField.editable("instrucao_de_uso", "Instruções de uso"),
+                ColumnField.editable("dosagem_tecnica", "Dosagem técnica"));
     }
 
     @Override

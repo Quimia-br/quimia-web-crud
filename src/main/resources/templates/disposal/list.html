@@ -50,7 +50,10 @@
     <main class="content">
         <header class="page-header">
             <h1>Descarte</h1>
-            <button type="button" class="btn btn-primary" popovertarget="novo-disposal">Novo descarte</button>
+            <div class="page-actions">
+                <th:block th:replace="~{fragments/bulk-actions :: buttons}"></th:block>
+                <button type="button" class="btn btn-primary" popovertarget="novo-disposal">Novo descarte</button>
+            </div>
         </header>
 
         <div th:replace="~{fragments/alerts :: alerts}"></div>
@@ -257,5 +260,6 @@
         </form>
     </dialog>
     </th:block>
+    <th:block th:replace="~{fragments/bulk-actions :: dialogs}"></th:block>
 </body>
 </html>
