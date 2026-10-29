@@ -3,6 +3,8 @@ package com.quimia.quimiawebcrud.controller;
 import com.quimia.quimiawebcrud.dto.CompanyRequestDTO;
 import com.quimia.quimiawebcrud.dto.CompanyResponseDTO;
 import com.quimia.quimiawebcrud.model.Company;
+import com.quimia.quimiawebcrud.model.enums.CompanySize;
+import com.quimia.quimiawebcrud.model.enums.Status;
 import com.quimia.quimiawebcrud.service.CompanyService;
 import com.quimia.quimiawebcrud.service.CrudService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -38,6 +41,16 @@ public class CompanyController extends GenericController<Company, Integer, Compa
     @Override
     protected String getPluralName() {
         return "companies";
+    }
+
+    @Override
+    protected List<ColumnField> getColumnFields() {
+        return List.of(
+                ColumnField.filter("nome", "Nome"),
+                ColumnField.filter("cnpj", "CNPJ"),
+                ColumnField.filter("email", "E-mail"),
+                ColumnField.editable("porte", "Porte (" + ColumnField.options(CompanySize.values()) + ")"),
+                ColumnField.editable("status", "Status (" + ColumnField.options(Status.values()) + ")"));
     }
 
     @Override

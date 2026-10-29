@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,9 @@ import java.util.stream.Collectors;
 public abstract class GenericController<T extends Model, ID, Res, Req> extends ListController<Res> {
 
     private static final int MAX_MESSAGES = 3;
+    /** Mesmos limites dos campos dos popups "Atualizar por..." e "Apagar por...". */
+    private static final int MAX_FILTER_LENGTH = 255;
+    private static final int MAX_NEW_VALUE_LENGTH = 1000;
 
     protected abstract CrudService<T, ID, Req, Res> getService();
 
@@ -77,6 +81,82 @@ public abstract class GenericController<T extends Model, ID, Res, Req> extends L
                     "Não foi possível excluir: este registro está em uso por outros dados.");
         }
         return redirectToList();
+    }
+
+    /**
+     * Cada tela de cadastro diz quais colunas oferece nos popups "Atualizar por..." e "Apagar por...".
+     */
+    @Override
+    protected abstract List<ColumnField> getColumnFields();
+
+    @PostMapping("/update-by")
+    public String updateBy(@RequestParam("filterColumn") String filterColumn,
+                           @RequestParam(name = "filterValue", defaultValue = "") String filterValue,
+                           @RequestParam("changeColumn") String changeColumn,
+                           @RequestParam(name = "newValue", defaultValue = "") String newValue,
+                           RedirectAttributes redirect) {
+        if (!offers(filterColumn, false) || !offers(changeColumn, true)) {
+            redirect.addFlashAttribute("error", "Escolha uma das colunas da lista.");
+            return redirectToList();
+        }
+        if (filterValue.length() > MAX_FILTER_LENGTH || newValue.length() > MAX_NEW_VALUE_LENGTH) {
+            redirect.addFlashAttribute("error", "O valor informado é muito longo.");
+            return redirectToList();
+        }
+        try {
+            int updated = getService().updateByColumn(filterColumn, filterValue, Map.of(changeColumn, newValue));
+            if (updated == 0) {
+                redirect.addFlashAttribute("error", "Nenhum registro encontrado com esse valor.");
+            } else {
+                redirect.addFlashAttribute("message", count(updated, "atualizado"));
+            }
+        } catch (BusinessException e) {
+            redirect.addFlashAttribute("error", e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            log.warn("Violação de integridade ao atualizar por coluna em {}", getBasePath(), e);
+            redirect.addFlashAttribute("error",
+                    "Não foi possível atualizar: o novo valor não é aceito (tamanho, tipo ou registro relacionado inexistente).");
+        }
+        return redirectToList();
+    }
+
+    @PostMapping("/delete-by")
+    public String deleteBy(@RequestParam("filterColumn") String filterColumn,
+                           @RequestParam(name = "filterValue", defaultValue = "") String filterValue,
+                           RedirectAttributes redirect) {
+        if (!offers(filterColumn, false)) {
+            redirect.addFlashAttribute("error", "Escolha uma das colunas da lista.");
+            return redirectToList();
+        }
+        if (filterValue.length() > MAX_FILTER_LENGTH) {
+            redirect.addFlashAttribute("error", "O valor informado é muito longo.");
+            return redirectToList();
+        }
+        try {
+            int deleted = getService().deleteByColumn(filterColumn, filterValue);
+            if (deleted == 0) {
+                redirect.addFlashAttribute("error", "Nenhum registro encontrado com esse valor.");
+            } else {
+                redirect.addFlashAttribute("message", count(deleted, "excluído"));
+            }
+        } catch (BusinessException e) {
+            redirect.addFlashAttribute("error", e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            log.warn("Violação de integridade ao excluir por coluna em {}", getBasePath(), e);
+            redirect.addFlashAttribute("error",
+                    "Não foi possível excluir: algum dos registros está em uso por outros dados.");
+        }
+        return redirectToList();
+    }
+
+    /** Só vale uma coluna que a tela oferece (e, para alterar, uma que aceita novo valor): o nome vai para o SQL. */
+    private boolean offers(String column, boolean mustBeUpdatable) {
+        return getColumnFields().stream()
+                .anyMatch(field -> field.getColumn().equals(column) && (!mustBeUpdatable || field.isUpdatable()));
+    }
+
+    private static String count(int records, String action) {
+        return records == 1 ? "1 registro " + action + " com sucesso." : records + " registros " + action + "s com sucesso.";
     }
 
     /**

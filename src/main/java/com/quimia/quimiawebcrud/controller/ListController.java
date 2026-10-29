@@ -36,9 +36,19 @@ public abstract class ListController<Res> {
         return item -> true;
     }
 
+    /**
+     * Colunas dos popups "Atualizar por..." e "Apagar por...". Telas só de consulta não têm nenhuma.
+     */
+    protected List<ColumnField> getColumnFields() {
+        return List.of();
+    }
+
     @GetMapping
     public String list(@RequestParam Map<String, String> params, Model model) {
         addListAttributes(model);
+        List<ColumnField> columnFields = getColumnFields();
+        model.addAttribute("columnFields", columnFields);
+        model.addAttribute("updatableFields", columnFields.stream().filter(ColumnField::isUpdatable).toList());
         List<Res> filtered = readAll().stream().filter(filterBy(params, model)).toList();
         PageResult<Res> page = PageResult.of(filtered, Filters.pageNumber(params.getOrDefault("page", "1")), PAGE_SIZE);
         model.addAttribute(getPluralName(), page.getItems());

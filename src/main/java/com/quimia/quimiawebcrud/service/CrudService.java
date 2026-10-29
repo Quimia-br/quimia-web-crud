@@ -4,6 +4,9 @@ import com.quimia.quimiawebcrud.mapper.Mapper;
 import com.quimia.quimiawebcrud.model.Model;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Cadastro de uma tabela que a tela cria, edita e exclui. Toda criação e edição é conferida
  * ({@link #validate}) e registrada no log de edições; a exclusão fica a cargo de cada tabela,
@@ -35,6 +38,41 @@ public abstract class CrudService<E extends Model, ID, Req, Res> extends ReadSer
     }
 
     public abstract void delete(ID id);
+
+    /**
+     * Altera, em todos os registros em que {@code column} é igual a {@code value}, os campos de {@code changes}
+     * (coluna e novo valor). Não passa pelo {@link #validate}: só as colunas que a tela oferece para isso,
+     * que não têm regra de cadastro além do que o banco confere. Cada registro alterado entra no log de edições.
+     * Devolve quantos registros foram alterados.
+     */
+    @Transactional
+    public int updateByColumn(String column, String value, Map<String, String> changes) {
+        List<E> targets = getRepository().findByColumn(column, value);
+        if (targets.isEmpty()) {
+            return 0;
+        }
+        List<String> before = targets.stream().map(RecordSummary::of).toList();
+        int updated = getRepository().updateByColumn(column, value, changes);
+        for (int i = 0; i < targets.size(); i++) {
+            getEditLog().updated(targets.get(i), before.get(i));
+        }
+        return updated;
+    }
+
+    /**
+     * Exclui todos os registros em que {@code column} é igual a {@code value}, cada um pelo {@link #delete} da tela:
+     * apaga junto o que depende dele e guarda a cópia no log de edições. Se algum não puder ser excluído, nenhum é.
+     * Devolve quantos registros foram excluídos.
+     */
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public int deleteByColumn(String column, String value) {
+        List<E> targets = getRepository().findByColumn(column, value);
+        for (E target : targets) {
+            delete((ID) target.getId());
+        }
+        return targets.size();
+    }
 
     /**
      * Regras que o pedido precisa cumprir antes de gravar; {@code id} é nulo na criação.

@@ -199,6 +199,12 @@ select {
   gap: 12px;
 }
 
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .page-header h1 {
   margin: 0;
   font-size: 1.75rem;
