@@ -1,6 +1,5 @@
 package com.quimia.quimiawebcrud.service;
 
-import com.quimia.quimiawebcrud.dto.AdminLogRequestDTO;
 import com.quimia.quimiawebcrud.dto.AdminLogResponseDTO;
 import com.quimia.quimiawebcrud.mapper.AdminLogMapper;
 import com.quimia.quimiawebcrud.model.AdminLog;
@@ -18,7 +17,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class AdminLogService extends CrudService<AdminLog, Integer, AdminLogRequestDTO, AdminLogResponseDTO> {
+public class AdminLogService extends ReadService<AdminLog, Integer, AdminLogResponseDTO> {
 
     private final AdminLogRepository repository;
     private final AdminLogMapper mapper;

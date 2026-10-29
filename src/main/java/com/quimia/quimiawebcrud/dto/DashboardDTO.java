@@ -16,6 +16,7 @@ import java.util.List;
 public class DashboardDTO {
 
     private final String todayLabel;
+    private final LocalDateTime updatedAt;
     private final int periodDays;
     private final long totalUsers;
     private final long totalCompanies;
@@ -148,7 +149,8 @@ public class DashboardDTO {
     }
 
     /**
-     * Uma conta que pede atenção (pendente ou bloqueada).
+     * Uma conta que pede atenção (pendente ou bloqueada). Se o texto da view não tiver o formato esperado,
+     * {@code kind}, {@code status} e {@code path} ficam nulos e {@code name} guarda o texto inteiro.
      */
     @Getter
     @AllArgsConstructor
@@ -156,7 +158,6 @@ public class DashboardDTO {
         private final String kind;
         private final String name;
         private final Status status;
-        private final LocalDateTime date;
         private final String path;
     }
 

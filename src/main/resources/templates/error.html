@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Erro | Quimia</title>
+    <link rel="icon" type="image/svg+xml" href="../static/icons/logo.svg" th:href="@{/icons/logo.svg}">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
@@ -19,7 +20,7 @@
     -->
     <main class="error-card card">
         <a href="login.html" th:href="@{/}" class="error-logo">
-            <img src="../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+            <img src="../static/icons/logo.svg" th:src="@{/icons/logo.svg}" alt="Quimia">
         </a>
 
         <p class="error-code" th:text="${details != null ? details.status : (status != null ? status : 500)}">500</p>

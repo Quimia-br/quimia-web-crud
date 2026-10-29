@@ -1,138 +1,135 @@
 package com.quimia.quimiawebcrud.service;
 
-import com.quimia.quimiawebcrud.dto.AdminLogResponseDTO;
-import com.quimia.quimiawebcrud.dto.AdminResponseDTO;
-import com.quimia.quimiawebcrud.dto.CompanyResponseDTO;
 import com.quimia.quimiawebcrud.dto.DashboardDTO;
-import com.quimia.quimiawebcrud.dto.HistoryProductResponseDTO;
-import com.quimia.quimiawebcrud.dto.HistoryResponseDTO;
-import com.quimia.quimiawebcrud.dto.HistoryTypeResponseDTO;
-import com.quimia.quimiawebcrud.dto.ProductResponseDTO;
-import com.quimia.quimiawebcrud.dto.ShelfProductResponseDTO;
-import com.quimia.quimiawebcrud.dto.UserProductResponseDTO;
-import com.quimia.quimiawebcrud.dto.UserResponseDTO;
-import com.quimia.quimiawebcrud.model.enums.AdminAction;
+import com.quimia.quimiawebcrud.exception.DashboardUnavailableException;
 import com.quimia.quimiawebcrud.model.enums.Status;
-import org.junit.jupiter.api.BeforeEach;
+import com.quimia.quimiawebcrud.repository.DashboardRepository;
+import com.quimia.quimiawebcrud.repository.DashboardRepository.Row;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.jdbc.BadSqlGrammarException;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * O dashboard lê só a view materializada mv_dashboard: o service separa as seções das linhas, compara os períodos
+ * e prepara os gráficos.
+ */
 class DashboardServiceTest {
 
     private static final ZoneId ZONE = ZoneId.of("America/Sao_Paulo");
     private static final LocalDate TODAY = LocalDate.of(2026, 10, 20);
+    private static final LocalDateTime UPDATED = LocalDateTime.of(2026, 10, 20, 12, 0);
 
-    private final UserService users = mock(UserService.class);
-    private final CompanyService companies = mock(CompanyService.class);
-    private final AdminService admins = mock(AdminService.class);
-    private final ProductService products = mock(ProductService.class);
-    private final HistoryService histories = mock(HistoryService.class);
-    private final HistoryTypeService types = mock(HistoryTypeService.class);
-    private final AdminLogService adminLogs = mock(AdminLogService.class);
-    private final UserProductService userProducts = mock(UserProductService.class);
-    private final ShelfProductService shelfProducts = mock(ShelfProductService.class);
-    private final HistoryProductService historyProducts = mock(HistoryProductService.class);
+    private final DashboardRepository repository = mock(DashboardRepository.class);
+    private final Clock clock = Clock.fixed(TODAY.atTime(12, 0).atZone(ZONE).toInstant(), ZONE);
+    private final DashboardService service = new DashboardService(repository, clock);
 
-    private DashboardService service;
-
-    @BeforeEach
-    void setUp() {
-        Clock clock = Clock.fixed(TODAY.atTime(12, 0).atZone(ZONE).toInstant(), ZONE);
-        service = new DashboardService(users, companies, admins, products, histories, types, adminLogs,
-                userProducts, shelfProducts, historyProducts, clock);
-        when(users.readAll()).thenReturn(List.of());
-        when(companies.readAll()).thenReturn(List.of());
-        when(admins.readAll()).thenReturn(List.of());
-        when(products.readAll()).thenReturn(List.of());
-        when(histories.readAll()).thenReturn(List.of());
-        when(types.readAll()).thenReturn(List.of());
-        when(adminLogs.readAll()).thenReturn(List.of());
-        when(userProducts.readAll()).thenReturn(List.of());
-        when(shelfProducts.readAll()).thenReturn(List.of());
-        when(historyProducts.readAll()).thenReturn(List.of());
+    private static Row row(String section, Long users, Long products, Long companies, Long alerts, String admin,
+                           String action, LocalDateTime editDate, String table, String alert, Long uses, String productName,
+                           Long queryCount, String queryType, LocalDate day, Long dayTotal) {
+        return new Row(section, users, products, companies, alerts, admin, action, editDate, table, alert, uses,
+                productName, queryCount, queryType, day, dayTotal, UPDATED);
     }
 
-    private static UserResponseDTO user(int id, String name, Status status, int day) {
-        return UserResponseDTO.builder().id(id).userName(name).status(status)
-                .signUpDate(LocalDateTime.of(2026, 10, day, 8, 0)).build();
+    private static Row totals(long users, long products, long companies, long alerts) {
+        return row("totais", users, products, companies, alerts, null, null, null, null, null, null, null, null, null, null, null);
     }
 
-    private static HistoryResponseDTO history(int id, int userId, int typeId, LocalDateTime date) {
-        return HistoryResponseDTO.builder().id(id).userId(userId).historyTypeId(typeId).executionDate(date).build();
+    private static Row alert(String text) {
+        return row("alerta", null, null, null, null, null, null, null, null, text, null, null, null, null, null, null);
+    }
+
+    private static Row adminActivity(String admin, String action, String table, LocalDateTime date) {
+        return row("atividade", null, null, null, null, admin, action, date, table, null, null, null, null, null, null, null);
+    }
+
+    private static Row usageActivity(String user, String type, LocalDateTime date) {
+        return row("atividade_uso", null, null, null, null, user, null, date, null, null, null, null, null, type, null, null);
+    }
+
+    private static Row series(String section, LocalDate day, long total) {
+        return row(section, null, null, null, null, null, null, null, null, null, null, null, null, null, day, total);
+    }
+
+    private static Row product(String name, long uses) {
+        return row("produto", null, null, null, null, null, null, null, null, null, uses, name, null, null, null, null);
+    }
+
+    private static Row queryType(String name, long count) {
+        return row("tipo_consulta", null, null, null, null, null, null, null, null, null, null, null, count, name, null, null);
     }
 
     @Test
-    void emptySystemShowsZerosAndEmptyLists() {
+    void emptyViewShowsZerosAndEmptyLists() {
+        when(repository.findAll()).thenReturn(List.of());
+
         DashboardDTO dashboard = service.build(7);
 
         assertEquals(0, dashboard.getTotalUsers());
         assertEquals(0, dashboard.getTotalAlerts());
+        assertNull(dashboard.getUpdatedAt());
         assertEquals(7, dashboard.getActivity().getDots().size());
         assertEquals(4, dashboard.getActivity().getMax(), "sem registros a escala vai de 0 a 4");
         assertEquals(4, dashboard.getKpis().size());
+        assertEquals(6, dashboard.getSignups().getMonths().size());
         assertTrue(dashboard.getLatestActivities().isEmpty());
         assertTrue(dashboard.getRecentAlerts().isEmpty());
         assertTrue(dashboard.getTopProducts().isEmpty());
         assertEquals(0, dashboard.getQueriesByType().getTotal());
-        assertTrue(dashboard.getQueriesByType().getSlices().isEmpty());
     }
 
     @Test
-    void countsTotalsAndAlertsOnlyForPendingOrBlockedAccounts() {
-        when(users.readAll()).thenReturn(List.of(
-                user(1, "Ana", Status.ATIVO, 1), user(2, "Bia", Status.PENDENTE, 5), user(3, "Caio", Status.BLOQUEADO, 9)));
-        when(companies.readAll()).thenReturn(List.of(
-                CompanyResponseDTO.builder().id(1).name("Limpa Bem").status(Status.INATIVO).build(),
-                CompanyResponseDTO.builder().id(2).name("Brilho").status(Status.PENDENTE)
-                        .signUpDate(LocalDateTime.of(2026, 10, 7, 8, 0)).build()));
-        when(admins.readAll()).thenReturn(List.of(AdminResponseDTO.builder().id(1).userName("Adm").status(Status.ATIVO).build()));
-        when(products.readAll()).thenReturn(List.of(ProductResponseDTO.builder().id(1).name("Cloro").build()));
+    void totalsComeFromTheTotalsRowAndTheUpdateTimeFromTheView() {
+        when(repository.findAll()).thenReturn(List.of(totals(123, 500, 2, 90)));
 
         DashboardDTO dashboard = service.build(7);
 
-        assertEquals(3, dashboard.getTotalUsers());
+        assertEquals(123, dashboard.getTotalUsers());
+        assertEquals(500, dashboard.getTotalProducts());
         assertEquals(2, dashboard.getTotalCompanies());
-        assertEquals(1, dashboard.getTotalProducts());
-        assertEquals(3, dashboard.getTotalAlerts());
-        List<String> names = dashboard.getRecentAlerts().stream().map(DashboardDTO.AlertItem::getName).toList();
-        assertEquals(List.of("Caio", "Brilho", "Bia"), names, "newest first");
+        assertEquals(90, dashboard.getTotalAlerts());
+        assertEquals(UPDATED, dashboard.getUpdatedAt());
+        assertEquals("Terça-feira, 20 de outubro de 2026", dashboard.getTodayLabel());
     }
 
     @Test
     void chartCountsOnlyTheSelectedPeriodAndComparesWithThePreviousOne() {
-        when(histories.readAll()).thenReturn(List.of(
-                history(1, 1, 1, TODAY.atTime(9, 0)),
-                history(2, 1, 1, TODAY.atTime(15, 0)),
-                history(3, 1, 1, TODAY.minusDays(6).atTime(10, 0)),
-                history(4, 1, 1, TODAY.minusDays(7).atTime(10, 0)),
-                history(5, 1, 1, TODAY.plusDays(1).atTime(10, 0))));
+        when(repository.findAll()).thenReturn(List.of(
+                series("uso_dia", TODAY, 2),
+                series("uso_dia", TODAY.minusDays(6), 1),
+                series("uso_dia", TODAY.minusDays(7), 1),
+                series("uso_dia", TODAY.plusDays(1), 3)));
 
         DashboardDTO week = service.build(7);
         DashboardDTO.LineChart chart = week.getActivity();
 
         assertEquals(7, chart.getDots().size());
-        assertEquals(3, week.getPeriodTotal(), "yesterday-7 and tomorrow are outside the window");
+        assertEquals(3, week.getPeriodTotal(), "o dia 7 atrás e o de amanhã ficam fora da janela");
         assertEquals(3, chart.getCurrentTotal());
-        assertEquals(1, chart.getPreviousTotal(), "the record 7 days ago belongs to the previous period");
+        assertEquals(1, chart.getPreviousTotal(), "o registro de 7 dias atrás pertence ao período anterior");
         assertEquals("+200%", chart.getTrendText());
         assertEquals(DashboardDTO.Trend.UP, chart.getTrend());
         assertEquals(4, chart.getMax());
-        assertEquals("44.0", chart.getDots().get(0).getX(), "first day at the left edge");
-        assertEquals("628.0", chart.getDots().get(6).getX(), "today at the right edge");
-        assertEquals("133.0", chart.getDots().get(6).getY(), "two records: half of the 0..4 scale");
+        assertEquals("44.0", chart.getDots().get(0).getX(), "o primeiro dia fica na borda esquerda");
+        assertEquals("628.0", chart.getDots().get(6).getX(), "hoje fica na borda direita");
+        assertEquals("133.0", chart.getDots().get(6).getY(), "dois registros: metade da escala 0..4");
         assertEquals("191.5", chart.getDots().get(0).getY());
-        assertEquals("250.0", chart.getDots().get(3).getY(), "a day without records sits on the baseline");
+        assertEquals("250.0", chart.getDots().get(3).getY(), "dia sem registro fica na linha de base");
         assertTrue(chart.getDots().get(6).getTitle().contains("2 registros"));
         assertTrue(chart.getCurrentLine().startsWith("M44.0,191.5 C"));
         assertTrue(chart.getCurrentArea().endsWith("Z"));
@@ -143,15 +140,16 @@ class DashboardServiceTest {
 
     @Test
     void cardsShowTotalsAndHowSignupsChangedAgainstThePreviousPeriod() {
-        when(users.readAll()).thenReturn(List.of(
-                user(1, "Ana", Status.ATIVO, 20), user(2, "Bia", Status.ATIVO, 18),   // 2 nos últimos 7 dias
-                user(3, "Caio", Status.ATIVO, 10),                                    // 1 no período anterior
-                user(4, "Davi", Status.ATIVO, 1)));
-        when(companies.readAll()).thenReturn(List.of(
-                CompanyResponseDTO.builder().id(1).name("Limpa Bem").status(Status.ATIVO)
-                        .signUpDate(LocalDateTime.of(2026, 10, 2, 8, 0)).build()));
-        when(histories.readAll()).thenReturn(List.of(history(1, 1, 1, TODAY.atTime(9, 0)),
-                history(2, 1, 1, TODAY.minusDays(8).atTime(9, 0)), history(3, 1, 1, TODAY.minusDays(9).atTime(9, 0))));
+        when(repository.findAll()).thenReturn(List.of(
+                totals(4, 0, 1, 0),
+                series("cadastro_usuario_dia", LocalDate.of(2026, 10, 20), 1),   // 2 nos últimos 7 dias
+                series("cadastro_usuario_dia", LocalDate.of(2026, 10, 18), 1),
+                series("cadastro_usuario_dia", LocalDate.of(2026, 10, 10), 1),   // 1 no período anterior
+                series("cadastro_usuario_dia", LocalDate.of(2026, 10, 1), 1),
+                series("cadastro_empresa_dia", LocalDate.of(2026, 10, 2), 1),
+                series("uso_dia", TODAY, 1),
+                series("uso_dia", TODAY.minusDays(8), 1),
+                series("uso_dia", TODAY.minusDays(9), 1)));
 
         List<DashboardDTO.Kpi> kpis = service.build(7).getKpis();
 
@@ -168,16 +166,16 @@ class DashboardServiceTest {
         assertEquals(1, queries.getValue());
         assertEquals("-50%", queries.getTrendText());
         assertEquals(DashboardDTO.Trend.DOWN, queries.getTrend());
-        assertEquals(null, kpis.get(3).getTrendText(), "alertas não têm variação");
+        assertNull(kpis.get(3).getTrendText(), "alertas não têm variação");
     }
 
     @Test
     void signupsChartCountsTheLastSixMonthsOfUsersAndCompanies() {
-        when(users.readAll()).thenReturn(List.of(user(1, "Ana", Status.ATIVO, 5), user(2, "Bia", Status.ATIVO, 6),
-                UserResponseDTO.builder().id(3).userName("Caio").status(Status.ATIVO).signUpDate(LocalDateTime.of(2026, 7, 3, 8, 0)).build(),
-                UserResponseDTO.builder().id(4).userName("Davi").status(Status.ATIVO).signUpDate(LocalDateTime.of(2025, 1, 3, 8, 0)).build()));
-        when(companies.readAll()).thenReturn(List.of(CompanyResponseDTO.builder().id(1).name("Limpa Bem").status(Status.ATIVO)
-                .signUpDate(LocalDateTime.of(2026, 10, 2, 8, 0)).build()));
+        when(repository.findAll()).thenReturn(List.of(
+                series("cadastro_usuario_mes", LocalDate.of(2026, 10, 1), 2),
+                series("cadastro_usuario_mes", LocalDate.of(2026, 7, 1), 1),
+                series("cadastro_usuario_mes", LocalDate.of(2025, 1, 1), 9),
+                series("cadastro_empresa_mes", LocalDate.of(2026, 10, 1), 1)));
 
         DashboardDTO.MonthlyChart chart = service.build(7).getSignups();
 
@@ -187,13 +185,15 @@ class DashboardServiceTest {
         assertEquals(2, october.getUsers().getCount());
         assertEquals(1, october.getCompanies().getCount());
         assertEquals(1, chart.getMonths().get(2).getUsers().getCount());
-        assertEquals(4, chart.getMax());
+        assertEquals(4, chart.getMax(), "o mês de 2025 fica fora da escala");
         assertEquals(117, october.getUsers().getHeight(), "dois usuários: metade da escala 0..4");
         assertEquals(133, october.getUsers().getY());
     }
 
     @Test
     void invalidPeriodFallsBackToSevenDays() {
+        when(repository.findAll()).thenReturn(List.of());
+
         assertEquals(7, DashboardService.normalizePeriod(5));
         assertEquals(7, DashboardService.normalizePeriod(-1));
         assertEquals(30, DashboardService.normalizePeriod(30));
@@ -202,23 +202,20 @@ class DashboardServiceTest {
     }
 
     @Test
+    void usesTheInjectedClockForToday() {
+        Instant other = LocalDate.of(2027, 1, 15).atTime(9, 0).atZone(ZONE).toInstant();
+        DashboardService later = new DashboardService(repository, Clock.fixed(other, ZONE));
+        when(repository.findAll()).thenReturn(List.of(series("uso_dia", LocalDate.of(2027, 1, 15), 4)));
+
+        assertEquals(4, later.build(7).getPeriodTotal());
+        assertEquals(0, service.build(7).getPeriodTotal());
+    }
+
+    @Test
     void productRankingAndQueryDonutAreSortedAndScaled() {
-        when(types.readAll()).thenReturn(List.of(
-                HistoryTypeResponseDTO.builder().id(1).name("Descarte").build(),
-                HistoryTypeResponseDTO.builder().id(2).name("Mistura").build()));
-        when(histories.readAll()).thenReturn(List.of(
-                history(1, 1, 1, TODAY.atTime(9, 0)), history(2, 1, 1, TODAY.atTime(9, 5)),
-                history(3, 1, 1, TODAY.atTime(9, 6)), history(4, 1, 1, TODAY.atTime(9, 7)),
-                history(5, 1, 2, TODAY.atTime(9, 8)), history(6, 1, 2, TODAY.atTime(9, 9))));
-        when(products.readAll()).thenReturn(List.of(
-                ProductResponseDTO.builder().id(1).name("Cloro").build(),
-                ProductResponseDTO.builder().id(2).name("Detergente").build()));
-        when(userProducts.readAll()).thenReturn(List.of(
-                UserProductResponseDTO.builder().userId(1).productId(1).build(),
-                UserProductResponseDTO.builder().userId(2).productId(1).build(),
-                UserProductResponseDTO.builder().userId(1).productId(2).build()));
-        when(shelfProducts.readAll()).thenReturn(List.of(ShelfProductResponseDTO.builder().shelfId(1).productId(1).build()));
-        when(historyProducts.readAll()).thenReturn(List.of(HistoryProductResponseDTO.builder().historyId(1).productId(1).build()));
+        when(repository.findAll()).thenReturn(List.of(
+                product("Detergente", 1), product("Cloro", 4), product("Soda", 2),
+                queryType("Mistura", 2), queryType("Descarte", 4)));
 
         DashboardDTO dashboard = service.build(7);
 
@@ -227,49 +224,102 @@ class DashboardServiceTest {
         assertEquals(4, dashboard.getQueriesByType().getSlices().get(0).getCount());
         assertEquals(67, dashboard.getQueriesByType().getSlices().get(0).getPercent());
         assertEquals(33, dashboard.getQueriesByType().getSlices().get(1).getPercent());
-        assertEquals("Cloro", dashboard.getTopProducts().get(0).getName());
-        assertEquals(4, dashboard.getTopProducts().get(0).getCount(), "user lists + shelf + history");
-        assertEquals(25, dashboard.getTopProducts().get(1).getPercent());
+        assertEquals(List.of("Cloro", "Soda", "Detergente"), dashboard.getTopProducts().stream().map(DashboardDTO.RankItem::getName).toList());
+        assertEquals(4, dashboard.getTopProducts().get(0).getCount());
+        assertEquals(25, dashboard.getTopProducts().get(2).getPercent());
     }
 
     @Test
     void latestActivitiesMixUsageAndAdminChangesNewestFirstAndLimitedToSix() {
-        when(users.readAll()).thenReturn(List.of(user(1, "Ana", Status.ATIVO, 1)));
-        when(admins.readAll()).thenReturn(List.of(AdminResponseDTO.builder().id(1).userName("Adm").status(Status.ATIVO).build()));
-        when(types.readAll()).thenReturn(List.of(HistoryTypeResponseDTO.builder().id(1).name("Descarte").build()));
-        java.util.ArrayList<HistoryResponseDTO> many = new java.util.ArrayList<>();
+        List<Row> rows = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
-            many.add(history(i, 1, 1, TODAY.atTime(8, i)));
+            rows.add(usageActivity("Ana", "Descarte", TODAY.atTime(8, i)));
         }
-        when(histories.readAll()).thenReturn(many);
-        when(adminLogs.readAll()).thenReturn(List.of(AdminLogResponseDTO.builder().id(1).adminId(1).affectedTable("produtos")
-                .action(AdminAction.DELETE).editDate(TODAY.atTime(23, 0)).build()));
+        rows.add(adminActivity("Adm", "DELETE", "produtos", TODAY.atTime(23, 0)));
+        rows.add(adminActivity("Adm", "INSERT", "usuarios", TODAY.atTime(7, 0)));
+        when(repository.findAll()).thenReturn(rows);
 
         List<DashboardDTO.ActivityItem> items = service.build(7).getLatestActivities();
 
         assertEquals(6, items.size());
         assertEquals("Adm excluiu um registro em produtos", items.get(0).getText());
         assertEquals("Ana registrou: Descarte", items.get(1).getText());
-        assertTrue(items.get(1).getDate().isAfter(items.get(5).getDate()) || items.get(1).getDate().isEqual(items.get(5).getDate()));
+        assertEquals(TODAY.atTime(8, 7), items.get(1).getDate(), "o uso mais recente vem logo depois");
     }
 
     @Test
-    void aRestoreLineIsDescribedAsRestoredNotCreated() {
-        when(admins.readAll()).thenReturn(List.of(AdminResponseDTO.builder().id(1).userName("Adm").status(Status.ATIVO).build()));
-        when(adminLogs.readAll()).thenReturn(List.of(AdminLogResponseDTO.builder().id(1).adminId(1).affectedTable("usuarios")
-                .action(AdminAction.INSERT).restore(true).editDate(TODAY.atTime(23, 0)).build()));
+    void anAdminActionIsDescribedByItsKind() {
+        when(repository.findAll()).thenReturn(List.of(
+                adminActivity("Adm", "INSERT", "usuarios", TODAY.atTime(10, 0)),
+                adminActivity("Bia", "UPDATE", "empresas", TODAY.atTime(9, 0))));
 
-        assertEquals("Adm restaurou um registro em usuarios", service.build(7).getLatestActivities().get(0).getText());
+        List<DashboardDTO.ActivityItem> items = service.build(7).getLatestActivities();
+
+        assertEquals("Adm criou um registro em usuarios", items.get(0).getText());
+        assertEquals("Bia alterou um registro em empresas", items.get(1).getText());
     }
 
     @Test
-    void usesTheInjectedClockForToday() {
-        Instant other = LocalDate.of(2027, 1, 15).atTime(9, 0).atZone(ZONE).toInstant();
-        DashboardService later = new DashboardService(users, companies, admins, products, histories, types, adminLogs,
-                userProducts, shelfProducts, historyProducts, Clock.fixed(other, ZONE));
-        when(histories.readAll()).thenReturn(List.of(history(1, 1, 1, LocalDateTime.of(2027, 1, 15, 8, 0))));
+    void alertTextIsSplitIntoKindNameAndStatusWithALinkToTheSourceList() {
+        when(repository.findAll()).thenReturn(List.of(
+                alert("Ana Souza Usuário (BLOQUEADO)"), alert("Limpa Bem (Filial) Empresa (PENDENTE)"),
+                alert("Adm Administrador (PENDENTE)")));
 
-        assertEquals(1, later.build(7).getPeriodTotal());
-        assertEquals(0, service.build(7).getPeriodTotal());
+        List<DashboardDTO.AlertItem> alerts = service.build(7).getRecentAlerts();
+
+        assertEquals("Ana Souza", alerts.get(0).getName());
+        assertEquals("Usuário", alerts.get(0).getKind());
+        assertEquals(Status.BLOQUEADO, alerts.get(0).getStatus());
+        assertEquals("/users", alerts.get(0).getPath());
+        assertEquals("Limpa Bem (Filial)", alerts.get(1).getName(), "parênteses no nome não atrapalham");
+        assertEquals("/companies", alerts.get(1).getPath());
+        assertEquals("Administrador", alerts.get(2).getKind());
+        assertEquals("/admins", alerts.get(2).getPath());
+    }
+
+    @Test
+    void anAlertInAnUnexpectedFormatIsShownAsPlainText() {
+        when(repository.findAll()).thenReturn(List.of(alert("algo diferente"), alert("Ana Usuário (OUTRO)")));
+
+        List<DashboardDTO.AlertItem> alerts = service.build(7).getRecentAlerts();
+
+        assertEquals("algo diferente", alerts.get(0).getName());
+        assertNull(alerts.get(0).getStatus());
+        assertNull(alerts.get(0).getPath());
+        assertEquals("Ana Usuário (OUTRO)", alerts.get(1).getName(), "status desconhecido não vira link");
+    }
+
+    @Test
+    void onlyTheFirstFiveAlertsAreShown() {
+        List<Row> rows = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            rows.add(alert("Pessoa " + i + " Usuário (PENDENTE)"));
+        }
+        when(repository.findAll()).thenReturn(rows);
+
+        assertEquals(5, service.build(7).getRecentAlerts().size());
+    }
+
+    @Test
+    void anUnknownSectionIsIgnored() {
+        when(repository.findAll()).thenReturn(List.of(
+                row("nova", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null),
+                totals(1, 2, 3, 4)));
+
+        assertEquals(1, service.build(7).getTotalUsers());
+    }
+
+    @Test
+    void aFailureReadingTheViewBecomesADashboardUnavailableMessage() {
+        when(repository.findAll()).thenThrow(new BadSqlGrammarException("lê a view", "select ... from mv_dashboard",
+                new java.sql.SQLException("relation \"mv_dashboard\" does not exist")));
+
+        DashboardUnavailableException error = assertThrows(DashboardUnavailableException.class, () -> service.build(7));
+
+        assertEquals("Não foi possível carregar o dashboard agora. Tente novamente em instantes.", error.getMessage());
+        assertTrue(!error.getMessage().contains("mv_dashboard"), "o detalhe do banco não chega à tela");
+
+        doThrow(new DataAccessResourceFailureException("sem conexão")).when(repository).findAll();
+        assertThrows(DashboardUnavailableException.class, () -> service.build(7));
     }
 }

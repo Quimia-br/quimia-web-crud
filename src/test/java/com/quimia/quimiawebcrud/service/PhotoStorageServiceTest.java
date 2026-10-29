@@ -172,7 +172,8 @@ class PhotoStorageServiceTest {
         PhotoStorageService storage = storage();
         UserRepository repository = mock(UserRepository.class);
         when(repository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        UserService service = new UserService(repository, new UserMapper(), new PasswordHasher(), storage, mock(RecordRemovalService.class));
+        UserService service = new UserService(repository, new UserMapper(), new PasswordHasher(), storage, mock(RecordRemovalService.class),
+                mock(EditLog.class));
 
         UserRequestDTO forged = UserRequestDTO.builder().userName("Ana").email("a@x.com").password("s3nha-forte")
                 .status(Status.ATIVO).photoUrl("https://forjado.com/x.png").build();

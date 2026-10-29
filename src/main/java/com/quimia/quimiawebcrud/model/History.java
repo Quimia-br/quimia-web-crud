@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "historicos")
@@ -36,6 +37,15 @@ public class History extends Model {
 
     @Column(name = "descricao_resultado", length = 255)
     private String resultDescription;
+
+    @ManyToMany
+    @JoinTable(
+            name = "historicos_produtos",
+            joinColumns = @JoinColumn(name = "id_historico"),
+            inverseJoinColumns = @JoinColumn(name = "id_produto")
+    )
+    @ToString.Exclude
+    private List<Product> products;
 
     @PrePersist
     private void prePersist() {

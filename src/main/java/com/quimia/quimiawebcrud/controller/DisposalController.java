@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -49,6 +50,16 @@ public class DisposalController extends GenericController<Disposal, Integer, Dis
     protected void addListAttributes(Model model) {
         model.addAttribute("productsById", Lookups.byId(productService.readAll()));
         model.addAttribute("companiesById", Lookups.byId(companyService.readAll()));
+    }
+
+    @Override
+    protected List<ColumnField> getColumnFields() {
+        return List.of(
+                ColumnField.filter("id_produto", "Produto (ID)"),
+                ColumnField.editable("metodo_descarte_produto", "Descarte do produto"),
+                ColumnField.editable("metodo_descarte_embalagem", "Descarte da embalagem"),
+                ColumnField.editable("restricao_descarte", "Restrições de descarte"),
+                ColumnField.editable("precaucao_ambiental", "Precauções ambientais"));
     }
 
     @Override

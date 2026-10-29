@@ -2,12 +2,16 @@ package com.quimia.quimiawebcrud.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
@@ -36,6 +40,22 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
+    /**
+     * Demais regras de negócio (ex.: foto recusada) que chegam aqui sem um tratamento próprio.
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ModelAndView handleBusiness(BusinessException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    /**
+     * Arquivo acima do limite de upload do servidor: o pedido é recusado antes de chegar ao controller.
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ModelAndView handleMaxUploadSize(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.PAYLOAD_TOO_LARGE, "A foto deve ter no máximo 2 MB.", request);
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ModelAndView handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, "O valor informado na URL é inválido.", request);
@@ -46,6 +66,23 @@ public class GlobalExceptionHandler {
         log.warn("Violação de integridade em {}: {}", request.getRequestURI(), ex.getMostSpecificCause().getMessage());
         return buildResponse(HttpStatus.CONFLICT,
                 "A operação não pôde ser concluída: o registro está em uso por outros dados ou já existe.", request);
+    }
+
+    @ExceptionHandler(DashboardUnavailableException.class)
+    public ModelAndView handleDashboardUnavailable(DashboardUnavailableException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request);
+    }
+
+    /**
+     * Banco fora do ar, sem conexão livre no pool, consulta que passou do tempo ou travada por outra: não é culpa do
+     * pedido e costuma passar sozinha, então o aviso pede para tentar de novo em vez de mostrar um erro genérico.
+     */
+    @ExceptionHandler({DataAccessResourceFailureException.class, TransientDataAccessException.class,
+            CannotCreateTransactionException.class})
+    public ModelAndView handleDatabaseUnavailable(Exception ex, HttpServletRequest request) {
+        log.error("Banco indisponível em {}", request.getRequestURI(), ex);
+        return buildResponse(HttpStatus.SERVICE_UNAVAILABLE,
+                "O banco de dados está indisponível ou ocupado no momento. Tente novamente em instantes.", request);
     }
 
     /**

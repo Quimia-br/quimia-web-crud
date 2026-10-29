@@ -1,14 +1,13 @@
 package com.quimia.quimiawebcrud.repository;
 
 import com.quimia.quimiawebcrud.model.AdminLog;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface AdminLogRepository extends JpaRepository<AdminLog, Integer> {
+public interface AdminLogRepository extends ColumnFilterRepository<AdminLog, Integer> {
 
     /**
      * Uma linha por registro do log, sem trazer o texto grande: id, tabela, id do registro, ação e se há cópia

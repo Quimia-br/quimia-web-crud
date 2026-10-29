@@ -106,7 +106,7 @@ class LoginSecurityTest {
         assertTrue(page.contains("name=\"_csrf\""), "o formulário traz o token CSRF");
         assertFalse(page.contains("Cadastre-se"), "não existe cadastro público de administrador");
         mvc.perform(get("/css/style.css")).andExpect(status().isOk());
-        mvc.perform(get("/icons/logo.png")).andExpect(status().isOk());
+        mvc.perform(get("/icons/logo.svg")).andExpect(status().isOk());
         mvc.perform(get("/uploads/photos/x.png")).andExpect(status().isOk());
     }
 

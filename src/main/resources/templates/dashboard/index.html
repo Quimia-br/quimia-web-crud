@@ -50,7 +50,7 @@
         <header class="dash-header">
             <div class="dash-welcome">
                 <h1>Bem-vindo de volta, <span th:text="${adminName}">Administrador</span></h1>
-                <p><span th:text="${dashboard.todayLabel}">Quinta-feira, 22 de outubro de 2026</span> · veja o resumo do sistema</p>
+                <p><span th:text="${dashboard.todayLabel}">Quinta-feira, 22 de outubro de 2026</span> · veja o resumo do sistema<span th:if="${dashboard.updatedAt != null}"> · dados atualizados em <time th:text="${#temporals.format(dashboard.updatedAt, 'dd/MM/yyyy HH:mm')}">22/10/2026 14:05</time></span></p>
             </div>
             <div class="dash-tools">
                 <nav class="period-nav" aria-label="Período dos gráficos">
@@ -218,10 +218,11 @@
                 <ul class="dash-list">
                     <li th:each="alert : ${dashboard.recentAlerts}">
                         <span>
-                            <a th:href="@{${alert.path}(busca=${alert.name},status=${alert.status.name()})}" href="../user/list.html" th:text="${alert.name}">Nome</a>
-                            <small th:text="${alert.kind}">Usuário</small>
+                            <a th:if="${alert.path != null}" th:href="@{${alert.path}(busca=${alert.name},status=${alert.status.name()})}" href="../user/list.html" th:text="${alert.name}">Nome</a>
+                            <span th:if="${alert.path == null}" th:text="${alert.name}">Nome</span>
+                            <small th:if="${alert.kind != null}" th:text="${alert.kind}">Usuário</small>
                         </span>
-                        <span th:replace="~{fragments/badges :: status(${alert.status})}"></span>
+                        <th:block th:if="${alert.status != null}"><span th:replace="~{fragments/badges :: status(${alert.status})}"></span></th:block>
                     </li>
                 </ul>
                 <p class="dash-empty" th:if="${#lists.isEmpty(dashboard.recentAlerts)}">Nenhuma conta pendente ou bloqueada.</p>

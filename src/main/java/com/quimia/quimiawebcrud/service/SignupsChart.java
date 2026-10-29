@@ -4,14 +4,12 @@ import com.quimia.quimiawebcrud.dto.DashboardDTO.Bar;
 import com.quimia.quimiawebcrud.dto.DashboardDTO.MonthGroup;
 import com.quimia.quimiawebcrud.dto.DashboardDTO.MonthlyChart;
 
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * Barras de cadastros por mês (usuários e empresas lado a lado) nos últimos meses, em coordenadas de SVG.
@@ -30,9 +28,12 @@ final class SignupsChart {
     private SignupsChart() {
     }
 
-    static MonthlyChart build(List<LocalDateTime> userDates, List<LocalDateTime> companyDates, YearMonth lastMonth) {
-        var users = countByMonth(userDates);
-        var companies = countByMonth(companyDates);
+    /**
+     * @param users     cadastros de usuários por mês (meses fora dos últimos {@value #MONTHS} são ignorados)
+     * @param companies o mesmo para empresas
+     * @param lastMonth último mês do gráfico (o atual)
+     */
+    static MonthlyChart build(Map<YearMonth, Long> users, Map<YearMonth, Long> companies, YearMonth lastMonth) {
         List<YearMonth> months = new ArrayList<>();
         long highest = 0;
         for (int i = MONTHS - 1; i >= 0; i--) {
@@ -59,11 +60,6 @@ final class SignupsChart {
         int height = (int) Math.round(count * (BOTTOM - TOP) / (double) max);
         return new Bar(x, BOTTOM - height, BAR_WIDTH, height, count,
                 labelOf(month) + "/" + month.getYear() + ": " + count + " " + what);
-    }
-
-    private static java.util.Map<YearMonth, Long> countByMonth(List<LocalDateTime> dates) {
-        return dates.stream().filter(date -> date != null).map(YearMonth::from)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }
 
     private static String labelOf(YearMonth month) {
