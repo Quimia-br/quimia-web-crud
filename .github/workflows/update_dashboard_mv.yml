@@ -15,4 +15,4 @@ jobs:
 
       - name: Executar Query no PostgreSQL da Aiven
         run: |
-          psql "postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@://aivencloud.com" -c "REFRESH MATERIALIZED VIEW mv_dashboard;"
+          psql "postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/defaultdb?sslmode=require" -c "REFRESH MATERIALIZED VIEW mv_dashboard;"
