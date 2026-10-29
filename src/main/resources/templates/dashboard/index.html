@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Quimia</title>
-    <link rel="icon" type="image/svg+xml" href="../../static/icons/logo.svg" th:href="@{/icons/logo.svg}">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
@@ -15,7 +14,7 @@
 <body>
     <aside class="sidebar">
         <a href="index.html" th:href="@{/}" class="sidebar-logo">
-            <img src="../../static/icons/logo.svg" th:src="@{/icons/logo.svg}" alt="Quimia">
+            <img src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
         </a>
 
         <nav class="sidebar-nav" aria-label="Menu principal">
@@ -47,68 +46,161 @@
         </form>
     </aside>
 
-    <main class="content">
-        <header class="page-header">
-            <h1>Visão geral do sistema</h1>
-            <p class="kpi-note" th:if="${dashboard.updatedAt != null}">Dados atualizados em <time th:text="${#temporals.format(dashboard.updatedAt, 'dd/MM/yyyy HH:mm')}">06/10/2026 14:32</time></p>
-        </header>
-
-        <div th:replace="~{fragments/alerts :: alerts}"></div>
-
-        <!-- Números gerais -->
-        <section class="kpi-grid" aria-label="Resumo do sistema">
-            <article class="card kpi">
-                <h2>Usuários</h2>
-                <p class="kpi-value" th:text="${dashboard.totalUsers}">123</p>
-            </article>
-            <article class="card kpi">
-                <h2>Empresas</h2>
-                <p class="kpi-value" th:text="${dashboard.totalCompanies}">2</p>
-            </article>
-            <article class="card kpi">
-                <h2>Produtos</h2>
-                <p class="kpi-value" th:text="${dashboard.totalProducts}">500</p>
-            </article>
-            <article class="card kpi">
-                <h2>Alertas</h2>
-                <p class="kpi-value" th:text="${dashboard.totalAlerts}">90</p>
-                <p class="kpi-note">contas pendentes ou bloqueadas</p>
-            </article>
-        </section>
-
-        <!-- Atividade dos administradores ao longo do tempo: uma coluna por dia (seção atividade_dia da mv_dashboard) e a linha que liga o topo delas -->
-        <section class="card dash-card" aria-labelledby="atividade-titulo">
-            <header class="dash-card-header">
-                <h2 id="atividade-titulo">Atividade dos administradores ao longo do tempo</h2>
-                <nav class="period-nav" aria-label="Período do gráfico">
+    <main class="content dashboard">
+        <header class="dash-header">
+            <div class="dash-welcome">
+                <h1>Bem-vindo de volta, <span th:text="${adminName}">Administrador</span></h1>
+                <p><span th:text="${dashboard.todayLabel}">Quinta-feira, 22 de outubro de 2026</span> · veja o resumo do sistema<span th:if="${dashboard.updatedAt != null}"> · dados atualizados em <time th:text="${#temporals.format(dashboard.updatedAt, 'dd/MM/yyyy HH:mm')}">22/10/2026 14:05</time></span></p>
+            </div>
+            <div class="dash-tools">
+                <nav class="period-nav" aria-label="Período dos gráficos">
                     <a href="?periodo=7" th:href="@{/(periodo=7)}" th:attr="aria-current=${dashboard.periodDays == 7} ? 'true'" aria-current="true">7 dias</a>
                     <a href="?periodo=30" th:href="@{/(periodo=30)}" th:attr="aria-current=${dashboard.periodDays == 30} ? 'true'">30 dias</a>
                     <a href="?periodo=90" th:href="@{/(periodo=90)}" th:attr="aria-current=${dashboard.periodDays == 90} ? 'true'">90 dias</a>
                 </nav>
-            </header>
-            <p class="dash-summary"><strong th:text="${dashboard.periodTotal}">0</strong> alterações de administradores nos últimos <span th:text="${dashboard.periodDays}">7</span> dias</p>
-            <svg class="chart" viewBox="0 0 640 240" role="img" aria-label="Gráfico de alterações de administradores por dia">
-                <line class="chart-grid" x1="40" y1="200" x2="620" y2="200"></line>
-                <line class="chart-grid" x1="40" y1="110" x2="620" y2="110"></line>
-                <line class="chart-grid" x1="40" y1="20" x2="620" y2="20"></line>
-                <text class="chart-axis" x="32" y="204" text-anchor="end">0</text>
-                <text class="chart-axis" x="32" y="114" text-anchor="end" th:text="${dashboard.chartMax / 2}">1</text>
-                <text class="chart-axis" x="32" y="24" text-anchor="end" th:text="${dashboard.chartMax}">2</text>
-                <rect class="chart-bar" th:each="bar : ${dashboard.bars}" th:attr="x=${bar.x},y=${bar.y},width=${bar.width},height=${bar.height}">
-                    <title th:text="${bar.title}">01/01/2026: 0</title>
-                </rect>
-                <polyline class="chart-line" fill="none" th:attr="points=${dashboard.linePoints}"></polyline>
-                <th:block th:each="bar : ${dashboard.bars}">
-                    <text class="chart-label" y="224" text-anchor="middle" th:if="${bar.showLabel}" th:attr="x=${bar.labelX}" th:text="${bar.label}"></text>
-                </th:block>
-            </svg>
+                <div class="profile-chip">
+                    <span class="avatar" aria-hidden="true" th:text="${adminInitial}">A</span>
+                    <span class="profile-text"><strong th:text="${adminName}">Administrador</strong><small>Administrador</small></span>
+                </div>
+            </div>
+        </header>
+
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Números gerais, cada um com a variação contra o período anterior -->
+        <section class="kpi-grid" aria-label="Resumo do sistema">
+            <article class="card kpi-card" th:each="kpi : ${dashboard.kpis}" th:classappend="${kpi.highlight} ? 'kpi-highlight'">
+                <header class="kpi-head">
+                    <h2 th:text="${kpi.label}">Usuários</h2>
+                    <a class="kpi-link" th:if="${kpi.path != null}" th:href="@{${kpi.path}}" th:attr="aria-label=|Ver ${kpi.label}|" href="../user/list.html">&rsaquo;</a>
+                </header>
+                <p class="kpi-value" th:text="${#numbers.formatInteger(kpi.value, 1, 'POINT')}">123</p>
+                <p class="kpi-caption" th:text="${kpi.caption}">5 novos nos últimos 7 dias</p>
+                <p class="kpi-trend" th:if="${kpi.trendText != null}">
+                    <span class="trend" th:classappend="${kpi.trend.name() == 'UP'} ? 'trend-up' : (${kpi.trend.name() == 'DOWN'} ? 'trend-down' : 'trend-flat')" th:text="${kpi.trendText}">+12%</span>
+                    <small>em relação ao período anterior</small>
+                </p>
+            </article>
         </section>
 
-        <div class="dash-row">
-            <section class="card dash-card" aria-labelledby="ultimas-titulo">
+        <div class="dash-grid">
+            <!-- Atividade: período atual contra o anterior -->
+            <section class="card dash-card span-8" aria-labelledby="atividade-titulo">
                 <header class="dash-card-header">
-                    <h2 id="ultimas-titulo">Últimas atividades dos administradores</h2>
-                    <a class="btn btn-secondary" href="../admin-log/list.html" th:href="@{/admin-logs}">Checar relatórios</a>
+                    <div>
+                        <h2 id="atividade-titulo">Atividade de uso</h2>
+                        <p class="dash-sub"><strong th:text="${#numbers.formatInteger(dashboard.activity.currentTotal, 1, 'POINT')}">0</strong> registros nos últimos <span th:text="${dashboard.periodDays}">7</span> dias
+                            <span class="trend" th:classappend="${dashboard.activity.trend.name() == 'UP'} ? 'trend-up' : (${dashboard.activity.trend.name() == 'DOWN'} ? 'trend-down' : 'trend-flat')" th:text="${dashboard.activity.trendText}">+12%</span></p>
+                    </div>
+                    <ul class="legend" aria-label="Legenda do gráfico">
+                        <li><span class="legend-line legend-line-current"></span>Período atual</li>
+                        <li><span class="legend-line legend-line-previous"></span>Período anterior</li>
+                    </ul>
+                </header>
+                <svg class="chart" viewBox="0 0 640 292" role="img" aria-label="Gráfico de registros de uso por dia, período atual contra período anterior">
+                    <defs>
+                        <linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop class="area-stop-top" offset="0%"></stop>
+                            <stop class="area-stop-bottom" offset="100%"></stop>
+                        </linearGradient>
+                    </defs>
+                    <g th:each="tick : ${dashboard.activity.yTicks}">
+                        <line class="chart-grid" x1="44" x2="628" th:attr="y1=${tick.pos},y2=${tick.pos}"></line>
+                        <text class="chart-axis" x="36" text-anchor="end" th:attr="y=${tick.pos + 4}" th:text="${tick.text}">0</text>
+                    </g>
+                    <path class="chart-area" fill="url(#area-gradient)" th:attr="d=${dashboard.activity.currentArea}"></path>
+                    <path class="chart-line chart-line-previous" fill="none" th:attr="d=${dashboard.activity.previousLine}"></path>
+                    <path class="chart-line chart-line-current" fill="none" th:attr="d=${dashboard.activity.currentLine}"></path>
+                    <circle class="chart-dot" r="5" th:each="dot : ${dashboard.activity.dots}" th:attr="cx=${dot.x},cy=${dot.y}">
+                        <title th:text="${dot.title}">01/01/2026: 0 registros</title>
+                    </circle>
+                    <text class="chart-label" y="280" text-anchor="middle" th:each="label : ${dashboard.activity.xLabels}" th:attr="x=${label.pos}" th:text="${label.text}"></text>
+                </svg>
+            </section>
+
+            <!-- Consultas por tipo (rosca) -->
+            <section class="card dash-card span-4" aria-labelledby="consultas-titulo">
+                <header class="dash-card-header">
+                    <h2 id="consultas-titulo">Consultas por tipo</h2>
+                </header>
+                <div class="donut-wrap" th:if="${dashboard.queriesByType.total > 0}">
+                    <svg class="donut" viewBox="0 0 140 140" role="img" aria-label="Proporção de consultas por tipo">
+                        <circle class="donut-track" cx="70" cy="70" r="52" fill="none" stroke-width="18"></circle>
+                        <circle th:each="slice : ${dashboard.queriesByType.slices}" th:class="|donut-slice donut-slice-${slice.colorIndex}|" cx="70" cy="70" r="52" fill="none" stroke-width="18"
+                                transform="rotate(-90 70 70)" th:attr="stroke-dasharray=|${slice.dash} ${slice.gap}|,stroke-dashoffset=${slice.offset}">
+                            <title th:text="|${slice.name}: ${slice.count} (${slice.percent}%)|">Descarte: 4 (40%)</title>
+                        </circle>
+                        <text class="donut-total" x="70" y="72" text-anchor="middle" th:text="${#numbers.formatInteger(dashboard.queriesByType.total, 1, 'POINT')}">0</text>
+                        <text class="donut-caption" x="70" y="88" text-anchor="middle">consultas</text>
+                    </svg>
+                    <ul class="donut-legend">
+                        <li th:each="slice : ${dashboard.queriesByType.slices}">
+                            <span class="legend-dot" th:classappend="|legend-dot-${slice.colorIndex}|"></span>
+                            <span class="legend-name" th:text="${slice.name}">Descarte</span>
+                            <span class="legend-value"><strong th:text="${slice.count}">4</strong> <small th:text="|${slice.percent}%|">40%</small></span>
+                        </li>
+                    </ul>
+                </div>
+                <p class="dash-empty" th:if="${dashboard.queriesByType.total == 0}">Ainda não há consultas registradas.</p>
+            </section>
+
+            <!-- Cadastros por mês -->
+            <section class="card dash-card span-6" aria-labelledby="cadastros-titulo">
+                <header class="dash-card-header">
+                    <div>
+                        <h2 id="cadastros-titulo">Cadastros por mês</h2>
+                        <p class="dash-sub">Novos usuários e empresas nos últimos 6 meses</p>
+                    </div>
+                    <ul class="legend" aria-label="Legenda do gráfico">
+                        <li><span class="legend-dot legend-dot-1"></span>Usuários</li>
+                        <li><span class="legend-dot legend-dot-2"></span>Empresas</li>
+                    </ul>
+                </header>
+                <svg class="chart" viewBox="0 0 640 292" role="img" aria-label="Gráfico de cadastros de usuários e empresas por mês">
+                    <g th:each="tick : ${dashboard.signups.yTicks}">
+                        <line class="chart-grid" x1="44" x2="628" th:attr="y1=${tick.pos},y2=${tick.pos}"></line>
+                        <text class="chart-axis" x="36" text-anchor="end" th:attr="y=${tick.pos + 4}" th:text="${tick.text}">0</text>
+                    </g>
+                    <th:block th:each="month : ${dashboard.signups.months}">
+                        <rect class="bar bar-users" rx="4" th:attr="x=${month.users.x},y=${month.users.y},width=${month.users.width},height=${month.users.height}">
+                            <title th:text="${month.users.title}">Out/2026: 3 usuários</title>
+                        </rect>
+                        <rect class="bar bar-companies" rx="4" th:attr="x=${month.companies.x},y=${month.companies.y},width=${month.companies.width},height=${month.companies.height}">
+                            <title th:text="${month.companies.title}">Out/2026: 1 empresas</title>
+                        </rect>
+                        <text class="chart-label" y="280" text-anchor="middle" th:attr="x=${month.labelX}" th:text="${month.label}">Out</text>
+                    </th:block>
+                </svg>
+            </section>
+
+            <!-- Produtos mais utilizados -->
+            <section class="card dash-card span-6" aria-labelledby="produtos-titulo">
+                <header class="dash-card-header">
+                    <div>
+                        <h2 id="produtos-titulo">Produtos mais utilizados</h2>
+                        <p class="dash-sub"><span th:text="${#numbers.formatInteger(dashboard.totalProducts, 1, 'POINT')}">0</span> produtos cadastrados</p>
+                    </div>
+                    <a class="btn btn-secondary" href="../product/list.html" th:href="@{/products}">Ver produtos</a>
+                </header>
+                <table class="table dash-table" th:if="${!#lists.isEmpty(dashboard.topProducts)}">
+                    <thead>
+                        <tr><th scope="col">Produto</th><th scope="col" class="num">Usos</th><th scope="col">Participação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${dashboard.topProducts}">
+                            <td class="rank-name" th:text="${item.name}">Cloro</td>
+                            <td class="num" th:text="${item.count}">10</td>
+                            <td><progress max="100" th:value="${item.percent}" th:attr="aria-label=|${item.name}: ${item.count}|" value="60"></progress></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="dash-empty" th:if="${#lists.isEmpty(dashboard.topProducts)}">Ainda não há uso de produtos.</p>
+            </section>
+
+            <section class="card dash-card span-6" aria-labelledby="ultimas-titulo">
+                <header class="dash-card-header">
+                    <h2 id="ultimas-titulo">Últimas atividades</h2>
+                    <a class="btn btn-secondary" href="../history/list.html" th:href="@{/histories}">Checar relatórios</a>
                 </header>
                 <ul class="dash-list">
                     <li th:each="activity : ${dashboard.latestActivities}">
@@ -116,10 +208,10 @@
                         <time th:text="${activity.date != null ? #temporals.format(activity.date, 'dd/MM/yyyy HH:mm') : ''}">06/10/2026 14:32</time>
                     </li>
                 </ul>
-                <p class="dash-empty" th:if="${#lists.isEmpty(dashboard.latestActivities)}">Nenhuma alteração registrada ainda.</p>
+                <p class="dash-empty" th:if="${#lists.isEmpty(dashboard.latestActivities)}">Nenhuma atividade registrada ainda.</p>
             </section>
 
-            <section class="card dash-card" aria-labelledby="alertas-titulo">
+            <section class="card dash-card span-6" aria-labelledby="alertas-titulo">
                 <header class="dash-card-header">
                     <h2 id="alertas-titulo">Alertas recentes</h2>
                 </header>
@@ -134,36 +226,6 @@
                     </li>
                 </ul>
                 <p class="dash-empty" th:if="${#lists.isEmpty(dashboard.recentAlerts)}">Nenhuma conta pendente ou bloqueada.</p>
-            </section>
-        </div>
-
-        <div class="dash-row">
-            <section class="card dash-card" aria-labelledby="produtos-titulo">
-                <header class="dash-card-header">
-                    <h2 id="produtos-titulo">Produtos mais utilizados</h2>
-                </header>
-                <ol class="rank-list">
-                    <li th:each="item : ${dashboard.topProducts}">
-                        <span class="rank-name" th:text="${item.name}">Produto</span>
-                        <progress max="100" th:value="${item.percent}" th:attr="aria-label=|${item.name}: ${item.count}|" value="60"></progress>
-                        <span class="rank-count" th:text="${item.count}">10</span>
-                    </li>
-                </ol>
-                <p class="dash-empty" th:if="${#lists.isEmpty(dashboard.topProducts)}">Ainda não há uso de produtos.</p>
-            </section>
-
-            <section class="card dash-card" aria-labelledby="consultas-titulo">
-                <header class="dash-card-header">
-                    <h2 id="consultas-titulo">Consultas mais frequentes</h2>
-                </header>
-                <ol class="rank-list">
-                    <li th:each="item : ${dashboard.topQueries}">
-                        <span class="rank-name" th:text="${item.name}">Tipo</span>
-                        <progress max="100" th:value="${item.percent}" th:attr="aria-label=|${item.name}: ${item.count}|" value="60"></progress>
-                        <span class="rank-count" th:text="${item.count}">10</span>
-                    </li>
-                </ol>
-                <p class="dash-empty" th:if="${#lists.isEmpty(dashboard.topQueries)}">Ainda não há consultas registradas.</p>
             </section>
         </div>
     </main>

@@ -1,6 +1,8 @@
 package com.quimia.quimiawebcrud.service;
 
-import com.quimia.quimiawebcrud.dto.DashboardDTO.ChartBar;
+import com.quimia.quimiawebcrud.dto.DashboardDTO.Dot;
+import com.quimia.quimiawebcrud.dto.DashboardDTO.LineChart;
+import com.quimia.quimiawebcrud.dto.DashboardDTO.Tick;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,63 +13,101 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Calcula as medidas do gráfico de atividade: uma coluna por dia e uma linha ligando o topo das colunas.
- * Tudo em coordenadas de um desenho SVG, para a tela não precisar de JavaScript nem de estilos inline.
+ * Gráfico de atividade: uma linha suave para o período atual (com a área abaixo preenchida) e outra, tracejada,
+ * para o período anterior de mesmo tamanho. Tudo em coordenadas de um desenho SVG, para a tela não precisar de
+ * JavaScript nem de estilos inline.
  */
 final class ActivityChart {
 
-    static final int PLOT_LEFT = 40;
-    static final int PLOT_WIDTH = 580;
-    static final int PLOT_TOP = 20;
-    static final int PLOT_HEIGHT = 180;
-    private static final int MAX_BAR_WIDTH = 40;
+    static final int LEFT = 44;
+    static final int RIGHT = 628;
+    static final int TOP = 16;
+    static final int BOTTOM = 250;
     private static final int MAX_LABELS = 8;
     private static final Locale PT_BR = Locale.forLanguageTag("pt-BR");
+    private static final DateTimeFormatter FULL = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private final List<ChartBar> bars = new ArrayList<>();
-    private final StringBuilder linePoints = new StringBuilder();
-    private final int max;
+    private ActivityChart() {
+    }
 
     /**
-     * @param countsByDay quantidade de registros por dia (dias sem registro valem zero)
-     * @param lastDay     último dia do gráfico (hoje)
-     * @param days        quantidade de dias mostrados
+     * @param current  quantidade de registros por dia no período atual (dias sem registro valem zero)
+     * @param previous o mesmo para o período imediatamente anterior
+     * @param lastDay  último dia do gráfico (hoje)
+     * @param days     quantidade de dias de cada período (7, 30 ou 90)
      */
-    ActivityChart(Map<LocalDate, Long> countsByDay, LocalDate lastDay, int days) {
+    static LineChart build(Map<LocalDate, Long> current, Map<LocalDate, Long> previous, LocalDate lastDay, int days) {
+        long[] now = new long[days];
+        long[] before = new long[days];
         long highest = 0;
-        for (long value : countsByDay.values()) {
-            highest = Math.max(highest, value);
-        }
-        this.max = (int) Math.max(highest, 1);
-        int slot = PLOT_WIDTH / days;
-        int barWidth = Math.max(2, Math.min(MAX_BAR_WIDTH, (int) (slot * 0.6)));
-        int labelStep = (int) Math.ceil(days / (double) MAX_LABELS);
+        long currentTotal = 0;
+        long previousTotal = 0;
         for (int i = 0; i < days; i++) {
             LocalDate day = lastDay.minusDays(days - 1L - i);
-            long count = countsByDay.getOrDefault(day, 0L);
-            int height = (int) Math.round(count * (double) PLOT_HEIGHT / max);
-            int x = PLOT_LEFT + i * slot + (slot - barWidth) / 2;
-            int y = PLOT_TOP + PLOT_HEIGHT - height;
-            boolean showLabel = (days - 1 - i) % labelStep == 0;
-            bars.add(new ChartBar(labelOf(day, days), count, x, y, barWidth, height, showLabel, x + barWidth / 2,
-                    day.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + ": " + count));
-            if (i > 0) {
-                linePoints.append(' ');
-            }
-            linePoints.append(x + barWidth / 2).append(',').append(y);
+            now[i] = current.getOrDefault(day, 0L);
+            before[i] = previous.getOrDefault(day.minusDays(days), 0L);
+            highest = Math.max(highest, Math.max(now[i], before[i]));
+            currentTotal += now[i];
+            previousTotal += before[i];
         }
+        int step = ChartScale.niceStep(highest);
+        int max = step * ChartScale.GRID_LINES;
+
+        double[][] nowPoints = new double[days][2];
+        double[][] beforePoints = new double[days][2];
+        List<Dot> dots = new ArrayList<>();
+        List<Tick> xLabels = new ArrayList<>();
+        int labelStep = (int) Math.ceil(days / (double) MAX_LABELS);
+        for (int i = 0; i < days; i++) {
+            double x = LEFT + i * (RIGHT - LEFT) / (double) (days - 1);
+            nowPoints[i] = new double[]{x, yOf(now[i], max)};
+            beforePoints[i] = new double[]{x, yOf(before[i], max)};
+            LocalDate day = lastDay.minusDays(days - 1L - i);
+            dots.add(new Dot(ChartScale.number(x), ChartScale.number(nowPoints[i][1]),
+                    day.format(FULL) + ": " + now[i] + (now[i] == 1 ? " registro" : " registros")
+                            + " (período anterior: " + before[i] + ")"));
+            if ((days - 1 - i) % labelStep == 0) {
+                xLabels.add(new Tick((int) Math.round(x), labelOf(day, days)));
+            }
+        }
+
+        String line = smoothPath(nowPoints);
+        String area = line + " L" + ChartScale.number(nowPoints[days - 1][0]) + "," + BOTTOM
+                + " L" + ChartScale.number(nowPoints[0][0]) + "," + BOTTOM + " Z";
+        return new LineChart(ChartScale.yTicks(step, TOP, BOTTOM), xLabels, line, area, smoothPath(beforePoints), dots,
+                max, currentTotal, previousTotal, ChartScale.trendText(currentTotal, previousTotal),
+                ChartScale.trend(currentTotal, previousTotal));
     }
 
-    List<ChartBar> bars() {
-        return bars;
+    private static double yOf(long value, int max) {
+        return BOTTOM - value * (BOTTOM - TOP) / (double) max;
     }
 
-    String linePoints() {
-        return linePoints.toString();
+    /**
+     * Curva suave que passa por todos os pontos (Catmull-Rom convertida em curvas de Bézier). Os pontos de controle
+     * ficam dentro da área do gráfico, para a linha nunca descer abaixo do zero.
+     */
+    static String smoothPath(double[][] p) {
+        StringBuilder path = new StringBuilder("M").append(ChartScale.number(p[0][0])).append(',')
+                .append(ChartScale.number(p[0][1]));
+        for (int i = 0; i < p.length - 1; i++) {
+            double[] before = p[Math.max(i - 1, 0)];
+            double[] from = p[i];
+            double[] to = p[i + 1];
+            double[] after = p[Math.min(i + 2, p.length - 1)];
+            double c1x = from[0] + (to[0] - before[0]) / 6;
+            double c1y = clamp(from[1] + (to[1] - before[1]) / 6);
+            double c2x = to[0] - (after[0] - from[0]) / 6;
+            double c2y = clamp(to[1] - (after[1] - from[1]) / 6);
+            path.append(" C").append(ChartScale.number(c1x)).append(',').append(ChartScale.number(c1y))
+                    .append(' ').append(ChartScale.number(c2x)).append(',').append(ChartScale.number(c2y))
+                    .append(' ').append(ChartScale.number(to[0])).append(',').append(ChartScale.number(to[1]));
+        }
+        return path.toString();
     }
 
-    int max() {
-        return max;
+    private static double clamp(double y) {
+        return Math.max(TOP, Math.min(BOTTOM, y));
     }
 
     private static String labelOf(LocalDate day, int days) {

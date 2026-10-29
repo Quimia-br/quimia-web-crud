@@ -30,7 +30,12 @@ public class DashboardRepository {
     public static final String ACTIVITY = "atividade";
     public static final String PRODUCT = "produto";
     public static final String QUERY_TYPE = "tipo_consulta";
-    public static final String ACTIVITY_DAY = "atividade_dia";
+    public static final String USAGE_ACTIVITY = "atividade_uso";
+    public static final String USAGE_DAY = "uso_dia";
+    public static final String USER_SIGNUP_DAY = "cadastro_usuario_dia";
+    public static final String COMPANY_SIGNUP_DAY = "cadastro_empresa_dia";
+    public static final String USER_SIGNUP_MONTH = "cadastro_usuario_mes";
+    public static final String COMPANY_SIGNUP_MONTH = "cadastro_empresa_mes";
 
     private static final String SELECT = "select secao, contagem_usuarios, contagem_produtos, contagem_empresas, "
             + "contagem_alertas, admin, acao, data_edicao, tabela_afetada, alerta, total_usos, nome_produto, "

@@ -8,46 +8,138 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Tudo o que a tela inicial (dashboard) mostra, lido da view materializada mv_dashboard.
+ * Tudo o que a tela inicial (dashboard) mostra. Os gráficos já vêm com as medidas calculadas para o desenho em SVG,
+ * para a tela não precisar de JavaScript nem de estilos inline.
  */
 @Getter
 @AllArgsConstructor
 public class DashboardDTO {
 
+    private final String todayLabel;
+    private final LocalDateTime updatedAt;
+    private final int periodDays;
     private final long totalUsers;
     private final long totalCompanies;
     private final long totalProducts;
     private final long totalAlerts;
-    private final LocalDateTime updatedAt;
-    private final int periodDays;
     private final long periodTotal;
-    private final List<ChartBar> bars;
-    private final String linePoints;
-    private final int chartMax;
+    private final List<Kpi> kpis;
+    private final LineChart activity;
+    private final Donut queriesByType;
+    private final MonthlyChart signups;
     private final List<ActivityItem> latestActivities;
     private final List<AlertItem> recentAlerts;
     private final List<RankItem> topProducts;
-    private final List<RankItem> topQueries;
+
+    public enum Trend {
+        UP, DOWN, FLAT
+    }
 
     /**
-     * Uma coluna do gráfico de atividade (um dia), com as medidas já calculadas para o desenho em SVG.
+     * Um cartão de número do topo: valor, legenda e a variação em relação ao período anterior.
      */
     @Getter
     @AllArgsConstructor
-    public static class ChartBar {
+    public static class Kpi {
         private final String label;
-        private final long count;
-        private final int x;
-        private final int y;
-        private final int width;
-        private final int height;
-        private final boolean showLabel;
-        private final int labelX;
+        private final long value;
+        private final String caption;
+        private final String trendText;
+        private final Trend trend;
+        private final boolean highlight;
+        private final String path;
+    }
+
+    /** Uma marca dos eixos: posição no desenho e o texto. */
+    @Getter
+    @AllArgsConstructor
+    public static class Tick {
+        private final int pos;
+        private final String text;
+    }
+
+    /** Ponto do gráfico de linha, com o texto que aparece ao passar o mouse. */
+    @Getter
+    @AllArgsConstructor
+    public static class Dot {
+        private final String x;
+        private final String y;
         private final String title;
     }
 
     /**
-     * Uma alteração recente feita por um administrador.
+     * Gráfico de linhas suaves: o período atual (com área preenchida) contra o período anterior.
+     */
+    @Getter
+    @AllArgsConstructor
+    public static class LineChart {
+        private final List<Tick> yTicks;
+        private final List<Tick> xLabels;
+        private final String currentLine;
+        private final String currentArea;
+        private final String previousLine;
+        private final List<Dot> dots;
+        private final int max;
+        private final long currentTotal;
+        private final long previousTotal;
+        private final String trendText;
+        private final Trend trend;
+    }
+
+    /** Uma fatia da rosca: a legenda e as medidas do arco (traço e deslocamento do círculo). */
+    @Getter
+    @AllArgsConstructor
+    public static class Slice {
+        private final String name;
+        private final long count;
+        private final int percent;
+        private final int colorIndex;
+        private final String dash;
+        private final String gap;
+        private final String offset;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class Donut {
+        private final long total;
+        private final List<Slice> slices;
+    }
+
+    /** Uma coluna do gráfico de barras mensal. */
+    @Getter
+    @AllArgsConstructor
+    public static class Bar {
+        private final int x;
+        private final int y;
+        private final int width;
+        private final int height;
+        private final long count;
+        private final String title;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class MonthGroup {
+        private final String label;
+        private final int labelX;
+        private final Bar users;
+        private final Bar companies;
+    }
+
+    /**
+     * Cadastros por mês: usuários e empresas lado a lado.
+     */
+    @Getter
+    @AllArgsConstructor
+    public static class MonthlyChart {
+        private final List<Tick> yTicks;
+        private final List<MonthGroup> months;
+        private final int max;
+    }
+
+    /**
+     * Um acontecimento recente: uso registrado por um usuário ou alteração feita por um administrador.
      */
     @Getter
     @AllArgsConstructor
