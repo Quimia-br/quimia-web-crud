@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Tudo o que a tela inicial (dashboard) mostra.
+ * Tudo o que a tela inicial (dashboard) mostra, lido da view materializada mv_dashboard.
  */
 @Getter
 @AllArgsConstructor
@@ -18,6 +18,7 @@ public class DashboardDTO {
     private final long totalCompanies;
     private final long totalProducts;
     private final long totalAlerts;
+    private final LocalDateTime updatedAt;
     private final int periodDays;
     private final long periodTotal;
     private final List<ChartBar> bars;
@@ -46,7 +47,7 @@ public class DashboardDTO {
     }
 
     /**
-     * Um acontecimento recente: uso registrado por um usuário ou alteração feita por um administrador.
+     * Uma alteração recente feita por um administrador.
      */
     @Getter
     @AllArgsConstructor
@@ -56,7 +57,8 @@ public class DashboardDTO {
     }
 
     /**
-     * Uma conta que pede atenção (pendente ou bloqueada).
+     * Uma conta que pede atenção (pendente ou bloqueada). Se o texto da view não tiver o formato esperado,
+     * {@code kind}, {@code status} e {@code path} ficam nulos e {@code name} guarda o texto inteiro.
      */
     @Getter
     @AllArgsConstructor
@@ -64,7 +66,6 @@ public class DashboardDTO {
         private final String kind;
         private final String name;
         private final Status status;
-        private final LocalDateTime date;
         private final String path;
     }
 

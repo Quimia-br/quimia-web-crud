@@ -88,6 +88,7 @@ class ApplicationIntegrationTest {
     @MockitoBean HistoryProductRepository historyProducts;
     @MockitoBean ShelfProductRepository shelfProducts;
     @MockitoBean UserProductRepository userProducts;
+    @MockitoBean DashboardRepository dashboard;
 
     final List<User> userStore = new ArrayList<>();
 

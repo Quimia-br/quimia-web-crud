@@ -2,8 +2,11 @@ package com.quimia.quimiawebcrud.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -63,6 +66,23 @@ public class GlobalExceptionHandler {
         log.warn("Violação de integridade em {}: {}", request.getRequestURI(), ex.getMostSpecificCause().getMessage());
         return buildResponse(HttpStatus.CONFLICT,
                 "A operação não pôde ser concluída: o registro está em uso por outros dados ou já existe.", request);
+    }
+
+    @ExceptionHandler(DashboardUnavailableException.class)
+    public ModelAndView handleDashboardUnavailable(DashboardUnavailableException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request);
+    }
+
+    /**
+     * Banco fora do ar, sem conexão livre no pool, consulta que passou do tempo ou travada por outra: não é culpa do
+     * pedido e costuma passar sozinha, então o aviso pede para tentar de novo em vez de mostrar um erro genérico.
+     */
+    @ExceptionHandler({DataAccessResourceFailureException.class, TransientDataAccessException.class,
+            CannotCreateTransactionException.class})
+    public ModelAndView handleDatabaseUnavailable(Exception ex, HttpServletRequest request) {
+        log.error("Banco indisponível em {}", request.getRequestURI(), ex);
+        return buildResponse(HttpStatus.SERVICE_UNAVAILABLE,
+                "O banco de dados está indisponível ou ocupado no momento. Tente novamente em instantes.", request);
     }
 
     /**
