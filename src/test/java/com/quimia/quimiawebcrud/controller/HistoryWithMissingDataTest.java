@@ -55,4 +55,19 @@ class HistoryWithMissingDataTest {
 
         assertTrue(html.contains("ver-history-1"), "a linha do histórico aparece");
     }
+
+    @Test
+    void historyShowsProductNames() throws Exception {
+        List<HistoryResponseDTO> histories = new ArrayList<>();
+        histories.add(HistoryResponseDTO.builder().id(1).userId(99).historyTypeId(98)
+                .productNames(List.of("Acetona", "Etanol")).build());
+        when(historyService.readAll()).thenReturn(histories);
+        when(userService.readAll()).thenReturn(new ArrayList<>());
+        when(shelfService.readAll()).thenReturn(new ArrayList<>());
+        when(historyTypeService.readAll()).thenReturn(new ArrayList<>());
+
+        String html = mvc.perform(get("/histories")).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        assertTrue(html.contains("Acetona, Etanol"), "os nomes dos produtos aparecem");
+    }
 }
