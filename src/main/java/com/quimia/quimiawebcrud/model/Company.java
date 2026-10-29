@@ -8,6 +8,9 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
+/**
+ * Empresa cadastrada (tabela {@code usuarios_empresas}): é a dona dos produtos. CNPJ e e-mail não se repetem.
+ */
 @Entity
 @Table(name = "usuarios_empresas")
 @AttributeOverride(name = "id", column = @Column(name = "id_usuario_empresa"))
@@ -44,6 +47,7 @@ public class Company extends Model {
     @Column(name = "url_foto", columnDefinition = "TEXT")
     private String photoUrl;
 
+    // Valores padrão para o registro criado sem eles: cadastro de agora, porte desconhecido e conta ativa.
     @PrePersist
     private void prePersist() {
         if (signUpDate == null) signUpDate = LocalDateTime.now();

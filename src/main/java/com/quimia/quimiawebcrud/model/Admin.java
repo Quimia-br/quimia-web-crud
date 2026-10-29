@@ -7,6 +7,10 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
+/**
+ * Administrador do painel: é quem entra no sistema (pelo e-mail e senha) e cadastra, edita e exclui os dados.
+ * A senha é guardada só como hash ({@code senha_hash}).
+ */
 @Entity
 @Table(name = "admins")
 @AttributeOverride(name = "id", column = @Column(name = "id_admin"))
@@ -33,6 +37,7 @@ public class Admin extends Model {
     @Column(name = "status", nullable = false, length = 50)
     private Status status;
 
+    // Valores padrão para o registro criado sem eles (data de cadastro de agora e conta ativa).
     @PrePersist
     private void prePersist() {
         if (signUpDate == null) signUpDate = LocalDateTime.now();

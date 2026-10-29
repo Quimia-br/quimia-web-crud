@@ -6,6 +6,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * Produto guardado em uma estante, com a data em que foi colocado. A chave é a dupla estante + produto.
+ */
 @Entity
 @Table(name = "produtos_estantes")
 @Builder
@@ -15,6 +18,8 @@ import java.time.LocalDateTime;
 @Getter
 public class ShelfProduct {
 
+    // As colunas de estante e produto são gravadas pela chave; as relações abaixo só servem para leitura
+    // (insertable/updatable = false), para o Hibernate não gravar a mesma coluna duas vezes.
     @EmbeddedId
     private ShelfProductId id;
 

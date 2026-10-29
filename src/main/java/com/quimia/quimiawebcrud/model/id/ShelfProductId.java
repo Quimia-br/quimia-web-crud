@@ -6,6 +6,9 @@ import lombok.*;
 
 import java.io.Serializable;
 
+/**
+ * Chave composta de {@code ShelfProduct}: estante + produto (um produto aparece uma vez em cada estante).
+ */
 @Embeddable
 @Getter
 @Setter

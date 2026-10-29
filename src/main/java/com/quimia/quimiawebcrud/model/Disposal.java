@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Ficha de descarte (FDS) de um produto: como descartar o produto e a embalagem, restrições e precauções ambientais.
+ * Cada produto tem no máximo uma ficha ({@code id_produto} é único).
+ */
 @Entity
 @Table(name = "descartes_fds")
 @AttributeOverride(name = "id", column = @Column(name = "id_descarte_fds"))

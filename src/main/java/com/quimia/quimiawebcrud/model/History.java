@@ -7,6 +7,10 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Registro de uso feito por um usuário no aplicativo (uma consulta de um certo tipo, com data e resultado).
+ * A estante é opcional. O painel só lê esta tabela: quem grava é o aplicativo.
+ */
 @Entity
 @Table(name = "historicos")
 @AttributeOverride(name = "id", column = @Column(name = "id_historico"))
@@ -38,6 +42,8 @@ public class History extends Model {
     @Column(name = "descricao_resultado", length = 255)
     private String resultDescription;
 
+    // Só para leitura (nomes dos produtos no relatório). A tabela historicos_produtos tem id próprio e exige
+    // id_usuario, então gravar por este mapeamento falharia; a gravação é a da entidade HistoryProduct.
     @ManyToMany
     @JoinTable(
             name = "historicos_produtos",

@@ -6,6 +6,9 @@ import lombok.*;
 
 import java.io.Serializable;
 
+/**
+ * Chave composta de {@code UserProduct}: usuário + produto (um produto aparece uma vez na lista de cada usuário).
+ */
 @Embeddable
 @Getter
 @Setter

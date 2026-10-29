@@ -6,6 +6,9 @@ import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
+/**
+ * Localização de um usuário: CEP e, quando informadas, latitude e longitude. Cada usuário tem no máximo uma.
+ */
 @Entity
 @Table(name = "localizacoes")
 @AttributeOverride(name = "id", column = @Column(name = "id_localizacao"))

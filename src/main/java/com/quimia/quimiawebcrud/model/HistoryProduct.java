@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Produto usado em um registro de histórico. A ligação é com o produto da lista do usuário ({@code produtos_usuarios},
+ * pela chave composta usuário + produto), não com o produto direto.
+ */
 @Entity
 @Table(name = "historicos_produtos")
 @AttributeOverride(name = "id", column = @Column(name = "id_historico_produto"))

@@ -7,6 +7,11 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
+/**
+ * Uma linha do log de edições: qual administrador fez o quê, em qual tabela e em qual registro.
+ * Nas edições, {@code previousData} guarda o resumo do registro antes da mudança; nas exclusões, guarda também a
+ * cópia das linhas apagadas, que é o que permite restaurar (ver {@code RemovalLogFormat}).
+ */
 @Entity
 @Table(name = "admin_log_edicoes")
 @AttributeOverride(name = "id", column = @Column(name = "id_admin_log_edicao"))
