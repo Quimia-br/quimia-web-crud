@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Selo de status: verde (Ativo), vermelho (Bloqueado/Desativado) ou cinza (demais). -->
+    <span th:fragment="status(value)" class="badge"
+          th:classappend="${value == null} ? 'badge-neutral' : (${value.name() == 'ATIVO'} ? 'badge-success' : (${value.name() == 'BLOQUEADO' or value.name() == 'DESATIVADO'} ? 'badge-danger' : 'badge-neutral'))"
+          th:text="${value == null} ? '' : ${#strings.capitalize(#strings.toLowerCase(value.name()))}">Ativo</span>
+
+    <!-- Selo da ação do log de administradores (recebe o registro do log). A restauração é gravada como INSERT, mas aparece como "Restauração". -->
+    <span th:fragment="logAction(log)" class="badge"
+          th:classappend="${log.action == null} ? 'badge-neutral' : (${log.restore} ? 'badge-info' : (${log.action.name() == 'INSERT'} ? 'badge-success' : (${log.action.name() == 'DELETE'} ? 'badge-danger' : 'badge-neutral')))"
+          th:text="${log.action == null} ? '' : (${log.restore} ? 'Restauração' : (${log.action.name() == 'INSERT'} ? 'Criação' : (${log.action.name() == 'DELETE'} ? 'Exclusão' : 'Alteração')))">Alteração</span>
+</body>
+</html>

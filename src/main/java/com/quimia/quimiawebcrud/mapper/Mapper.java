@@ -1,10 +1,11 @@
 package com.quimia.quimiawebcrud.mapper;
 
-public interface Mapper<E, Req, Res> {
+/**
+ * Mapper das tabelas que a tela cadastra e edita: além de mostrar, monta e altera a entidade.
+ */
+public interface Mapper<E, Req, Res> extends ResponseMapper<E, Res> {
 
     E toEntity(Req request);
-
-    Res toResponse(E entity);
 
     void updateEntity(E entity, Req request);
 }

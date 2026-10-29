@@ -2,13 +2,15 @@ package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.dto.UserRequestDTO;
 import com.quimia.quimiawebcrud.dto.UserResponseDTO;
+import com.quimia.quimiawebcrud.exception.DuplicateResourceException;
+import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.UserMapper;
 import com.quimia.quimiawebcrud.model.User;
 import com.quimia.quimiawebcrud.repository.UserRepository;
+import com.quimia.quimiawebcrud.security.PasswordHasher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.mindrot.jbcrypt.BCrypt;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +18,10 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
 
     private final UserRepository repository;
     private final UserMapper mapper;
+    private final PasswordHasher passwordHasher;
+    private final PhotoStorageService photoStorage;
+    private final RecordRemovalService removal;
+    private final EditLog editLog;
 
     @Override
     protected UserRepository getRepository() {
@@ -28,32 +34,47 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
     }
 
     @Override
-    @Transactional
-    public UserResponseDTO create(UserRequestDTO request) {
-        if (!hasText(request.getPassword())) {
-            throw new IllegalArgumentException("A senha e obrigatoria.");
+    protected EditLog getEditLog() {
+        return editLog;
+    }
+
+    @Override
+    protected void validate(UserRequestDTO request, Integer id) {
+        if (id == null && !Passwords.present(request.getPassword())) {
+            throw new InvalidDataException("A senha é obrigatória.");
         }
+        boolean emailTaken = id == null
+                ? repository.existsByEmailIgnoreCase(request.getEmail())
+                : repository.existsByEmailIgnoreCaseAndIdNot(request.getEmail(), id);
+        if (emailTaken) {
+            throw new DuplicateResourceException("Já existe um usuário com este e-mail.");
+        }
+    }
+
+    @Override
+    protected User newEntity(UserRequestDTO request) {
         User entity = mapper.toEntity(request);
-        entity.setPasswordHash(hashPassword(request.getPassword()));
-        return mapper.toResponse(repository.save(entity));
+        entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
+        entity.setPhotoUrl(photoStorage.replace(request.getPhoto(), null));
+        return entity;
+    }
+
+    @Override
+    protected void applyChanges(User entity, UserRequestDTO request) {
+        String currentPhoto = entity.getPhotoUrl();
+        mapper.updateEntity(entity, request);
+        entity.setPhotoUrl(photoStorage.replace(request.getPhoto(), currentPhoto));
+        if (Passwords.present(request.getPassword())) {
+            entity.setPasswordHash(passwordHasher.hash(request.getPassword()));
+        }
     }
 
     @Override
     @Transactional
-    public UserResponseDTO update(Integer id, UserRequestDTO request) {
-        User entity = getEntity(id);
-        mapper.updateEntity(entity, request);
-        if (hasText(request.getPassword())) {
-            entity.setPasswordHash(hashPassword(request.getPassword()));
-        }
-        return mapper.toResponse(entity);
-    }
-
-    private String hashPassword(String originalPassword) {
-        return BCrypt.hashpw(originalPassword, BCrypt.gensalt());
-    }
-
-    private boolean hasText(String value) {
-        return value != null && !value.isBlank();
+    public void delete(Integer id) {
+        User record = getEntity(id);
+        String photoUrl = record.getPhotoUrl();
+        removal.removeUser(record);
+        photoStorage.release(photoUrl);
     }
 }

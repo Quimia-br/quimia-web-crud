@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Tipo de consulta registrada no histórico (ex.: descarte, mistura). O nome não se repete.
+ */
 @Entity
 @Table(name = "tipos_historicos")
 @AttributeOverride(name = "id", column = @Column(name = "id_tipo_historico"))

@@ -8,6 +8,9 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Usuário do aplicativo. O e-mail não se repete e a senha é guardada só como hash ({@code senha_hash}).
+ */
 @Entity
 @Table(name = "usuarios")
 @AttributeOverride(name = "id", column = @Column(name = "id_usuario"))
@@ -40,6 +43,7 @@ public class User extends Model {
     @Column(name = "url_foto", columnDefinition = "TEXT")
     private String photoUrl;
 
+    // Valores padrão para o registro criado sem eles (data de cadastro de agora e conta ativa).
     @PrePersist
     private void prePersist() {
         if (signUpDate == null) signUpDate = LocalDateTime.now();

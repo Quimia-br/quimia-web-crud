@@ -4,25 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Produtos | Quimia</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/icons/logo.svg" th:href="@{/icons/logo.svg}">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
 </head>
 
 <body>
     <aside class="sidebar">
-        <a href="../admin/list.html" th:href="@{/admins}" class="sidebar-logo">
-            <img src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+        <a href="../dashboard/index.html" th:href="@{/}" class="sidebar-logo">
+            <img src="../../static/icons/logo.svg" th:src="@{/icons/logo.svg}" alt="Quimia">
         </a>
-
-        <div class="sidebar-search">
-            <label for="busca-menu" class="sr-only">Pesquisar no menu</label>
-            <input type="search" id="busca-menu" placeholder="Pesquisar...">
-        </div>
 
         <nav class="sidebar-nav" aria-label="Menu principal">
             <ul>
+                <li><a href="../dashboard/index.html" th:href="@{/}" class="nav-link"><img src="../../static/icons/chart-column.svg" th:src="@{/icons/chart-column.svg}" alt="">Dashboard</a></li>
                 <li><a href="../admin/list.html" th:href="@{/admins}" class="nav-link"><img src="../../static/icons/admin.svg" th:src="@{/icons/admin.svg}" alt="">Administradores</a></li>
                 <li><a href="../company/list.html" th:href="@{/companies}" class="nav-link"><img src="../../static/icons/company.svg" th:src="@{/icons/company.svg}" alt="">Empresas</a></li>
                 <li><a href="../user/list.html" th:href="@{/users}" class="nav-link"><img src="../../static/icons/user.svg" th:src="@{/icons/user.svg}" alt="">Usuários</a></li>
@@ -44,33 +42,39 @@
             </ul>
         </nav>
 
-        <a href="#" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</a>
+        <form class="sidebar-logout-form" method="post" action="#" th:action="@{/logout}">
+            <button type="submit" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</button>
+        </form>
     </aside>
 
     <main class="content">
         <header class="page-header">
             <h1>Produtos</h1>
+            <div class="page-actions">
+                <th:block th:replace="~{fragments/bulk-actions :: buttons}"></th:block>
+                <button type="button" class="btn btn-primary" popovertarget="novo-product">Novo produto</button>
+            </div>
         </header>
+
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
 
         <form class="toolbar" method="get">
             <div class="toolbar-search">
                 <label for="busca" class="sr-only">Buscar por nome ou número CAS</label>
-                <input type="search" id="busca" name="busca" placeholder="Buscar por nome ou número CAS...">
+                <input type="search" id="busca" name="busca" placeholder="Buscar por nome ou número CAS..." th:value="${filters['busca']}">
             </div>
             <div class="toolbar-filter">
                 <label for="empresa">Empresa</label>
                 <select id="empresa" name="empresa">
                     <option value="">Todas</option>
-                    <option value="1">Limpa Bem Química Ltda</option>
-                    <option value="2">Brilho Total Indústria</option>
+                    <option th:each="o : ${companiesById.values()}" th:value="${o.id}" th:text="${o.name}" th:selected="${filters['empresa'] == #strings.toString(o.id)}">Opção</option>
                 </select>
             </div>
             <div class="toolbar-filter">
                 <label for="marca">Marca</label>
-                <input type="text" id="marca" name="marca" placeholder="Qualquer marca">
+                <input type="text" id="marca" name="marca" placeholder="Qualquer marca" th:value="${filters['marca']}">
             </div>
             <button type="submit" class="btn btn-secondary">Filtrar</button>
-            <button type="button" class="btn btn-primary" popovertarget="novo-product">Novo produto</button>
         </form>
 
         <section class="card" aria-label="Lista de produtos">
@@ -86,48 +90,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Hipoclorito de sódio 2,5%</td>
-                        <td class="cell-nowrap">7681-52-9</td>
-                        <td>Limpa Bem</td>
-                        <td>Limpa Bem Química Ltda</td>
+                    <tr th:each="item : ${products}">
+                        <td>[[${item.id}]]</td>
+                        <td>[[${item.name}]]</td>
+                        <td class="cell-nowrap">[[${item.casNumber}]]</td>
+                        <td>[[${item.brand}]]</td>
+                        <td>[[${companiesById[item.companyId]?.name}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver Hipoclorito de sódio 2,5%"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Ver ${item.name}|,popovertarget=|ver-product-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
 
-                            <button type="button" class="btn-icon" aria-label="Editar Hipoclorito de sódio 2,5%" popovertarget="editar-product-1"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Editar ${item.name}|,popovertarget=|editar-product-${item.id}|"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
 
-                            <button type="button" class="btn-icon" aria-label="Excluir Hipoclorito de sódio 2,5%" popovertarget="excluir-product-1"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Excluir ${item.name}|,popovertarget=|excluir-product-${item.id}|"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
                         </td>
                     </tr>
-
-                    <tr>
-                        <td>2</td>
-                        <td>Ácido clorídrico 10%</td>
-                        <td class="cell-nowrap">7647-01-0</td>
-                        <td>Brilho Total</td>
-                        <td>Brilho Total Indústria</td>
-                        <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver Ácido clorídrico 10%"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
-
-                            <button type="button" class="btn-icon" aria-label="Editar Ácido clorídrico 10%" popovertarget="editar-product-2"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
-
-                            <button type="button" class="btn-icon" aria-label="Excluir Ácido clorídrico 10%" popovertarget="excluir-product-2"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
-                        </td>
+                    <tr th:if="${#lists.isEmpty(products)}">
+                        <td colspan="6">Nenhum registro encontrado.</td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
-        <nav class="pagination" aria-label="Paginação">
-            <a href="#" aria-label="Página anterior"><img src="../../static/icons/chevron-left.svg" th:src="@{/icons/chevron-left.svg}" alt=""></a>
-
-            <a href="#" aria-current="page">1</a>
-
-            <a href="#">2</a>
-
-            <a href="#" aria-label="Próxima página"><img src="../../static/icons/chevron-right.svg" th:src="@{/icons/chevron-right.svg}" alt=""></a>
-        </nav>
+        <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
 
     <!-- ========== POPUPS ========== -->
@@ -152,7 +136,7 @@
 
             <div class="field">
                 <label for="novo-cas">Nº CAS <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="novo-cas" name="casNumber" placeholder="0000000-00-0" maxlength="12" required>
+                <input type="text" id="novo-cas" name="casNumber" pattern="\d{2,7}-\d{2}-\d" title="Use o formato 0000000-00-0, por exemplo 7681-52-9." placeholder="0000000-00-0" maxlength="12" required>
             </div>
 
             <div class="field">
@@ -163,10 +147,9 @@
             <div class="field">
                 <label for="novo-empresa">Empresa <span class="required" aria-hidden="true">*</span></label>
                 <select id="novo-empresa" name="companyId" required>
-                    <option value="">Selecione...</option>
-                    <option value="1">Limpa Bem Química Ltda</option>
-                    <option value="2">Brilho Total Indústria</option>
-                </select>
+<option value="">Selecione...</option>
+<option th:each="c : ${companiesById.values()}" th:value="${c.id}" th:text="${c.name}">Opção</option>
+</select>
             </div>
 
             <div class="field">
@@ -186,148 +169,103 @@
         </form>
     </dialog>
 
-    <!-- Editar e excluir: um par de popups para cada linha da tabela,
-         já com os dados daquela linha. O número no id (1, 2...) é o id
-         do registro e liga cada botão da tabela ao seu popup. -->
+    <!-- Editar e excluir: um par de popups para cada registro da lista. -->
 
-    <!-- Linha 1: Hipoclorito de sódio 2,5% -->
-    <dialog class="modal" id="editar-product-1" popover aria-labelledby="editar-product-1-titulo">
+    <th:block th:each="item : ${products}">
+    <dialog class="modal" popover th:attr="id=|ver-product-${item.id}|,aria-labelledby=|ver-product-${item.id}-titulo|">
         <header class="modal-header">
             <div>
-                <h2 id="editar-product-1-titulo">Editar produto</h2>
-                <p>ID 1</p>
+                <h2 th:attr="id=|ver-product-${item.id}-titulo|">Produto</h2>
+                <p>ID [[${item.id}]]</p>
             </div>
-            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-product-1" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|ver-product-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <div class="modal-form">
+            <dl class="detail-list">
+                <div><dt>Nome</dt><dd th:text="${item.name != null and !#strings.isEmpty(item.name) ? item.name : '—'}">valor</dd></div>
+                <div><dt>Nº CAS</dt><dd th:text="${item.casNumber != null and !#strings.isEmpty(item.casNumber) ? item.casNumber : '—'}">valor</dd></div>
+                <div><dt>Marca</dt><dd th:text="${item.brand != null and !#strings.isEmpty(item.brand) ? item.brand : '—'}">valor</dd></div>
+                <div><dt>Empresa</dt><dd th:text="${companiesById[item.companyId]?.name != null and !#strings.isEmpty(companiesById[item.companyId]?.name) ? companiesById[item.companyId]?.name : '—'}">valor</dd></div>
+                <div><dt>Instruções de uso</dt><dd th:text="${item.instructions != null and !#strings.isEmpty(item.instructions) ? item.instructions : '—'}">valor</dd></div>
+                <div><dt>Dosagem técnica</dt><dd th:text="${item.dosage != null and !#strings.isEmpty(item.dosage) ? item.dosage : '—'}">valor</dd></div>
+            </dl>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|ver-product-${item.id}|">Fechar</button>
+            </footer>
+        </div>
+    </dialog>
+
+        <dialog class="modal" popover th:attr="id=|editar-product-${item.id}|,aria-labelledby=|editar-product-${item.id}-titulo|">
+        <header class="modal-header">
+            <div>
+                <h2 th:attr="id=|editar-product-${item.id}-titulo|">Editar produto</h2>
+                <p>ID [[${item.id}]]</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|editar-product-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
         </header>
 
         <form class="modal-form" method="post" action="#" th:action="@{/products/save}">
-            <input type="hidden" name="id" value="1">
+            <input type="hidden" name="id" th:value="${item.id}">
 
             <div class="field">
-                <label for="editar-nome-1">Nome <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="editar-nome-1" name="name" value="Hipoclorito de sódio 2,5%" maxlength="150" required autofocus>
+                <label th:attr="for=|editar-nome-${item.id}|">Nome <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" name="name" maxlength="150" required autofocus th:value="${item.name}" th:attr="id=|editar-nome-${item.id}|">
             </div>
 
             <div class="field">
-                <label for="editar-cas-1">Nº CAS <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="editar-cas-1" name="casNumber" value="7681-52-9" maxlength="12" required>
+                <label th:attr="for=|editar-cas-${item.id}|">Nº CAS <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" name="casNumber" pattern="\d{2,7}-\d{2}-\d" title="Use o formato 0000000-00-0, por exemplo 7681-52-9." maxlength="12" required th:value="${item.casNumber}" th:attr="id=|editar-cas-${item.id}|">
             </div>
 
             <div class="field">
-                <label for="editar-marca-1">Marca <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="editar-marca-1" name="brand" value="Limpa Bem" maxlength="150" required>
+                <label th:attr="for=|editar-marca-${item.id}|">Marca <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" name="brand" maxlength="150" required th:value="${item.brand}" th:attr="id=|editar-marca-${item.id}|">
             </div>
 
             <div class="field">
-                <label for="editar-empresa-1">Empresa <span class="required" aria-hidden="true">*</span></label>
-                <select id="editar-empresa-1" name="companyId" required>
-                    <option value="1" selected>Limpa Bem Química Ltda</option>
-                    <option value="2">Brilho Total Indústria</option>
-                </select>
+                <label th:attr="for=|editar-empresa-${item.id}|">Empresa <span class="required" aria-hidden="true">*</span></label>
+                <select name="companyId" required th:attr="id=|editar-empresa-${item.id}|">
+<option value="">Selecione...</option>
+<option th:each="c : ${companiesById.values()}" th:value="${c.id}" th:text="${c.name}" th:selected="${item.companyId == c.id}">Opção</option>
+</select>
             </div>
 
             <div class="field">
-                <label for="editar-instrucoes-1">Instruções de uso <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="editar-instrucoes-1" name="instructions" required>
+                <label th:attr="for=|editar-instrucoes-${item.id}|">Instruções de uso <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" name="instructions" required th:value="${item.instructions}" th:attr="id=|editar-instrucoes-${item.id}|">
             </div>
 
             <div class="field">
-                <label for="editar-dosagem-1">Dosagem técnica <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="editar-dosagem-1" name="dosage" required>
+                <label th:attr="for=|editar-dosagem-${item.id}|">Dosagem técnica <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" name="dosage" required th:value="${item.dosage}" th:attr="id=|editar-dosagem-${item.id}|">
             </div>
 
             <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" popovertarget="editar-product-1" popovertargetaction="hide">Cancelar</button>
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|editar-product-${item.id}|">Cancelar</button>
                 <button type="submit" class="btn btn-primary">Salvar</button>
             </footer>
         </form>
     </dialog>
 
-    <dialog class="modal modal-confirm" id="excluir-product-1" popover aria-labelledby="excluir-product-1-titulo">
-        <form class="modal-form" method="post" action="#" th:action="@{/products/1/delete}">
+    <dialog class="modal modal-confirm" popover th:attr="id=|excluir-product-${item.id}|,aria-labelledby=|excluir-product-${item.id}-titulo|">
+        <form class="modal-form" method="post" action="#" th:action="@{/products/{id}/delete(id=${item.id})}">
             <div class="confirm">
                 <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
                 <div>
-                    <h2 id="excluir-product-1-titulo">Excluir produto?</h2>
-                    <p>Tem certeza de que deseja excluir <strong>“Hipoclorito de sódio 2,5%”</strong>? Essa ação não poderá ser desfeita.</p>
+                    <h2 th:attr="id=|excluir-product-${item.id}-titulo|">Excluir produto?</h2>
+                    <p>Tem certeza de que deseja excluir <strong>“[[${item.name}]]”</strong>? A ficha de descarte e os itens de estantes, de usuários e do histórico ligados a ele também serão apagados. Os dados ficam registrados no log de edições, e essa ação não poderá ser desfeita.</p>
                 </div>
             </div>
 
             <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" popovertarget="excluir-product-1" popovertargetaction="hide" autofocus>Cancelar</button>
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" autofocus th:attr="popovertarget=|excluir-product-${item.id}|">Cancelar</button>
                 <button type="submit" class="btn btn-danger">Excluir</button>
             </footer>
         </form>
     </dialog>
-
-    <!-- Linha 2: Ácido clorídrico 10% -->
-    <dialog class="modal" id="editar-product-2" popover aria-labelledby="editar-product-2-titulo">
-        <header class="modal-header">
-            <div>
-                <h2 id="editar-product-2-titulo">Editar produto</h2>
-                <p>ID 2</p>
-            </div>
-            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-product-2" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
-        </header>
-
-        <form class="modal-form" method="post" action="#" th:action="@{/products/save}">
-            <input type="hidden" name="id" value="2">
-
-            <div class="field">
-                <label for="editar-nome-2">Nome <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="editar-nome-2" name="name" value="Ácido clorídrico 10%" maxlength="150" required autofocus>
-            </div>
-
-            <div class="field">
-                <label for="editar-cas-2">Nº CAS <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="editar-cas-2" name="casNumber" value="7647-01-0" maxlength="12" required>
-            </div>
-
-            <div class="field">
-                <label for="editar-marca-2">Marca <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="editar-marca-2" name="brand" value="Brilho Total" maxlength="150" required>
-            </div>
-
-            <div class="field">
-                <label for="editar-empresa-2">Empresa <span class="required" aria-hidden="true">*</span></label>
-                <select id="editar-empresa-2" name="companyId" required>
-                    <option value="1">Limpa Bem Química Ltda</option>
-                    <option value="2" selected>Brilho Total Indústria</option>
-                </select>
-            </div>
-
-            <div class="field">
-                <label for="editar-instrucoes-2">Instruções de uso <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="editar-instrucoes-2" name="instructions" required>
-            </div>
-
-            <div class="field">
-                <label for="editar-dosagem-2">Dosagem técnica <span class="required" aria-hidden="true">*</span></label>
-                <input type="text" id="editar-dosagem-2" name="dosage" required>
-            </div>
-
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" popovertarget="editar-product-2" popovertargetaction="hide">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Salvar</button>
-            </footer>
-        </form>
-    </dialog>
-
-    <dialog class="modal modal-confirm" id="excluir-product-2" popover aria-labelledby="excluir-product-2-titulo">
-        <form class="modal-form" method="post" action="#" th:action="@{/products/2/delete}">
-            <div class="confirm">
-                <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
-                <div>
-                    <h2 id="excluir-product-2-titulo">Excluir produto?</h2>
-                    <p>Tem certeza de que deseja excluir <strong>“Ácido clorídrico 10%”</strong>? Essa ação não poderá ser desfeita.</p>
-                </div>
-            </div>
-
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" popovertarget="excluir-product-2" popovertargetaction="hide" autofocus>Cancelar</button>
-                <button type="submit" class="btn btn-danger">Excluir</button>
-            </footer>
-        </form>
-    </dialog>
+    </th:block>
+    <th:block th:replace="~{fragments/bulk-actions :: dialogs}"></th:block>
 </body>
 </html>

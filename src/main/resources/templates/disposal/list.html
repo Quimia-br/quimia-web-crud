@@ -4,25 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Descarte | Quimia</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/icons/logo.svg" th:href="@{/icons/logo.svg}">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
 </head>
 
 <body>
     <aside class="sidebar">
-        <a href="../admin/list.html" th:href="@{/admins}" class="sidebar-logo">
-            <img src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+        <a href="../dashboard/index.html" th:href="@{/}" class="sidebar-logo">
+            <img src="../../static/icons/logo.svg" th:src="@{/icons/logo.svg}" alt="Quimia">
         </a>
-
-        <div class="sidebar-search">
-            <label for="busca-menu" class="sr-only">Pesquisar no menu</label>
-            <input type="search" id="busca-menu" placeholder="Pesquisar...">
-        </div>
 
         <nav class="sidebar-nav" aria-label="Menu principal">
             <ul>
+                <li><a href="../dashboard/index.html" th:href="@{/}" class="nav-link"><img src="../../static/icons/chart-column.svg" th:src="@{/icons/chart-column.svg}" alt="">Dashboard</a></li>
                 <li><a href="../admin/list.html" th:href="@{/admins}" class="nav-link"><img src="../../static/icons/admin.svg" th:src="@{/icons/admin.svg}" alt="">Administradores</a></li>
                 <li><a href="../company/list.html" th:href="@{/companies}" class="nav-link"><img src="../../static/icons/company.svg" th:src="@{/icons/company.svg}" alt="">Empresas</a></li>
                 <li><a href="../user/list.html" th:href="@{/users}" class="nav-link"><img src="../../static/icons/user.svg" th:src="@{/icons/user.svg}" alt="">Usuários</a></li>
@@ -44,37 +42,43 @@
             </ul>
         </nav>
 
-        <a href="#" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</a>
+        <form class="sidebar-logout-form" method="post" action="#" th:action="@{/logout}">
+            <button type="submit" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</button>
+        </form>
     </aside>
 
     <main class="content">
         <header class="page-header">
             <h1>Descarte</h1>
+            <div class="page-actions">
+                <th:block th:replace="~{fragments/bulk-actions :: buttons}"></th:block>
+                <button type="button" class="btn btn-primary" popovertarget="novo-disposal">Novo descarte</button>
+            </div>
         </header>
+
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
 
         <form class="toolbar" method="get">
             <div class="toolbar-search">
                 <label for="busca" class="sr-only">Buscar por produto ou número CAS</label>
-                <input type="search" id="busca" name="busca" placeholder="Buscar por produto ou número CAS...">
+                <input type="search" id="busca" name="busca" placeholder="Buscar por produto ou número CAS..." th:value="${filters['busca']}">
             </div>
             <div class="toolbar-filter">
                 <label for="empresa">Empresa</label>
                 <select id="empresa" name="empresa">
                     <option value="">Todas</option>
-                    <option value="1">Limpa Bem Química Ltda</option>
-                    <option value="2">Brilho Total Indústria</option>
+                    <option th:each="o : ${companiesById.values()}" th:value="${o.id}" th:text="${o.name}" th:selected="${filters['empresa'] == #strings.toString(o.id)}">Opção</option>
                 </select>
             </div>
             <div class="toolbar-filter">
                 <label for="metodo">Método de descarte</label>
                 <select id="metodo" name="metodo">
                     <option value="">Todos</option>
-                    <option value="PREENCHIDO">Preenchido</option>
-                    <option value="VAZIO">Não preenchido</option>
+                    <option value="PREENCHIDO" th:selected="${filters['metodo'] == 'PREENCHIDO'}">Preenchido</option>
+                    <option value="VAZIO" th:selected="${filters['metodo'] == 'VAZIO'}">Não preenchido</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-secondary">Filtrar</button>
-            <button type="button" class="btn btn-primary" popovertarget="novo-disposal">Novo descarte</button>
         </form>
 
         <section class="card" aria-label="Lista de descartes">
@@ -90,48 +94,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Hipoclorito de sódio 2,5%</td>
-                        <td class="cell-nowrap">7681-52-9</td>
-                        <td class="cell-truncate">Diluir em grande volume de água antes de descartar na rede de esgoto.</td>
-                        <td class="cell-truncate">Não descartar em rios, lagos ou solo.</td>
+                    <tr th:each="item : ${disposals}">
+                        <td>[[${item.id}]]</td>
+                        <td>[[${productsById[item.productId]?.name}]]</td>
+                        <td class="cell-nowrap">[[${productsById[item.productId]?.casNumber}]]</td>
+                        <td class="cell-truncate">[[${item.productDisposalMethod}]]</td>
+                        <td class="cell-truncate">[[${item.environmentalPrecautions}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver descarte de Hipoclorito de sódio 2,5%"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Ver descarte de ${productsById[item.productId]?.name}|,popovertarget=|ver-disposal-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
 
-                            <button type="button" class="btn-icon" aria-label="Editar descarte de Hipoclorito de sódio 2,5%" popovertarget="editar-disposal-1"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Editar descarte de ${productsById[item.productId]?.name}|,popovertarget=|editar-disposal-${item.id}|"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
 
-                            <button type="button" class="btn-icon" aria-label="Excluir descarte de Hipoclorito de sódio 2,5%" popovertarget="excluir-disposal-1"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Excluir descarte de ${productsById[item.productId]?.name}|,popovertarget=|excluir-disposal-${item.id}|"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
                         </td>
                     </tr>
-
-                    <tr>
-                        <td>2</td>
-                        <td>Ácido clorídrico 10%</td>
-                        <td class="cell-nowrap">7647-01-0</td>
-                        <td>—</td>
-                        <td class="cell-truncate">Neutralizar antes do descarte.</td>
-                        <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver descarte de Ácido clorídrico 10%"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
-
-                            <button type="button" class="btn-icon" aria-label="Editar descarte de Ácido clorídrico 10%" popovertarget="editar-disposal-2"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
-
-                            <button type="button" class="btn-icon" aria-label="Excluir descarte de Ácido clorídrico 10%" popovertarget="excluir-disposal-2"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></button>
-                        </td>
+                    <tr th:if="${#lists.isEmpty(disposals)}">
+                        <td colspan="6">Nenhum registro encontrado.</td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
-        <nav class="pagination" aria-label="Paginação">
-            <a href="#" aria-label="Página anterior"><img src="../../static/icons/chevron-left.svg" th:src="@{/icons/chevron-left.svg}" alt=""></a>
-
-            <a href="#" aria-current="page">1</a>
-
-            <a href="#">2</a>
-
-            <a href="#" aria-label="Próxima página"><img src="../../static/icons/chevron-right.svg" th:src="@{/icons/chevron-right.svg}" alt=""></a>
-        </nav>
+        <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
 
     <!-- ========== POPUPS ========== -->
@@ -152,10 +136,9 @@
             <div class="field">
                 <label for="novo-produto">Produto <span class="required" aria-hidden="true">*</span></label>
                 <select id="novo-produto" name="productId" required autofocus>
-                    <option value="">Selecione...</option>
-                    <option value="1">Hipoclorito de sódio 2,5%</option>
-                    <option value="2">Ácido clorídrico 10%</option>
-                </select>
+<option value="">Selecione...</option>
+<option th:each="c : ${productsById.values()}" th:value="${c.id}" th:text="${c.name}">Opção</option>
+</select>
             </div>
 
             <div class="field">
@@ -185,138 +168,98 @@
         </form>
     </dialog>
 
-    <!-- Editar e excluir: um par de popups para cada linha da tabela,
-         já com os dados daquela linha. O número no id (1, 2...) é o id
-         do registro e liga cada botão da tabela ao seu popup. -->
+    <!-- Editar e excluir: um par de popups para cada registro da lista. -->
 
-    <!-- Linha 1: Hipoclorito de sódio 2,5% -->
-    <dialog class="modal" id="editar-disposal-1" popover aria-labelledby="editar-disposal-1-titulo">
+    <th:block th:each="item : ${disposals}">
+    <dialog class="modal" popover th:attr="id=|ver-disposal-${item.id}|,aria-labelledby=|ver-disposal-${item.id}-titulo|">
         <header class="modal-header">
             <div>
-                <h2 id="editar-disposal-1-titulo">Editar descarte</h2>
-                <p>ID 1 · Hipoclorito de sódio 2,5%</p>
+                <h2 th:attr="id=|ver-disposal-${item.id}-titulo|">Ficha de descarte</h2>
+                <p>ID [[${item.id}]]</p>
             </div>
-            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-disposal-1" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|ver-disposal-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <div class="modal-form">
+            <dl class="detail-list">
+                <div><dt>Produto</dt><dd th:text="${productsById[item.productId]?.name != null and !#strings.isEmpty(productsById[item.productId]?.name) ? productsById[item.productId]?.name : '—'}">valor</dd></div>
+                <div><dt>Nº CAS</dt><dd th:text="${productsById[item.productId]?.casNumber != null and !#strings.isEmpty(productsById[item.productId]?.casNumber) ? productsById[item.productId]?.casNumber : '—'}">valor</dd></div>
+                <div><dt>Descarte do produto</dt><dd th:text="${item.productDisposalMethod != null and !#strings.isEmpty(item.productDisposalMethod) ? item.productDisposalMethod : '—'}">valor</dd></div>
+                <div><dt>Descarte da embalagem</dt><dd th:text="${item.packagingDisposalMethod != null and !#strings.isEmpty(item.packagingDisposalMethod) ? item.packagingDisposalMethod : '—'}">valor</dd></div>
+                <div><dt>Restrições</dt><dd th:text="${item.disposalRestrictions != null and !#strings.isEmpty(item.disposalRestrictions) ? item.disposalRestrictions : '—'}">valor</dd></div>
+                <div><dt>Precauções ambientais</dt><dd th:text="${item.environmentalPrecautions != null and !#strings.isEmpty(item.environmentalPrecautions) ? item.environmentalPrecautions : '—'}">valor</dd></div>
+            </dl>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|ver-disposal-${item.id}|">Fechar</button>
+            </footer>
+        </div>
+    </dialog>
+
+        <dialog class="modal" popover th:attr="id=|editar-disposal-${item.id}|,aria-labelledby=|editar-disposal-${item.id}-titulo|">
+        <header class="modal-header">
+            <div>
+                <h2 th:attr="id=|editar-disposal-${item.id}-titulo|">Editar descarte</h2>
+                <p>ID [[${item.id}]] · [[${productsById[item.productId]?.name}]]</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|editar-disposal-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
         </header>
 
         <form class="modal-form" method="post" action="#" th:action="@{/disposals/save}">
-            <input type="hidden" name="id" value="1">
+            <input type="hidden" name="id" th:value="${item.id}">
 
             <div class="field">
-                <label for="editar-produto-1">Produto <span class="required" aria-hidden="true">*</span></label>
-                <select id="editar-produto-1" name="productId" required autofocus>
-                    <option value="1" selected>Hipoclorito de sódio 2,5%</option>
-                    <option value="2">Ácido clorídrico 10%</option>
-                </select>
+                <label th:attr="for=|editar-produto-${item.id}|">Produto <span class="required" aria-hidden="true">*</span></label>
+                <select name="productId" required autofocus th:attr="id=|editar-produto-${item.id}|">
+<option value="">Selecione...</option>
+<option th:each="c : ${productsById.values()}" th:value="${c.id}" th:text="${c.name}" th:selected="${item.productId == c.id}">Opção</option>
+</select>
             </div>
 
             <div class="field">
-                <label for="editar-metodo-produto-1">Método de descarte do produto</label>
-                <input type="text" id="editar-metodo-produto-1" name="productDisposalMethod" value="Diluir em grande volume de água antes de descartar na rede de esgoto.">
+                <label th:attr="for=|editar-metodo-produto-${item.id}|">Método de descarte do produto</label>
+                <input type="text" name="productDisposalMethod" th:value="${item.productDisposalMethod}" th:attr="id=|editar-metodo-produto-${item.id}|">
             </div>
 
             <div class="field">
-                <label for="editar-metodo-embalagem-1">Método de descarte da embalagem</label>
-                <input type="text" id="editar-metodo-embalagem-1" name="packagingDisposalMethod">
+                <label th:attr="for=|editar-metodo-embalagem-${item.id}|">Método de descarte da embalagem</label>
+                <input type="text" name="packagingDisposalMethod" th:value="${item.packagingDisposalMethod}" th:attr="id=|editar-metodo-embalagem-${item.id}|">
             </div>
 
             <div class="field">
-                <label for="editar-restricoes-1">Restrições de descarte</label>
-                <input type="text" id="editar-restricoes-1" name="disposalRestrictions">
+                <label th:attr="for=|editar-restricoes-${item.id}|">Restrições de descarte</label>
+                <input type="text" name="disposalRestrictions" th:value="${item.disposalRestrictions}" th:attr="id=|editar-restricoes-${item.id}|">
             </div>
 
             <div class="field">
-                <label for="editar-precaucoes-1">Precauções ambientais</label>
-                <input type="text" id="editar-precaucoes-1" name="environmentalPrecautions" value="Não descartar em rios, lagos ou solo.">
+                <label th:attr="for=|editar-precaucoes-${item.id}|">Precauções ambientais</label>
+                <input type="text" name="environmentalPrecautions" th:value="${item.environmentalPrecautions}" th:attr="id=|editar-precaucoes-${item.id}|">
             </div>
 
             <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" popovertarget="editar-disposal-1" popovertargetaction="hide">Cancelar</button>
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|editar-disposal-${item.id}|">Cancelar</button>
                 <button type="submit" class="btn btn-primary">Salvar</button>
             </footer>
         </form>
     </dialog>
 
-    <dialog class="modal modal-confirm" id="excluir-disposal-1" popover aria-labelledby="excluir-disposal-1-titulo">
-        <form class="modal-form" method="post" action="#" th:action="@{/disposals/1/delete}">
+    <dialog class="modal modal-confirm" popover th:attr="id=|excluir-disposal-${item.id}|,aria-labelledby=|excluir-disposal-${item.id}-titulo|">
+        <form class="modal-form" method="post" action="#" th:action="@{/disposals/{id}/delete(id=${item.id})}">
             <div class="confirm">
                 <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
                 <div>
-                    <h2 id="excluir-disposal-1-titulo">Excluir descarte?</h2>
-                    <p>Tem certeza de que deseja excluir o descarte de <strong>“Hipoclorito de sódio 2,5%”</strong>? Essa ação não poderá ser desfeita.</p>
+                    <h2 th:attr="id=|excluir-disposal-${item.id}-titulo|">Excluir descarte?</h2>
+                    <p>Tem certeza de que deseja excluir o descarte de <strong>“[[${productsById[item.productId]?.name}]]”</strong>? Os dados ficam registrados no log de edições, e essa ação não poderá ser desfeita.</p>
                 </div>
             </div>
 
             <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" popovertarget="excluir-disposal-1" popovertargetaction="hide" autofocus>Cancelar</button>
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" autofocus th:attr="popovertarget=|excluir-disposal-${item.id}|">Cancelar</button>
                 <button type="submit" class="btn btn-danger">Excluir</button>
             </footer>
         </form>
     </dialog>
-
-    <!-- Linha 2: Ácido clorídrico 10% -->
-    <dialog class="modal" id="editar-disposal-2" popover aria-labelledby="editar-disposal-2-titulo">
-        <header class="modal-header">
-            <div>
-                <h2 id="editar-disposal-2-titulo">Editar descarte</h2>
-                <p>ID 2 · Ácido clorídrico 10%</p>
-            </div>
-            <button type="button" class="btn-icon" aria-label="Fechar" popovertarget="editar-disposal-2" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
-        </header>
-
-        <form class="modal-form" method="post" action="#" th:action="@{/disposals/save}">
-            <input type="hidden" name="id" value="2">
-
-            <div class="field">
-                <label for="editar-produto-2">Produto <span class="required" aria-hidden="true">*</span></label>
-                <select id="editar-produto-2" name="productId" required autofocus>
-                    <option value="1">Hipoclorito de sódio 2,5%</option>
-                    <option value="2" selected>Ácido clorídrico 10%</option>
-                </select>
-            </div>
-
-            <div class="field">
-                <label for="editar-metodo-produto-2">Método de descarte do produto</label>
-                <input type="text" id="editar-metodo-produto-2" name="productDisposalMethod">
-            </div>
-
-            <div class="field">
-                <label for="editar-metodo-embalagem-2">Método de descarte da embalagem</label>
-                <input type="text" id="editar-metodo-embalagem-2" name="packagingDisposalMethod">
-            </div>
-
-            <div class="field">
-                <label for="editar-restricoes-2">Restrições de descarte</label>
-                <input type="text" id="editar-restricoes-2" name="disposalRestrictions">
-            </div>
-
-            <div class="field">
-                <label for="editar-precaucoes-2">Precauções ambientais</label>
-                <input type="text" id="editar-precaucoes-2" name="environmentalPrecautions" value="Neutralizar antes do descarte.">
-            </div>
-
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" popovertarget="editar-disposal-2" popovertargetaction="hide">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Salvar</button>
-            </footer>
-        </form>
-    </dialog>
-
-    <dialog class="modal modal-confirm" id="excluir-disposal-2" popover aria-labelledby="excluir-disposal-2-titulo">
-        <form class="modal-form" method="post" action="#" th:action="@{/disposals/2/delete}">
-            <div class="confirm">
-                <span class="confirm-icon"><img src="../../static/icons/delete.svg" th:src="@{/icons/delete.svg}" alt=""></span>
-                <div>
-                    <h2 id="excluir-disposal-2-titulo">Excluir descarte?</h2>
-                    <p>Tem certeza de que deseja excluir o descarte de <strong>“Ácido clorídrico 10%”</strong>? Essa ação não poderá ser desfeita.</p>
-                </div>
-            </div>
-
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" popovertarget="excluir-disposal-2" popovertargetaction="hide" autofocus>Cancelar</button>
-                <button type="submit" class="btn btn-danger">Excluir</button>
-            </footer>
-        </form>
-    </dialog>
+    </th:block>
+    <th:block th:replace="~{fragments/bulk-actions :: dialogs}"></th:block>
 </body>
 </html>

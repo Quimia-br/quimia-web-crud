@@ -35,3 +35,12 @@ build/
 ### env ###
 .env
 env
+
+### uploads ###
+uploads/
+
+### claude ###
+/claude
+/Claude
+claude.md
+claude

@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Produto químico cadastrado por uma empresa, identificado pelo número CAS (único), com instruções de uso e dosagem.
+ */
 @Entity
 @Table(name = "produtos")
 @AttributeOverride(name = "id", column = @Column(name = "id_produto"))
@@ -28,12 +31,13 @@ public class Product extends Model {
     @Column(name = "marca", nullable = false, length = 150)
     private String brand;
 
-    @Column(name = "instrucoes_de_uso", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "instrucao_de_uso", nullable = false, columnDefinition = "TEXT")
     private String instructions;
 
     @Column(name = "dosagem_tecnica", nullable = false, columnDefinition = "TEXT")
     private String dosage;
 
+    // A marca é obrigatória no banco: sem ela, o produto fica com "DESCONHECIDO".
     @PrePersist
     private void prePersist() {
         if (brand == null || brand.isBlank()) brand = "DESCONHECIDO";

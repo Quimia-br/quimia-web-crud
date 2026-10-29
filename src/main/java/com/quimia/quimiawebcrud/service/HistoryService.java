@@ -1,6 +1,5 @@
 package com.quimia.quimiawebcrud.service;
 
-import com.quimia.quimiawebcrud.dto.HistoryRequestDTO;
 import com.quimia.quimiawebcrud.dto.HistoryResponseDTO;
 import com.quimia.quimiawebcrud.mapper.HistoryMapper;
 import com.quimia.quimiawebcrud.model.History;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class HistoryService extends CrudService<History, Integer, HistoryRequestDTO, HistoryResponseDTO> {
+public class HistoryService extends ReadService<History, Integer, HistoryResponseDTO> {
 
     private final HistoryRepository repository;
     private final HistoryMapper mapper;

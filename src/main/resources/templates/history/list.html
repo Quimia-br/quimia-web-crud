@@ -4,25 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relatório de usuários | Quimia</title>
+    <link rel="icon" type="image/svg+xml" href="../../static/icons/logo.svg" th:href="@{/icons/logo.svg}">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
 </head>
 
 <body>
     <aside class="sidebar">
-        <a href="../admin/list.html" th:href="@{/admins}" class="sidebar-logo">
-            <img src="../../static/icons/logo.png" th:src="@{/icons/logo.png}" alt="Quimia">
+        <a href="../dashboard/index.html" th:href="@{/}" class="sidebar-logo">
+            <img src="../../static/icons/logo.svg" th:src="@{/icons/logo.svg}" alt="Quimia">
         </a>
-
-        <div class="sidebar-search">
-            <label for="busca-menu" class="sr-only">Pesquisar no menu</label>
-            <input type="search" id="busca-menu" placeholder="Pesquisar...">
-        </div>
 
         <nav class="sidebar-nav" aria-label="Menu principal">
             <ul>
+                <li><a href="../dashboard/index.html" th:href="@{/}" class="nav-link"><img src="../../static/icons/chart-column.svg" th:src="@{/icons/chart-column.svg}" alt="">Dashboard</a></li>
                 <li><a href="../admin/list.html" th:href="@{/admins}" class="nav-link"><img src="../../static/icons/admin.svg" th:src="@{/icons/admin.svg}" alt="">Administradores</a></li>
                 <li><a href="../company/list.html" th:href="@{/companies}" class="nav-link"><img src="../../static/icons/company.svg" th:src="@{/icons/company.svg}" alt="">Empresas</a></li>
                 <li><a href="../user/list.html" th:href="@{/users}" class="nav-link"><img src="../../static/icons/user.svg" th:src="@{/icons/user.svg}" alt="">Usuários</a></li>
@@ -44,7 +42,9 @@
             </ul>
         </nav>
 
-        <a href="#" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</a>
+        <form class="sidebar-logout-form" method="post" action="#" th:action="@{/logout}">
+            <button type="submit" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</button>
+        </form>
     </aside>
 
     <main class="content">
@@ -52,24 +52,25 @@
             <h1>Relatório de usuários</h1>
         </header>
 
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
         <form class="toolbar" method="get">
             <div class="toolbar-search">
                 <label for="busca" class="sr-only">Buscar por usuário</label>
-                <input type="search" id="busca" name="busca" placeholder="Buscar por usuário...">
+                <input type="search" id="busca" name="busca" placeholder="Buscar por usuário..." th:value="${filters['busca']}">
             </div>
             <div class="toolbar-filter">
                 <label for="tipo">Tipo</label>
                 <select id="tipo" name="tipo">
                     <option value="">Todos</option>
-                    <option value="1">Limpeza de ambiente</option>
-                    <option value="2">Descarte de embalagem</option>
+                    <option th:each="o : ${historyTypesById.values()}" th:value="${o.id}" th:text="${o.name}" th:selected="${filters['tipo'] == #strings.toString(o.id)}">Opção</option>
                 </select>
             </div>
             <div class="toolbar-filter">
                 <label for="execucaode">Execução de</label>
-                <input type="date" id="execucaode" name="execucaoDe">
+                <input type="date" id="execucaode" name="execucaoDe" th:value="${filters['execucaoDe']}">
                 <label for="execucaoate">até</label>
-                <input type="date" id="execucaoate" name="execucaoAte">
+                <input type="date" id="execucaoate" name="execucaoAte" th:value="${filters['execucaoAte']}">
             </div>
             <button type="submit" class="btn btn-secondary">Filtrar</button>
         </form>
@@ -82,48 +83,61 @@
                         <th scope="col">Usuário</th>
                         <th scope="col">Tipo</th>
                         <th scope="col">Estante</th>
+                        <th scope="col">Produtos</th>
                         <th scope="col">Execução</th>
                         <th scope="col">Resultado</th>
                         <th scope="col" class="col-actions">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Lucas Almeida</td>
-                        <td>Limpeza de ambiente</td>
-                        <td>Cozinha</td>
-                        <td class="cell-nowrap">06/10/2026 14:32</td>
-                        <td class="cell-truncate">Limpeza concluída sem ocorrências.</td>
+                    <tr th:each="item : ${histories}">
+                        <td>[[${item.id}]]</td>
+                        <td>[[${usersById[item.userId]?.userName}]]</td>
+                        <td>[[${historyTypesById[item.historyTypeId]?.name}]]</td>
+                        <td>[[${shelvesById.get(item.shelfId)?.room}]]</td>
+                        <td class="cell-truncate">[[${item.productNames != null ? #strings.listJoin(item.productNames, ', ') : ''}]]</td>
+                        <td class="cell-nowrap">[[${item.executionDate != null ? #temporals.format(item.executionDate, 'dd/MM/yyyy HH:mm') : ''}]]</td>
+                        <td class="cell-truncate">[[${item.resultDescription}]]</td>
                         <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver registro 1"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
+                            <button type="button" class="btn-icon" th:attr="aria-label=|Ver registro ${item.id}|,popovertarget=|ver-history-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
                         </td>
                     </tr>
-
-                    <tr>
-                        <td>2</td>
-                        <td>Mariana Castro</td>
-                        <td>Descarte de embalagem</td>
-                        <td>—</td>
-                        <td class="cell-nowrap">07/10/2026 09:15</td>
-                        <td class="cell-truncate">Embalagem enviada para coleta seletiva.</td>
-                        <td class="col-actions">
-                            <a href="#" class="btn-icon" aria-label="Ver registro 2"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></a>
-                        </td>
+                    <tr th:if="${#lists.isEmpty(histories)}">
+                        <td colspan="8">Nenhum registro encontrado.</td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
-        <nav class="pagination" aria-label="Paginação">
-            <a href="#" aria-label="Página anterior"><img src="../../static/icons/chevron-left.svg" th:src="@{/icons/chevron-left.svg}" alt=""></a>
-
-            <a href="#" aria-current="page">1</a>
-
-            <a href="#">2</a>
-
-            <a href="#" aria-label="Próxima página"><img src="../../static/icons/chevron-right.svg" th:src="@{/icons/chevron-right.svg}" alt=""></a>
-        </nav>
+        <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
+
+    <!-- Detalhes de cada registro (somente leitura) -->
+    <th:block th:each="item : ${histories}">
+    <dialog class="modal" popover th:attr="id=|ver-history-${item.id}|,aria-labelledby=|ver-history-${item.id}-titulo|">
+        <header class="modal-header">
+            <div>
+                <h2 th:attr="id=|ver-history-${item.id}-titulo|">Registro de uso</h2>
+                <p>ID [[${item.id}]]</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" popovertargetaction="hide" th:attr="popovertarget=|ver-history-${item.id}|"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <div class="modal-form">
+            <dl class="detail-list">
+                <div><dt>Usuário</dt><dd th:text="${usersById[item.userId]?.userName != null and !#strings.isEmpty(usersById[item.userId]?.userName) ? usersById[item.userId]?.userName : '—'}">valor</dd></div>
+                <div><dt>Tipo</dt><dd th:text="${historyTypesById[item.historyTypeId]?.name != null and !#strings.isEmpty(historyTypesById[item.historyTypeId]?.name) ? historyTypesById[item.historyTypeId]?.name : '—'}">valor</dd></div>
+                <div><dt>Estante</dt><dd th:text="${shelvesById.get(item.shelfId)?.room != null and !#strings.isEmpty(shelvesById.get(item.shelfId)?.room) ? shelvesById.get(item.shelfId)?.room : '—'}">valor</dd></div>
+                <div><dt>Produtos</dt><dd th:text="${item.productNames != null and !#lists.isEmpty(item.productNames) ? #strings.listJoin(item.productNames, ', ') : '—'}">valor</dd></div>
+                <div><dt>Execução</dt><dd th:text="${item.executionDate != null ? #temporals.format(item.executionDate, 'dd/MM/yyyy HH:mm') : '—'}">01/01/2026 10:00</dd></div>
+                <div><dt>Resultado</dt><dd th:text="${item.resultDescription != null and !#strings.isEmpty(item.resultDescription) ? item.resultDescription : '—'}">valor</dd></div>
+            </dl>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" popovertargetaction="hide" th:attr="popovertarget=|ver-history-${item.id}|">Fechar</button>
+            </footer>
+        </div>
+    </dialog>
+    </th:block>
 </body>
 </html>
