@@ -21,8 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -307,6 +310,49 @@ class DashboardServiceTest {
                 totals(1, 2, 3, 4)));
 
         assertEquals(1, service.build(7).getTotalUsers());
+    }
+
+    @Test
+    void refreshAsksTheDatabaseToRecalculateTheView() {
+        service.refresh();
+
+        verify(repository).refresh();
+    }
+
+    @Test
+    void aFailureRefreshingTheViewBecomesAFriendlyMessageWithoutTheDatabaseDetail() {
+        doThrow(new BadSqlGrammarException("atualiza a view", "refresh materialized view concurrently mv_dashboard",
+                new java.sql.SQLException("must be owner of materialized view mv_dashboard"))).when(repository).refresh();
+
+        DashboardUnavailableException error = assertThrows(DashboardUnavailableException.class, service::refresh);
+
+        assertEquals("Não foi possível atualizar o dashboard agora. Tente novamente em instantes.", error.getMessage());
+        assertTrue(!error.getMessage().contains("owner"), "o detalhe do banco não chega à tela");
+        // a trava é liberada: a próxima tentativa roda normalmente
+        doNothing().when(repository).refresh();
+        service.refresh();
+    }
+
+    @Test
+    void aSecondRefreshWhileTheFirstIsRunningIsRefused() throws Exception {
+        java.util.concurrent.atomic.AtomicReference<Throwable> second = new java.util.concurrent.atomic.AtomicReference<>();
+        doAnswer(invocation -> {
+            Thread other = new Thread(() -> {
+                try {
+                    service.refresh();
+                } catch (Throwable e) {
+                    second.set(e);
+                }
+            });
+            other.start();
+            other.join();
+            return null;
+        }).when(repository).refresh();
+
+        service.refresh();
+
+        assertTrue(second.get() instanceof DashboardUnavailableException);
+        assertEquals("Já existe uma atualização do dashboard em andamento. Aguarde alguns instantes.", second.get().getMessage());
     }
 
     @Test

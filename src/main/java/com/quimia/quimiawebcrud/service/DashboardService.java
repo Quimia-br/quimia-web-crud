@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Monta os números da tela inicial a partir da view materializada mv_dashboard, numa única leitura.
@@ -54,6 +55,7 @@ public class DashboardService {
 
     private final DashboardRepository repository;
     private final Clock clock;
+    private final ReentrantLock refreshLock = new ReentrantLock();
 
     /**
      * Períodos aceitos no seletor dos gráficos; qualquer outro valor vira o padrão (7 dias).
@@ -128,6 +130,26 @@ public class DashboardService {
                 activities.stream().limit(ACTIVITY_SIZE).toList(),
                 alertItems.stream().limit(LIST_SIZE).toList(),
                 ranking(productUses));
+    }
+
+    /**
+     * Atualiza a view com os dados de agora. Só uma atualização roda por vez: um segundo clique enquanto a primeira
+     * ainda está em andamento é recusado em vez de enfileirar outro cálculo pesado no banco.
+     */
+    public void refresh() {
+        if (!refreshLock.tryLock()) {
+            throw new DashboardUnavailableException(
+                    "Já existe uma atualização do dashboard em andamento. Aguarde alguns instantes.");
+        }
+        try {
+            repository.refresh();
+        } catch (DataAccessException e) {
+            log.error("Não foi possível atualizar a mv_dashboard", e);
+            throw new DashboardUnavailableException(
+                    "Não foi possível atualizar o dashboard agora. Tente novamente em instantes.");
+        } finally {
+            refreshLock.unlock();
+        }
     }
 
     /** Falha ao ler a view (ela não existe, não foi populada, banco fora do ar...) vira um aviso para a tela. */

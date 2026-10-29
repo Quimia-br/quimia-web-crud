@@ -41,6 +41,9 @@ public class DashboardRepository {
             + "contagem_alertas, admin, acao, data_edicao, tabela_afetada, alerta, total_usos, nome_produto, "
             + "tipo_contagem, nome_tipo, data_dia, total_dia, atualizado_em from mv_dashboard order by id";
 
+    /** CONCURRENTLY: quem estiver abrindo o dashboard continua lendo a versão antiga até a nova ficar pronta. */
+    private static final String REFRESH = "refresh materialized view concurrently mv_dashboard";
+
     /** Uma linha da view; só as colunas da própria {@code section} vêm preenchidas. */
     public record Row(String section, Long users, Long products, Long companies, Long alerts,
                       String admin, String action, LocalDateTime editDate, String affectedTable,
@@ -55,6 +58,12 @@ public class DashboardRepository {
         return entityManager.createNativeQuery(SELECT).getResultList().stream()
                 .map(row -> toRow((Object[]) row))
                 .toList();
+    }
+
+    /** Recalcula a view com os dados de agora. Precisa do índice único da view e de o usuário do banco ser o dono dela. */
+    @Transactional
+    public void refresh() {
+        entityManager.createNativeQuery(REFRESH).executeUpdate();
     }
 
     private static Row toRow(Object[] c) {

@@ -58,6 +58,10 @@
                     <a href="?periodo=30" th:href="@{/(periodo=30)}" th:attr="aria-current=${dashboard.periodDays == 30} ? 'true'">30 dias</a>
                     <a href="?periodo=90" th:href="@{/(periodo=90)}" th:attr="aria-current=${dashboard.periodDays == 90} ? 'true'">90 dias</a>
                 </nav>
+                <form method="post" action="#" th:action="@{/dashboard/refresh}">
+                    <input type="hidden" name="periodo" value="7" th:value="${dashboard.periodDays}">
+                    <button type="submit" class="btn btn-secondary">Atualizar dashboard</button>
+                </form>
                 <div class="profile-chip">
                     <span class="avatar" aria-hidden="true" th:text="${adminInitial}">A</span>
                     <span class="profile-text"><strong th:text="${adminName}">Administrador</strong><small>Administrador</small></span>

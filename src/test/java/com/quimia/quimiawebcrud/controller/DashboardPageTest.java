@@ -25,9 +25,14 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -144,6 +149,36 @@ class DashboardPageTest {
         assertTrue(html.contains("href=\"/users?busca=Ana&amp;status=BLOQUEADO\""));
         assertTrue(html.contains("href=\"/admins?busca=Adm&amp;status=PENDENTE\""));
         assertTrue(html.contains("algo diferente"));
+    }
+
+    @Test
+    void theRefreshButtonPostsToTheRefreshRouteKeepingThePeriod() throws Exception {
+        String html = page("30", List.of());
+
+        assertTrue(html.contains("Atualizar dashboard"));
+        assertTrue(html.contains("action=\"/dashboard/refresh\""));
+        assertTrue(html.contains("name=\"periodo\" value=\"30\""), "volta para o mesmo período");
+    }
+
+    @Test
+    void refreshingRecalculatesTheViewAndComesBackToTheSamePeriod() throws Exception {
+        mvc.perform(post("/dashboard/refresh").param("periodo", "30"))
+                .andExpect(redirectedUrl("/?periodo=30"))
+                .andExpect(flash().attribute("message", "Dashboard atualizado."));
+        verify(dashboardService).refresh();
+
+        mvc.perform(post("/dashboard/refresh").param("periodo", "5"))
+                .andExpect(redirectedUrl("/?periodo=7"));
+    }
+
+    @Test
+    void whenTheRefreshFailsTheReasonShowsAsANoticeInsteadOfAnErrorPage() throws Exception {
+        doThrow(new DashboardUnavailableException("Não foi possível atualizar o dashboard agora. Tente novamente em instantes."))
+                .when(dashboardService).refresh();
+
+        mvc.perform(post("/dashboard/refresh"))
+                .andExpect(redirectedUrl("/?periodo=7"))
+                .andExpect(flash().attribute("error", "Não foi possível atualizar o dashboard agora. Tente novamente em instantes."));
     }
 
     @Test
