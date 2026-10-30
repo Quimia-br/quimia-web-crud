@@ -562,22 +562,84 @@ select {
   }
 }
 
-@media (max-width: 768px) {
-  body {
-    flex-direction: column;
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 72px;
   }
 
   .sidebar {
-    width: auto;
-    position: static;
-    height: auto;
-    align-self: stretch;
+    padding: 24px 8px;
+    z-index: 1;
+  }
+
+  .sidebar-logo img {
+    width: 44px;
+    height: 44px;
   }
 
   .sidebar-nav {
-    overflow-y: visible;
+    padding-right: 0;
+    scrollbar-gutter: auto;
   }
 
+  .nav-link {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .nav-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .nav-group summary::after {
+    display: none;
+  }
+
+  .nav-group ul {
+    position: absolute;
+    left: calc(100% + 8px);
+    min-width: 200px;
+    margin-top: calc(-1 * var(--control-height));
+    padding: 8px;
+    background: var(--color-sidebar);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-modal);
+  }
+
+  .nav-group ul .nav-link {
+    justify-content: flex-start;
+    padding: 0 12px;
+  }
+
+  .nav-group ul .nav-label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+  }
+
+  @supports (anchor-name: --nav-reports) {
+    .nav-group summary {
+      anchor-name: --nav-reports;
+    }
+
+    .nav-group ul {
+      position-anchor: --nav-reports;
+      top: anchor(top);
+      margin-top: 0;
+      position-try-fallbacks: flip-block;
+      position-visibility: anchors-visible;
+    }
+  }
+}
+
+@media (max-width: 768px) {
   .content {
     padding: 16px;
   }
