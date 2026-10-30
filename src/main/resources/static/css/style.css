@@ -623,6 +623,20 @@ select {
     overflow: visible;
     clip: auto;
   }
+
+  @supports (anchor-name: --nav-reports) {
+    .nav-group summary {
+      anchor-name: --nav-reports;
+    }
+
+    .nav-group ul {
+      position-anchor: --nav-reports;
+      top: anchor(top);
+      margin-top: 0;
+      position-try-fallbacks: flip-block;
+      position-visibility: anchors-visible;
+    }
+  }
 }
 
 @media (max-width: 768px) {
