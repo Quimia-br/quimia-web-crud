@@ -124,10 +124,11 @@ select {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding-right: 8px;
-  scrollbar-width: thin;
-  scrollbar-gutter: stable;
-  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+  scrollbar-width: none;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .sidebar-nav ul {
@@ -593,8 +594,6 @@ select {
 
   :root:not(.sidebar-pinned) .sidebar .sidebar-nav {
     overflow-x: hidden;
-    padding-right: 0;
-    scrollbar-gutter: auto;
   }
 
   :root:not(.sidebar-pinned) .sidebar .nav-link {
@@ -635,11 +634,6 @@ select {
   .sidebar-logo img {
     width: 44px;
     height: 44px;
-  }
-
-  .sidebar-nav {
-    padding-right: 0;
-    scrollbar-gutter: auto;
   }
 
   .nav-link {
