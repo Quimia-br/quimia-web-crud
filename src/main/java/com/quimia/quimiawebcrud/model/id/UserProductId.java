@@ -2,13 +2,20 @@ package com.quimia.quimiawebcrud.model.id;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+/**
+ * Chave composta de {@code produtos_usuarios}: um registro por par (usuário, produto). Só o aplicativo grava essa
+ * tabela; o painel apenas lê. As duas colunas juntas identificam a linha, por isso {@code equals} e
+ * {@code hashCode} usam as duas, e o JPA exige que a classe seja {@code Serializable}.
+ */
 @Embeddable
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
