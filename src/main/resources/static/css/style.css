@@ -229,9 +229,14 @@ select {
 
 .toolbar-filter {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   color: var(--color-text-muted);
+}
+
+.toolbar-filter label {
+  white-space: nowrap;
 }
 
 .btn {
@@ -568,7 +573,7 @@ select {
   }
 
   .sidebar {
-    padding: 24px 8px;
+    padding: 24px 12px;
     z-index: 1;
   }
 
@@ -603,7 +608,7 @@ select {
   .nav-group ul {
     position: absolute;
     left: calc(100% + 8px);
-    min-width: 200px;
+    min-width: 184px;
     margin-top: calc(-1 * var(--control-height));
     padding: 8px;
     background: var(--color-sidebar);
@@ -622,6 +627,28 @@ select {
     height: auto;
     overflow: visible;
     clip: auto;
+  }
+
+  .nav-group::details-content {
+    content-visibility: visible;
+  }
+
+  .nav-group:not(:hover):not(:focus-within) ul {
+    display: none;
+  }
+
+  .nav-group ul::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 100%;
+    bottom: 0;
+    width: 24px;
+  }
+
+  .nav-group:has([aria-current="page"]) > summary {
+    background: rgba(255, 255, 255, 0.6);
+    font-weight: 700;
   }
 
   @supports (anchor-name: --nav-reports) {
