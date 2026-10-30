@@ -10,6 +10,7 @@
 
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
     <link rel="stylesheet" href="../../static/css/dashboard.css" th:href="@{/css/dashboard.css}">
+    <script src="../../static/js/sidebar.js" th:src="@{/js/sidebar.js}"></script>
 </head>
 
 <body>
@@ -41,6 +42,8 @@
                 </li>
             </ul>
         </nav>
+
+        <button type="button" class="nav-link sidebar-pin" aria-pressed="false" title="Fixar menu" data-sidebar-pin><img src="../../static/icons/pin.svg" th:src="@{/icons/pin.svg}" alt=""><span class="nav-label">Fixar menu</span></button>
 
         <form class="sidebar-logout-form" method="post" action="#" th:action="@{/logout}">
             <button type="submit" class="nav-link sidebar-logout" title="Sair"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt=""><span class="nav-label">Sair</span></button>
