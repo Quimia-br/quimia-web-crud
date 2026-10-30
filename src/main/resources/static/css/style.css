@@ -563,21 +563,6 @@ select {
 }
 
 @media (max-width: 768px) {
-  body {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: auto;
-    position: static;
-    height: auto;
-    align-self: stretch;
-  }
-
-  .sidebar-nav {
-    overflow-y: visible;
-  }
-
   .content {
     padding: 16px;
   }
