@@ -1,6 +1,6 @@
 :root {
-  --color-sidebar: #3EC5D4;
-  --color-sidebar-text: #12343A;
+  --color-sidebar: #2C7B82;
+  --color-sidebar-text: #FFFFFF;
   --color-primary: #0F6B78;
   --color-primary-hover: #0B5560;
   --color-bg: #F4F6F5;
@@ -104,6 +104,10 @@ select {
   margin-inline: auto;
 }
 
+.sidebar :focus-visible {
+  outline-color: #FFFFFF;
+}
+
 .sidebar-logo {
   align-self: center;
   margin-bottom: 12px;
@@ -123,7 +127,7 @@ select {
   padding-right: 8px;
   scrollbar-width: thin;
   scrollbar-gutter: stable;
-  scrollbar-color: rgba(18, 52, 58, 0.45) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
 }
 
 .sidebar-nav ul {
@@ -151,14 +155,15 @@ select {
 .nav-link img {
   width: 20px;
   height: 20px;
+  filter: brightness(0) invert(1);
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .nav-link[aria-current="page"] {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.22);
   font-weight: 700;
 }
 
@@ -647,7 +652,7 @@ select {
   }
 
   .nav-group:has([aria-current="page"]) > summary {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.22);
     font-weight: 700;
   }
 
