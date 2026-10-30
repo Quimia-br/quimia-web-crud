@@ -568,7 +568,7 @@ select {
   }
 
   .sidebar {
-    padding: 24px 8px;
+    padding: 24px 12px;
     z-index: 1;
   }
 
@@ -603,7 +603,7 @@ select {
   .nav-group ul {
     position: absolute;
     left: calc(100% + 8px);
-    min-width: 200px;
+    min-width: 184px;
     margin-top: calc(-1 * var(--control-height));
     padding: 8px;
     background: var(--color-sidebar);
