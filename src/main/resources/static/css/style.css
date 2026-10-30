@@ -573,7 +573,7 @@ select {
 }
 
 @media (min-width: 1025px) {
-  .sidebar {
+  :root:not(.sidebar-pinned) .sidebar {
     width: 72px;
     padding: 24px 12px;
     overflow-x: hidden;
@@ -581,49 +581,49 @@ select {
     transition: width var(--transition), margin-right var(--transition), box-shadow var(--transition);
   }
 
-  .sidebar:hover,
-  .sidebar:has(:focus-visible) {
+  :root:not(.sidebar-pinned) .sidebar:hover,
+  :root:not(.sidebar-pinned) .sidebar:has(:focus-visible) {
     width: var(--sidebar-width);
     margin-right: calc(72px - var(--sidebar-width));
     box-shadow: var(--shadow-modal);
   }
 
-  .sidebar .sidebar-logo {
+  :root:not(.sidebar-pinned) .sidebar .sidebar-logo {
     align-self: flex-start;
     margin-left: 2px;
   }
 
-  .sidebar .sidebar-logo img {
+  :root:not(.sidebar-pinned) .sidebar .sidebar-logo img {
     width: 44px;
     height: 44px;
   }
 
-  .sidebar .sidebar-nav {
+  :root:not(.sidebar-pinned) .sidebar .sidebar-nav {
     overflow-x: hidden;
     padding-right: 0;
     scrollbar-gutter: auto;
   }
 
-  .sidebar .nav-link {
+  :root:not(.sidebar-pinned) .sidebar .nav-link {
     padding: 0 14px;
     white-space: nowrap;
   }
 
-  .sidebar .nav-label,
-  .sidebar .nav-group summary::after {
+  :root:not(.sidebar-pinned) .sidebar .nav-label,
+  :root:not(.sidebar-pinned) .sidebar .nav-group summary::after {
     transition: opacity var(--transition);
   }
 
-  .sidebar:not(:hover):not(:has(:focus-visible)) .nav-label,
-  .sidebar:not(:hover):not(:has(:focus-visible)) .nav-group summary::after {
+  :root:not(.sidebar-pinned) .sidebar:not(:hover):not(:has(:focus-visible)) .nav-label,
+  :root:not(.sidebar-pinned) .sidebar:not(:hover):not(:has(:focus-visible)) .nav-group summary::after {
     opacity: 0;
   }
 
-  .sidebar:not(:hover):not(:has(:focus-visible)) .nav-group ul {
+  :root:not(.sidebar-pinned) .sidebar:not(:hover):not(:has(:focus-visible)) .nav-group ul {
     display: none;
   }
 
-  .sidebar:not(:hover):not(:has(:focus-visible)) .nav-group:has([aria-current="page"]) > summary {
+  :root:not(.sidebar-pinned) .sidebar:not(:hover):not(:has(:focus-visible)) .nav-group:has([aria-current="page"]) > summary {
     background: rgba(255, 255, 255, 0.22);
     font-weight: 700;
   }
@@ -664,6 +664,10 @@ select {
   }
 
   .nav-group summary::after {
+    display: none;
+  }
+
+  .sidebar-pin {
     display: none;
   }
 
@@ -745,6 +749,18 @@ select {
   background: transparent;
   font: inherit;
   text-align: left;
+}
+
+.sidebar-pin {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+}
+
+.sidebar-pin[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.22);
 }
 
 /* Avisos de sucesso e erro no topo das listas */
