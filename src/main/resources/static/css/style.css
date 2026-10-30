@@ -569,6 +569,7 @@ select {
 
   .sidebar {
     padding: 24px 8px;
+    z-index: 1;
   }
 
   .sidebar-logo img {
@@ -597,6 +598,30 @@ select {
 
   .nav-group summary::after {
     display: none;
+  }
+
+  .nav-group ul {
+    position: absolute;
+    left: calc(100% + 8px);
+    min-width: 200px;
+    margin-top: calc(-1 * var(--control-height));
+    padding: 8px;
+    background: var(--color-sidebar);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-modal);
+  }
+
+  .nav-group ul .nav-link {
+    justify-content: flex-start;
+    padding: 0 12px;
+  }
+
+  .nav-group ul .nav-label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
   }
 }
 
