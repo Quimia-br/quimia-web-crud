@@ -229,9 +229,14 @@ select {
 
 .toolbar-filter {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   color: var(--color-text-muted);
+}
+
+.toolbar-filter label {
+  white-space: nowrap;
 }
 
 .btn {
