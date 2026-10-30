@@ -129,7 +129,11 @@ class DashboardPageTest {
         String html = page("7", List.of());
 
         assertFalse(html.contains(" style="), "estilos ficam no arquivo CSS, não na página");
-        assertFalse(html.contains("<script"), "o dashboard não usa JavaScript");
+        String[] afterEachScriptTag = html.split("<script", -1);   // o item 0 é o que vem antes do primeiro <script
+        for (int i = 1; i < afterEachScriptTag.length; i++) {
+            String tag = afterEachScriptTag[i].substring(0, afterEachScriptTag[i].indexOf('>'));
+            assertTrue(tag.contains(" src="), "só arquivos .js próprios são permitidos (script-src 'self'), nunca script dentro da página");
+        }
         assertFalse(html.contains("onclick=") || html.contains("onload="));
     }
 
