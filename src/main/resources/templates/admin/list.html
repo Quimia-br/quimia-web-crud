@@ -23,29 +23,29 @@
         <nav class = "sidebar-nav" aria-label = "Menu principal">
 
             <ul>
-                <li><a href="../dashboard/index.html" th:href="@{/}" class="nav-link"><img src="../../static/icons/chart-column.svg" th:src="@{/icons/chart-column.svg}" alt="">Dashboard</a></li>
-                <li><a href="../admin/list.html" th:href="@{/admins}" class = "nav-link" aria-current = "page"><img src="../../static/icons/admin.svg" th:src="@{/icons/admin.svg}" alt="">Administradores</a></li>
+                <li><a href="../dashboard/index.html" th:href="@{/}" class="nav-link" title="Dashboard"><img src="../../static/icons/chart-column.svg" th:src="@{/icons/chart-column.svg}" alt=""><span class="nav-label">Dashboard</span></a></li>
+                <li><a href="../admin/list.html" th:href="@{/admins}" class = "nav-link" aria-current = "page" title="Administradores"><img src="../../static/icons/admin.svg" th:src="@{/icons/admin.svg}" alt=""><span class="nav-label">Administradores</span></a></li>
 
-                <li><a href="../company/list.html" th:href="@{/companies}" class = "nav-link"><img src="../../static/icons/company.svg" th:src="@{/icons/company.svg}" alt="">Empresas</a></li>
+                <li><a href="../company/list.html" th:href="@{/companies}" class = "nav-link" title="Empresas"><img src="../../static/icons/company.svg" th:src="@{/icons/company.svg}" alt=""><span class="nav-label">Empresas</span></a></li>
 
-                <li><a href="../user/list.html" th:href="@{/users}" class = "nav-link"><img src="../../static/icons/user.svg" th:src="@{/icons/user.svg}" alt="">Usuários</a></li>
+                <li><a href="../user/list.html" th:href="@{/users}" class = "nav-link" title="Usuários"><img src="../../static/icons/user.svg" th:src="@{/icons/user.svg}" alt=""><span class="nav-label">Usuários</span></a></li>
 
-                <li><a href="../product/list.html" th:href="@{/products}" class = "nav-link"><img src="../../static/icons/product.svg" th:src="@{/icons/product.svg}" alt="">Produtos</a></li>
+                <li><a href="../product/list.html" th:href="@{/products}" class = "nav-link" title="Produtos"><img src="../../static/icons/product.svg" th:src="@{/icons/product.svg}" alt=""><span class="nav-label">Produtos</span></a></li>
 
-                <li><a href="../disposal/list.html" th:href="@{/disposals}" class = "nav-link"><img src="../../static/icons/disposal.svg" th:src="@{/icons/disposal.svg}" alt="">Descarte</a></li>
+                <li><a href="../disposal/list.html" th:href="@{/disposals}" class = "nav-link" title="Descarte"><img src="../../static/icons/disposal.svg" th:src="@{/icons/disposal.svg}" alt=""><span class="nav-label">Descarte</span></a></li>
 
-                <li><a href="../location/list.html" th:href="@{/locations}" class = "nav-link"><img src="../../static/icons/location.svg" th:src="@{/icons/location.svg}" alt="">Localização</a></li>
+                <li><a href="../location/list.html" th:href="@{/locations}" class = "nav-link" title="Localização"><img src="../../static/icons/location.svg" th:src="@{/icons/location.svg}" alt=""><span class="nav-label">Localização</span></a></li>
 
-                <li><a href="../shelf/list.html" th:href="@{/shelves}" class = "nav-link"><img src="../../static/icons/shelf.svg" th:src="@{/icons/shelf.svg}" alt="">Estante</a></li>
+                <li><a href="../shelf/list.html" th:href="@{/shelves}" class = "nav-link" title="Estante"><img src="../../static/icons/shelf.svg" th:src="@{/icons/shelf.svg}" alt=""><span class="nav-label">Estante</span></a></li>
 
-                <li><a href="../history-type/list.html" th:href="@{/history-types}" class = "nav-link"><img src="../../static/icons/history-type.svg" th:src="@{/icons/history-type.svg}" alt="">Tipo histórico</a></li>
+                <li><a href="../history-type/list.html" th:href="@{/history-types}" class = "nav-link" title="Tipo histórico"><img src="../../static/icons/history-type.svg" th:src="@{/icons/history-type.svg}" alt=""><span class="nav-label">Tipo histórico</span></a></li>
 
                 <li>
                     <details class = "nav-group">
-                        <summary class = "nav-link"><img src="../../static/icons/report.svg" th:src="@{/icons/report.svg}" alt="">Relatórios</summary>
+                        <summary class = "nav-link" title="Relatórios"><img src="../../static/icons/report.svg" th:src="@{/icons/report.svg}" alt=""><span class="nav-label">Relatórios</span></summary>
                         <ul>
-                            <li><a href="../history/list.html" th:href="@{/histories}" class = "nav-link">Usuários</a></li>
-                            <li><a href="../admin-log/list.html" th:href="@{/admin-logs}" class = "nav-link">Administradores</a></li>
+                            <li><a href="../history/list.html" th:href="@{/histories}" class = "nav-link" title="Usuários"><span class="nav-label">Usuários</span></a></li>
+                            <li><a href="../admin-log/list.html" th:href="@{/admin-logs}" class = "nav-link" title="Administradores"><span class="nav-label">Administradores</span></a></li>
                         </ul>
                     </details>
                 </li>
@@ -53,7 +53,7 @@
         </nav>
 
         <form class="sidebar-logout-form" method="post" action="#" th:action="@{/logout}">
-            <button type="submit" class="nav-link sidebar-logout"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt="">Sair</button>
+            <button type="submit" class="nav-link sidebar-logout" title="Sair"><img src="../../static/icons/logout.svg" th:src="@{/icons/logout.svg}" alt=""><span class="nav-label">Sair</span></button>
         </form>
 
     </aside>
