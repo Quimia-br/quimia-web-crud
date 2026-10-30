@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter
 @Getter
-public class Admin extends Model {
+public class Admin extends BaseEntity {
 
     @Column(name = "nome", nullable = false, length = 150)
     private String userName;

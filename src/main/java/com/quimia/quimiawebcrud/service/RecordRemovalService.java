@@ -6,7 +6,7 @@ import com.quimia.quimiawebcrud.model.AdminLog;
 import com.quimia.quimiawebcrud.model.Company;
 import com.quimia.quimiawebcrud.model.Disposal;
 import com.quimia.quimiawebcrud.model.HistoryType;
-import com.quimia.quimiawebcrud.model.Model;
+import com.quimia.quimiawebcrud.model.BaseEntity;
 import com.quimia.quimiawebcrud.model.Product;
 import com.quimia.quimiawebcrud.model.User;
 import com.quimia.quimiawebcrud.model.enums.AdminAction;
@@ -129,7 +129,7 @@ public class RecordRemovalService {
         remove(admin, ADMIN_PARTS);
     }
 
-    private void remove(Model record, List<Part> parts) {
+    private void remove(BaseEntity record, List<Part> parts) {
         Admin author = currentAdmin.require();
         List<String> details = RecordSummary.fields(record);
         if (record instanceof Admin && record.getId().equals(author.getId())) {

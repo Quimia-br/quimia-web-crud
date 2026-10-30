@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.controller;
 
 import com.quimia.quimiawebcrud.exception.BusinessException;
-import com.quimia.quimiawebcrud.model.Model;
+import com.quimia.quimiawebcrud.model.BaseEntity;
 import com.quimia.quimiawebcrud.service.CrudService;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * qualquer outro erro sobe para o tratador global (página de erro).
  */
 @Slf4j
-public abstract class GenericController<T extends Model, ID, Res, Req> extends ListController<Res> {
+public abstract class GenericController<T extends BaseEntity, ID, Res, Req> extends ListController<Res> {
 
     private static final int MAX_MESSAGES = 3;
     /** Mesmos limites dos campos dos popups "Atualizar por..." e "Apagar por...". */

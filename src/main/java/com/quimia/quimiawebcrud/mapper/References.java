@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.mapper;
 
 import com.quimia.quimiawebcrud.model.Company;
-import com.quimia.quimiawebcrud.model.Model;
+import com.quimia.quimiawebcrud.model.BaseEntity;
 import com.quimia.quimiawebcrud.model.Product;
 
 final class References {
@@ -17,7 +17,7 @@ final class References {
         return id == null ? null : Product.builder().id(id).build();
     }
 
-    static Integer idOf(Model entity) {
+    static Integer idOf(BaseEntity entity) {
         return entity == null ? null : entity.getId();
     }
 }

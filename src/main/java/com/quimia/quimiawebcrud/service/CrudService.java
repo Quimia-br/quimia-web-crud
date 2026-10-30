@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.mapper.Mapper;
-import com.quimia.quimiawebcrud.model.Model;
+import com.quimia.quimiawebcrud.model.BaseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.Map;
  * ({@link #validate}) e registrada no log de edições; a exclusão fica a cargo de cada tabela,
  * que apaga junto o que depende do registro (ver {@link RecordRemovalService}).
  */
-public abstract class CrudService<E extends Model, ID, Req, Res> extends ReadService<E, ID, Res> {
+public abstract class CrudService<E extends BaseEntity, ID, Req, Res> extends ReadService<E, ID, Res> {
 
     @Override
     protected abstract Mapper<E, Req, Res> getMapper();

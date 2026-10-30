@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter
 @Getter
-public class HistoryType extends Model {
+public class HistoryType extends BaseEntity {
 
     @Column(name = "nome", nullable = false, unique = true, length = 150)
     private String name;
