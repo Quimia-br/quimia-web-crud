@@ -624,6 +624,28 @@ select {
     clip: auto;
   }
 
+  .nav-group::details-content {
+    content-visibility: visible;
+  }
+
+  .nav-group:not(:hover):not(:focus-within) ul {
+    display: none;
+  }
+
+  .nav-group ul::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 100%;
+    bottom: 0;
+    width: 24px;
+  }
+
+  .nav-group:has([aria-current="page"]) > summary {
+    background: rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+  }
+
   @supports (anchor-name: --nav-reports) {
     .nav-group summary {
       anchor-name: --nav-reports;
