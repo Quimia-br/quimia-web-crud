@@ -578,14 +578,12 @@ select {
     padding: 24px 12px;
     overflow-x: hidden;
     z-index: 2;
-    transition: width var(--transition), margin-right var(--transition), box-shadow var(--transition);
+    transition: width var(--transition);
   }
 
   :root:not(.sidebar-pinned) .sidebar:hover,
   :root:not(.sidebar-pinned) .sidebar:has(:focus-visible) {
     width: var(--sidebar-width);
-    margin-right: calc(72px - var(--sidebar-width));
-    box-shadow: var(--shadow-modal);
   }
 
   :root:not(.sidebar-pinned) .sidebar .sidebar-logo {
