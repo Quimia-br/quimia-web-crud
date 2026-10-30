@@ -78,7 +78,7 @@ select {
   width: var(--sidebar-width);
   flex-shrink: 0;
   background: var(--color-sidebar);
-  padding: 24px 16px;
+  padding: 24px 12px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -145,7 +145,7 @@ select {
   align-items: center;
   gap: 12px;
   min-height: var(--control-height);
-  padding: 0 12px;
+  padding: 0 14px;
   border-radius: var(--radius);
   color: var(--color-sidebar-text);
   text-decoration: none;
@@ -576,7 +576,6 @@ select {
 @media (min-width: 1025px) {
   :root:not(.sidebar-pinned) .sidebar {
     width: 72px;
-    padding: 24px 12px;
     overflow-x: hidden;
     z-index: 2;
     transition: width var(--transition);
@@ -592,7 +591,6 @@ select {
   }
 
   :root:not(.sidebar-pinned) .sidebar .nav-link {
-    padding: 0 14px;
     white-space: nowrap;
   }
 
@@ -622,7 +620,6 @@ select {
   }
 
   .sidebar {
-    padding: 24px 12px;
     z-index: 1;
   }
 
