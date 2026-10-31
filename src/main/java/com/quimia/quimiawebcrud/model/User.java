@@ -1,13 +1,26 @@
 package com.quimia.quimiawebcrud.model;
 
 import com.quimia.quimiawebcrud.model.enums.Status;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Pessoa que usa o aplicativo da Quimia (tabela {@code usuarios}). O painel lista, edita e remove; o cadastro vem do aplicativo.
+ */
 @Entity
 @Table(name = "usuarios")
 @AttributeOverride(name = "id", column = @Column(name = "id_usuario"))

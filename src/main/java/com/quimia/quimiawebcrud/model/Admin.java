@@ -1,12 +1,25 @@
 package com.quimia.quimiawebcrud.model;
 
 import com.quimia.quimiawebcrud.model.enums.Status;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
+/**
+ * Administrador do painel (tabela {@code admins}). É quem faz login aqui e quem aparece no log de edições.
+ */
 @Entity
 @Table(name = "admins")
 @AttributeOverride(name = "id", column = @Column(name = "id_admin"))

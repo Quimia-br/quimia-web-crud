@@ -22,6 +22,9 @@ import lombok.experimental.SuperBuilder;
 @Getter
 public abstract class BaseEntity {
 
+    /** Texto gravado quando um campo obrigatório chega vazio; é o mesmo valor que o banco usa. */
+    protected static final String UNKNOWN = "DESCONHECIDO";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
