@@ -20,7 +20,7 @@ import java.util.function.Predicate;
 @Controller
 @RequestMapping("/history-types")
 @RequiredArgsConstructor
-public class HistoryTypeController extends GenericController<HistoryType, Integer, HistoryTypeResponseDTO, HistoryTypeRequestDTO> {
+public class HistoryTypeController extends GenericController<HistoryType, Integer, HistoryTypeRequestDTO, HistoryTypeResponseDTO> {
 
     private final HistoryTypeService historyTypeService;
 

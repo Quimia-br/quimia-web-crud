@@ -29,14 +29,14 @@ import java.util.stream.Collectors;
  * qualquer outro erro sobe para o tratador global (página de erro).
  */
 @Slf4j
-public abstract class GenericController<T extends BaseEntity, ID, Res, Req> extends ListController<Res> {
+public abstract class GenericController<E extends BaseEntity, ID, Req, Res> extends ListController<Res> {
 
     private static final int MAX_MESSAGES = 3;
     /** Mesmos limites dos campos dos popups "Atualizar por..." e "Apagar por...". */
     private static final int MAX_FILTER_LENGTH = 255;
     private static final int MAX_NEW_VALUE_LENGTH = 1000;
 
-    protected abstract CrudService<T, ID, Req, Res> getService();
+    protected abstract CrudService<E, ID, Req, Res> getService();
 
     @Override
     protected List<Res> readAll() {

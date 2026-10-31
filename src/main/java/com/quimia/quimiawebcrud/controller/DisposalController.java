@@ -23,7 +23,7 @@ import java.util.function.Predicate;
 @Controller
 @RequestMapping("/disposals")
 @RequiredArgsConstructor
-public class DisposalController extends GenericController<Disposal, Integer, DisposalResponseDTO, DisposalRequestDTO> {
+public class DisposalController extends GenericController<Disposal, Integer, DisposalRequestDTO, DisposalResponseDTO> {
 
     private final DisposalService disposalService;
     private final ProductService productService;

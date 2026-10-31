@@ -21,7 +21,7 @@ import java.util.function.Predicate;
 @Controller
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class UserController extends GenericController<User, Integer, UserResponseDTO, UserRequestDTO> {
+public class UserController extends GenericController<User, Integer, UserRequestDTO, UserResponseDTO> {
 
     private final UserService userService;
 

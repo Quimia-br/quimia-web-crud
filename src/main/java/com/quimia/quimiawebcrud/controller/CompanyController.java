@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 @Controller
 @RequestMapping("/companies")
 @RequiredArgsConstructor
-public class CompanyController extends GenericController<Company, Integer, CompanyResponseDTO, CompanyRequestDTO> {
+public class CompanyController extends GenericController<Company, Integer, CompanyRequestDTO, CompanyResponseDTO> {
 
     private final CompanyService companyService;
 

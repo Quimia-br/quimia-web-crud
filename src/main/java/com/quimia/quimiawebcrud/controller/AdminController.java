@@ -21,7 +21,7 @@ import java.util.function.Predicate;
 @Controller
 @RequestMapping("/admins")
 @RequiredArgsConstructor
-public class AdminController extends GenericController<Admin, Integer, AdminResponseDTO, AdminRequestDTO> {
+public class AdminController extends GenericController<Admin, Integer, AdminRequestDTO, AdminResponseDTO> {
 
     private final AdminService adminService;
 
