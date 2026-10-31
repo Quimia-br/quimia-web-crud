@@ -2,7 +2,7 @@ package com.quimia.quimiawebcrud.controller;
 
 import com.quimia.quimiawebcrud.exception.BusinessException;
 import com.quimia.quimiawebcrud.service.CurrentAdmin;
-import com.quimia.quimiawebcrud.service.DashboardService;
+import com.quimia.quimiawebcrud.service.dashboard.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

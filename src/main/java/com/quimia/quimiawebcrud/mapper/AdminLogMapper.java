@@ -2,7 +2,7 @@ package com.quimia.quimiawebcrud.mapper;
 
 import com.quimia.quimiawebcrud.dto.AdminLogResponseDTO;
 import com.quimia.quimiawebcrud.model.AdminLog;
-import com.quimia.quimiawebcrud.service.RemovalLogFormat;
+import com.quimia.quimiawebcrud.service.removal.RemovalLogFormat;
 import org.springframework.stereotype.Component;
 
 import static com.quimia.quimiawebcrud.mapper.References.idOf;

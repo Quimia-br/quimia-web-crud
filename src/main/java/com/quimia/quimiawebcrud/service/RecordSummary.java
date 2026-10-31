@@ -14,16 +14,16 @@ import java.util.List;
  * Resumo legível de um registro, gravado no log de edições (antes de editar ou de excluir).
  * A senha nunca entra no resumo.
  */
-final class RecordSummary {
+public final class RecordSummary {
 
     private RecordSummary() {
     }
 
-    static String of(BaseEntity record) {
+    public static String of(BaseEntity record) {
         return String.join("\n", fields(record));
     }
 
-    static List<String> fields(BaseEntity record) {
+    public static List<String> fields(BaseEntity record) {
         return switch (record) {
             case User user -> List.of(
                     field("Nome", user.getUserName()), field("E-mail", user.getEmail()), field("Status", user.getStatus()),

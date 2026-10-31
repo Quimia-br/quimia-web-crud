@@ -6,7 +6,7 @@ import com.quimia.quimiawebcrud.exception.GlobalExceptionHandler;
 import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.exception.ResourceNotFoundException;
 import com.quimia.quimiawebcrud.model.enums.Status;
-import com.quimia.quimiawebcrud.service.UserService;
+import com.quimia.quimiawebcrud.service.crud.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;

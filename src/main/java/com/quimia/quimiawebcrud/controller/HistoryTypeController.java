@@ -1,10 +1,13 @@
 package com.quimia.quimiawebcrud.controller;
 
+import com.quimia.quimiawebcrud.controller.support.ColumnField;
+import com.quimia.quimiawebcrud.controller.support.Filters;
+import com.quimia.quimiawebcrud.controller.support.GenericController;
 import com.quimia.quimiawebcrud.dto.HistoryTypeRequestDTO;
 import com.quimia.quimiawebcrud.dto.HistoryTypeResponseDTO;
 import com.quimia.quimiawebcrud.model.HistoryType;
 import com.quimia.quimiawebcrud.service.CrudService;
-import com.quimia.quimiawebcrud.service.HistoryTypeService;
+import com.quimia.quimiawebcrud.service.crud.HistoryTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

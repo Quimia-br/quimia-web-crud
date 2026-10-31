@@ -1,12 +1,15 @@
 package com.quimia.quimiawebcrud.controller;
 
+import com.quimia.quimiawebcrud.controller.support.ColumnField;
+import com.quimia.quimiawebcrud.controller.support.Filters;
+import com.quimia.quimiawebcrud.controller.support.GenericController;
 import com.quimia.quimiawebcrud.dto.CompanyRequestDTO;
 import com.quimia.quimiawebcrud.dto.CompanyResponseDTO;
 import com.quimia.quimiawebcrud.model.Company;
 import com.quimia.quimiawebcrud.model.enums.CompanySize;
 import com.quimia.quimiawebcrud.model.enums.Status;
-import com.quimia.quimiawebcrud.service.CompanyService;
 import com.quimia.quimiawebcrud.service.CrudService;
+import com.quimia.quimiawebcrud.service.crud.CompanyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

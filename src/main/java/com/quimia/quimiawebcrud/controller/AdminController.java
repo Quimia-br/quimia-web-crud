@@ -1,11 +1,14 @@
 package com.quimia.quimiawebcrud.controller;
 
+import com.quimia.quimiawebcrud.controller.support.ColumnField;
+import com.quimia.quimiawebcrud.controller.support.Filters;
+import com.quimia.quimiawebcrud.controller.support.GenericController;
 import com.quimia.quimiawebcrud.dto.AdminRequestDTO;
 import com.quimia.quimiawebcrud.dto.AdminResponseDTO;
 import com.quimia.quimiawebcrud.model.Admin;
 import com.quimia.quimiawebcrud.model.enums.Status;
-import com.quimia.quimiawebcrud.service.AdminService;
 import com.quimia.quimiawebcrud.service.CrudService;
+import com.quimia.quimiawebcrud.service.crud.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,6 +1,6 @@
 package com.quimia.quimiawebcrud.controller;
 
-import com.quimia.quimiawebcrud.service.PhotoStorageService;
+import com.quimia.quimiawebcrud.service.photo.PhotoStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;

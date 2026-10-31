@@ -1,10 +1,10 @@
 package com.quimia.quimiawebcrud.controller;
 
-import com.quimia.quimiawebcrud.service.HistoryService;
-import com.quimia.quimiawebcrud.service.HistoryTypeService;
-import com.quimia.quimiawebcrud.service.PhotoUrlPolicy;
-import com.quimia.quimiawebcrud.service.ShelfService;
-import com.quimia.quimiawebcrud.service.UserService;
+import com.quimia.quimiawebcrud.service.crud.HistoryService;
+import com.quimia.quimiawebcrud.service.crud.HistoryTypeService;
+import com.quimia.quimiawebcrud.service.crud.ShelfService;
+import com.quimia.quimiawebcrud.service.crud.UserService;
+import com.quimia.quimiawebcrud.service.photo.PhotoUrlPolicy;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
