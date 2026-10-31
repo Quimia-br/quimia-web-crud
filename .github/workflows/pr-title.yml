@@ -1,7 +1,7 @@
 name: PR title
 
 # O título do PR precisa seguir o Conventional Commits, porque é ele que aparece nas notas do release
-# e na escolha da versão. Exemplos: "feat(sidebar): add a pin button", "fix: keep the menu open", "docs: add README".
+# (a versão, essa sai dos commits). Exemplos: "feat(sidebar): add a pin button", "fix: keep the menu open", "docs: add README".
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
