@@ -138,6 +138,15 @@ class DashboardPageTest {
     }
 
     @Test
+    void headLoadsTheDashboardStyles() throws Exception {
+        String html = page("7", List.of());
+
+        assertTrue(html.contains("<title>Dashboard | Quimia</title>"));
+        assertTrue(html.contains("/css/dashboard.css"));
+        assertFalse(html.contains("/css/detail.css"), "o dashboard não usa o CSS dos popups de detalhe");
+    }
+
+    @Test
     void sidebarHighlightsOnlyTheDashboard() throws Exception {
         String html = page("7", List.of());
 

@@ -1,25 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administradores | Quimia</title>
-    <link rel="icon" type="image/svg+xml" href="../../static/icons/logo.svg" th:href="@{/icons/logo.svg}">
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
-
-    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
-    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
-
-    <script src="../../static/js/password-toggle.js" th:src="@{/js/password-toggle.js}" defer></script>
-    <script src="../../static/js/sidebar.js" th:src="@{/js/sidebar.js}"></script>
-</head>
+    <head th:replace="~{fragments/head :: head('Administradores', ${ {'detail'} }, true)}"></head>
 
 <body>
     <th:block th:replace="~{fragments/sidebar :: sidebar('/admins')}"></th:block>
 
-    <main class = "content">
-        <header class = "page-header">
+    <main class="content">
+        <header class="page-header">
             <h1>Administradores</h1>
             <div class="page-actions">
                 <th:block th:replace="~{fragments/bulk-actions :: buttons}"></th:block>
@@ -54,8 +41,8 @@
             <button type="submit" class="btn btn-secondary">Buscar</button>
         </form>
 
-        <section class = "card" aria-label = "Lista de administradores">
-            <table class = "table">
+        <section class="card" aria-label="Lista de administradores">
+            <table class="table">
                 <thead>
                     <tr>
                         <th scope="col">ID</th>
@@ -63,7 +50,7 @@
                         <th scope="col">Email</th>
                         <th scope="col">Status</th>
                         <th scope="col">Cadastro</th>
-                        <th scope="col" class = "col-actions">Ações</th>
+                        <th scope="col" class="col-actions">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -73,7 +60,7 @@
                         <td>[[${item.email}]]</td>
                         <td><span th:replace="~{fragments/badges :: status(${item.status})}"></span></td>
                         <td>[[${item.signUpDate != null ? #temporals.format(item.signUpDate, 'dd/MM/yyyy') : ''}]]</td>
-                        <td class = "col-actions">
+                        <td class="col-actions">
                             <button type="button" class="btn-icon" th:attr="aria-label=|Ver ${item.userName}|,popovertarget=|ver-admin-${item.id}|"><img src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""></button>
                             
                             <button type="button" class="btn-icon" th:attr="aria-label=|Editar ${item.userName}|,popovertarget=|editar-admin-${item.id}|"><img src="../../static/icons/edit.svg" th:src="@{/icons/edit.svg}" alt=""></button>
