@@ -138,6 +138,15 @@ class DashboardPageTest {
     }
 
     @Test
+    void sidebarHighlightsOnlyTheDashboard() throws Exception {
+        String html = page("7", List.of());
+
+        assertTrue(html.matches("(?s).*<a href=\"/\"[^>]*title=\"Dashboard\"[^>]*aria-current=\"page\".*"), "o dashboard fica destacado");
+        assertTrue(html.split("aria-current=\"page\"", -1).length - 1 >= 1);
+        assertFalse(html.matches("(?s).*<a href=\"/users\"[^>]*aria-current=\"page\".*"), "as outras telas não");
+    }
+
+    @Test
     void periodSelectorMarksTheChosenPeriod() throws Exception {
         String html = page("30", List.of());
 
