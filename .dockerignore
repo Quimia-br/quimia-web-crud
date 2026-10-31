@@ -1,0 +1,9 @@
+# Fica fora da imagem: segredos, arquivos locais e o que o build recria
+.env
+.git
+.idea
+target
+uploads
+*.md
+CLAUDE.md
+.github
