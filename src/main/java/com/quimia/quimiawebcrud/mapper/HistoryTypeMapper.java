@@ -5,6 +5,9 @@ import com.quimia.quimiawebcrud.dto.HistoryTypeResponseDTO;
 import com.quimia.quimiawebcrud.model.HistoryType;
 import org.springframework.stereotype.Component;
 
+/**
+ * Converte tipo de histórico entre entidade e DTO.
+ */
 @Component
 public class HistoryTypeMapper implements Mapper<HistoryType, HistoryTypeRequestDTO, HistoryTypeResponseDTO> {
 

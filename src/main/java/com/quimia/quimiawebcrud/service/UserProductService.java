@@ -9,6 +9,9 @@ import com.quimia.quimiawebcrud.repository.UserProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Regras de produtos de usuários: somente leitura.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserProductService extends ReadService<UserProduct, UserProductId, UserProductResponseDTO> {

@@ -9,6 +9,9 @@ import com.quimia.quimiawebcrud.repository.ShelfProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Regras de produtos de estantes: somente leitura.
+ */
 @Service
 @RequiredArgsConstructor
 public class ShelfProductService extends ReadService<ShelfProduct, ShelfProductId, ShelfProductResponseDTO> {

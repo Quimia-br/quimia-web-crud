@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+/**
+ * Telas de usuários em {@code /users}: lista, detalhe, cadastro, edição e remoção.
+ */
 @Controller
 @RequestMapping("/users")
 @RequiredArgsConstructor

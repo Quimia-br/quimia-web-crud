@@ -1,8 +1,14 @@
 package com.quimia.quimiawebcrud.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Campos comuns a todas as respostas: o id do registro.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

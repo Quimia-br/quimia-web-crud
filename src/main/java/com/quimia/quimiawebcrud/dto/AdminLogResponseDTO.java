@@ -1,11 +1,17 @@
 package com.quimia.quimiawebcrud.dto;
 
 import com.quimia.quimiawebcrud.model.enums.AdminAction;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
+/**
+ * Dados de registro do log de edições que as telas mostram.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

@@ -7,6 +7,9 @@ import com.quimia.quimiawebcrud.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Regras de localizações: somente leitura.
+ */
 @Service
 @RequiredArgsConstructor
 public class LocationService extends ReadService<Location, Integer, LocationResponseDTO> {

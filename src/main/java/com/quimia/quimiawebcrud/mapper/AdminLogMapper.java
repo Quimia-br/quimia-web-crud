@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 
 import static com.quimia.quimiawebcrud.mapper.References.idOf;
 
+/**
+ * Converte registro do log de edições entre entidade e DTO.
+ */
 @Component
 public class AdminLogMapper implements ResponseMapper<AdminLog, AdminLogResponseDTO> {
 

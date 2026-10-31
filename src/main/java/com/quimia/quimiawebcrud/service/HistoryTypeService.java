@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Regras de tipos de histórico: validação, gravação, remoção e registro no log de edições.
+ */
 @Service
 @RequiredArgsConstructor
 public class HistoryTypeService extends CrudService<HistoryType, Integer, HistoryTypeRequestDTO, HistoryTypeResponseDTO> {

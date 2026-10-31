@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import static com.quimia.quimiawebcrud.mapper.References.idOf;
 import static com.quimia.quimiawebcrud.mapper.References.product;
 
+/**
+ * Converte descarte entre entidade e DTO.
+ */
 @Component
 public class DisposalMapper implements Mapper<Disposal, DisposalRequestDTO, DisposalResponseDTO> {
 

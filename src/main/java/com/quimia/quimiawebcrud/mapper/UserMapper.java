@@ -5,6 +5,9 @@ import com.quimia.quimiawebcrud.dto.UserResponseDTO;
 import com.quimia.quimiawebcrud.model.User;
 import org.springframework.stereotype.Component;
 
+/**
+ * Converte usuário entre entidade e DTO.
+ */
 @Component
 public class UserMapper implements Mapper<User, UserRequestDTO, UserResponseDTO> {
 

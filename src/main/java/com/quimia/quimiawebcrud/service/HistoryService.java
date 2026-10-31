@@ -7,6 +7,9 @@ import com.quimia.quimiawebcrud.repository.HistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Regras de históricos: somente leitura.
+ */
 @Service
 @RequiredArgsConstructor
 public class HistoryService extends ReadService<History, Integer, HistoryResponseDTO> {

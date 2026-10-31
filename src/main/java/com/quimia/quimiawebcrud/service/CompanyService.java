@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Regras de empresas: validação, gravação, remoção e registro no log de edições.
+ */
 @Service
 @RequiredArgsConstructor
 public class CompanyService extends CrudService<Company, Integer, CompanyRequestDTO, CompanyResponseDTO> {

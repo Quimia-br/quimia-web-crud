@@ -5,8 +5,11 @@ import com.quimia.quimiawebcrud.model.HistoryProduct;
 import com.quimia.quimiawebcrud.model.UserProduct;
 import org.springframework.stereotype.Component;
 
-import static com.quimia.quimiawebcrud.mapper.References.*;
+import static com.quimia.quimiawebcrud.mapper.References.idOf;
 
+/**
+ * Converte produto de um histórico entre entidade e DTO.
+ */
 @Component
 public class HistoryProductMapper implements ResponseMapper<HistoryProduct, HistoryProductResponseDTO> {
 

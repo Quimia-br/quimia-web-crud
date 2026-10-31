@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import static com.quimia.quimiawebcrud.mapper.References.company;
 import static com.quimia.quimiawebcrud.mapper.References.idOf;
 
+/**
+ * Converte produto entre entidade e DTO.
+ */
 @Component
 public class ProductMapper implements Mapper<Product, ProductRequestDTO, ProductResponseDTO> {
 

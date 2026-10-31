@@ -7,11 +7,18 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Past;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
+/**
+ * Dados que o formulário de usuário envia, já validados.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

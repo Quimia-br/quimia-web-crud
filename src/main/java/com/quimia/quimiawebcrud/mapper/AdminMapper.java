@@ -5,6 +5,9 @@ import com.quimia.quimiawebcrud.dto.AdminResponseDTO;
 import com.quimia.quimiawebcrud.model.Admin;
 import org.springframework.stereotype.Component;
 
+/**
+ * Converte administrador entre entidade e DTO.
+ */
 @Component
 public class AdminMapper implements Mapper<Admin, AdminRequestDTO, AdminResponseDTO> {
 
