@@ -1,6 +1,7 @@
 package com.quimia.quimiawebcrud.controller;
 
 import com.quimia.quimiawebcrud.exception.BusinessException;
+import com.quimia.quimiawebcrud.exception.ResourceNotFoundException;
 import com.quimia.quimiawebcrud.model.BaseEntity;
 import com.quimia.quimiawebcrud.service.CrudService;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -50,37 +52,26 @@ public abstract class GenericController<T extends BaseEntity, ID, Res, Req> exte
             redirect.addFlashAttribute("error", describe(validation));
             return redirectToList();
         }
-        try {
-            if (id == null) {
-                getService().create(request);
-                redirect.addFlashAttribute("message", "Registro criado com sucesso.");
-            } else {
-                getService().update(id, request);
-                redirect.addFlashAttribute("message", "Registro atualizado com sucesso.");
-            }
-        } catch (BusinessException e) {
-            redirect.addFlashAttribute("error", e.getMessage());
-        } catch (DataIntegrityViolationException e) {
-            log.warn("Violação de integridade ao salvar em {}", getBasePath(), e);
-            redirect.addFlashAttribute("error",
-                    "Não foi possível salvar: já existe um registro com esses dados ou algum dado relacionado é inválido.");
-        }
-        return redirectToList();
+        return attempt(redirect, "salvar",
+                "Não foi possível salvar: já existe um registro com esses dados ou algum dado relacionado é inválido.",
+                () -> {
+                    if (id == null) {
+                        getService().create(request);
+                        return "Registro criado com sucesso.";
+                    }
+                    getService().update(id, request);
+                    return "Registro atualizado com sucesso.";
+                });
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable("id") ID id, RedirectAttributes redirect) {
-        try {
-            getService().delete(id);
-            redirect.addFlashAttribute("message", "Registro excluído com sucesso.");
-        } catch (BusinessException e) {
-            redirect.addFlashAttribute("error", e.getMessage());
-        } catch (DataIntegrityViolationException e) {
-            log.warn("Violação de integridade ao excluir em {}", getBasePath(), e);
-            redirect.addFlashAttribute("error",
-                    "Não foi possível excluir: este registro está em uso por outros dados.");
-        }
-        return redirectToList();
+        return attempt(redirect, "excluir",
+                "Não foi possível excluir: este registro está em uso por outros dados.",
+                () -> {
+                    getService().delete(id);
+                    return "Registro excluído com sucesso.";
+                });
     }
 
     /**
@@ -103,21 +94,10 @@ public abstract class GenericController<T extends BaseEntity, ID, Res, Req> exte
             redirect.addFlashAttribute("error", "O valor informado é muito longo.");
             return redirectToList();
         }
-        try {
-            int updated = getService().updateByColumn(filterColumn, filterValue, Map.of(changeColumn, newValue));
-            if (updated == 0) {
-                redirect.addFlashAttribute("error", "Nenhum registro encontrado com esse valor.");
-            } else {
-                redirect.addFlashAttribute("message", count(updated, "atualizado"));
-            }
-        } catch (BusinessException e) {
-            redirect.addFlashAttribute("error", e.getMessage());
-        } catch (DataIntegrityViolationException e) {
-            log.warn("Violação de integridade ao atualizar por coluna em {}", getBasePath(), e);
-            redirect.addFlashAttribute("error",
-                    "Não foi possível atualizar: o novo valor não é aceito (tamanho, tipo ou registro relacionado inexistente).");
-        }
-        return redirectToList();
+        return attempt(redirect, "atualizar por coluna",
+                "Não foi possível atualizar: o novo valor não é aceito (tamanho, tipo ou registro relacionado inexistente).",
+                () -> affectedMessage(getService().updateByColumn(filterColumn, filterValue, Map.of(changeColumn, newValue)),
+                        "atualizado"));
     }
 
     @PostMapping("/delete-by")
@@ -132,21 +112,9 @@ public abstract class GenericController<T extends BaseEntity, ID, Res, Req> exte
             redirect.addFlashAttribute("error", "O valor informado é muito longo.");
             return redirectToList();
         }
-        try {
-            int deleted = getService().deleteByColumn(filterColumn, filterValue);
-            if (deleted == 0) {
-                redirect.addFlashAttribute("error", "Nenhum registro encontrado com esse valor.");
-            } else {
-                redirect.addFlashAttribute("message", count(deleted, "excluído"));
-            }
-        } catch (BusinessException e) {
-            redirect.addFlashAttribute("error", e.getMessage());
-        } catch (DataIntegrityViolationException e) {
-            log.warn("Violação de integridade ao excluir por coluna em {}", getBasePath(), e);
-            redirect.addFlashAttribute("error",
-                    "Não foi possível excluir: algum dos registros está em uso por outros dados.");
-        }
-        return redirectToList();
+        return attempt(redirect, "excluir por coluna",
+                "Não foi possível excluir: algum dos registros está em uso por outros dados.",
+                () -> affectedMessage(getService().deleteByColumn(filterColumn, filterValue), "excluído"));
     }
 
     /** Só vale uma coluna que a tela oferece (e, para alterar, uma que aceita novo valor): o nome vai para o SQL. */
@@ -155,7 +123,27 @@ public abstract class GenericController<T extends BaseEntity, ID, Res, Req> exte
                 .anyMatch(field -> field.getColumn().equals(column) && (!mustBeUpdatable || field.isUpdatable()));
     }
 
-    private static String count(int records, String action) {
+    /**
+     * Roda a ação e guarda o resultado como aviso da próxima tela: a mensagem de sucesso que a ação devolve, o texto
+     * da regra de negócio que ela quebrou ou, se o banco recusar, a mensagem amigável recebida.
+     */
+    private String attempt(RedirectAttributes redirect, String what, String integrityMessage, Supplier<String> action) {
+        try {
+            redirect.addFlashAttribute("message", action.get());
+        } catch (BusinessException e) {
+            redirect.addFlashAttribute("error", e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            log.warn("Violação de integridade ao {} em {}", what, getBasePath(), e);
+            redirect.addFlashAttribute("error", integrityMessage);
+        }
+        return redirectToList();
+    }
+
+    /** "3 registros excluídos com sucesso."; zero registros não é sucesso, vira o aviso de que nada foi encontrado. */
+    private static String affectedMessage(int records, String action) {
+        if (records == 0) {
+            throw new ResourceNotFoundException("Nenhum registro encontrado com esse valor.");
+        }
         return records == 1 ? "1 registro " + action + " com sucesso." : records + " registros " + action + "s com sucesso.";
     }
 
