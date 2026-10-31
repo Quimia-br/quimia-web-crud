@@ -1,3 +1,4 @@
+/* Botão "Fixar menu": lembra no navegador (localStorage) se a barra lateral fica aberta. */
 (function () {
   'use strict';
 

@@ -61,7 +61,7 @@
   height: 34px;
   border-radius: 50%;
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   font-weight: 700;
 }
 
@@ -101,7 +101,7 @@
 
 .period-nav a[aria-current="true"] {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
 }
 
 /* ---------- Cartões de números ---------- */
@@ -176,8 +176,8 @@
 
 .card.kpi-highlight {
   border-color: transparent;
-  background: linear-gradient(135deg, #12343A 0%, #0F6B78 100%);
-  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  color: var(--color-on-primary);
 }
 
 .kpi-highlight .kpi-head h2,
@@ -188,7 +188,7 @@
 
 .kpi-highlight .kpi-link {
   background: rgba(255, 255, 255, 0.16);
-  color: #fff;
+  color: var(--color-on-primary);
 }
 
 .kpi-highlight .kpi-link:hover {
@@ -247,7 +247,7 @@
 .kpi-highlight .trend-down,
 .kpi-highlight .trend-flat {
   background: rgba(255, 255, 255, 0.18);
-  color: #fff;
+  color: var(--color-on-primary);
 }
 
 /* ---------- Grade dos cartões grandes ---------- */
