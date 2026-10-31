@@ -5,6 +5,9 @@ import com.quimia.quimiawebcrud.dto.CompanyResponseDTO;
 import com.quimia.quimiawebcrud.model.Company;
 import org.springframework.stereotype.Component;
 
+/**
+ * Converte empresa entre entidade e DTO.
+ */
 @Component
 public class CompanyMapper implements Mapper<Company, CompanyRequestDTO, CompanyResponseDTO> {
 

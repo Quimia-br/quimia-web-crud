@@ -26,6 +26,7 @@ public class PhotoController {
 
     private final PhotoStorageService photoStorage;
 
+    /** Devolve a foto pelo nome do arquivo; 404 se não for um arquivo criado pelo sistema. */
     @GetMapping("/{fileName}")
     public ResponseEntity<Resource> photo(@PathVariable String fileName) {
         return photoStorage.find(fileName)

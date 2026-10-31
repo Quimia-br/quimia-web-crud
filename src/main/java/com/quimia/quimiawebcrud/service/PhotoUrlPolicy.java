@@ -16,6 +16,7 @@ public class PhotoUrlPolicy {
             "^(https?://[^\\s\"'<>\\\\]{1,2000}|/uploads/photos/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(png|jpg))$",
             Pattern.CASE_INSENSITIVE);
 
+    /** Verdadeiro se o endereço pode ser usado como src de imagem. */
     public boolean isSafe(String url) {
         return url != null && SAFE.matcher(url).matches();
     }

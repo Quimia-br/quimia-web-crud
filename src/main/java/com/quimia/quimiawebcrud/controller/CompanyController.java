@@ -16,10 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+/**
+ * Telas de empresas em {@code /companies}: lista, detalhe, cadastro, edição e remoção.
+ */
 @Controller
 @RequestMapping("/companies")
 @RequiredArgsConstructor
-public class CompanyController extends GenericController<Company, Integer, CompanyResponseDTO, CompanyRequestDTO> {
+public class CompanyController extends GenericController<Company, Integer, CompanyRequestDTO, CompanyResponseDTO> {
 
     private final CompanyService companyService;
 

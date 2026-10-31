@@ -15,10 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+/**
+ * Telas de produtos em {@code /products}: lista, detalhe, cadastro, edição e remoção.
+ */
 @Controller
 @RequestMapping("/products")
 @RequiredArgsConstructor
-public class ProductController extends GenericController<Product, Integer, ProductResponseDTO, ProductRequestDTO> {
+public class ProductController extends GenericController<Product, Integer, ProductRequestDTO, ProductResponseDTO> {
 
     private final ProductService productService;
     private final CompanyService companyService;

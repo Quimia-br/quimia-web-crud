@@ -4,6 +4,9 @@ import com.quimia.quimiawebcrud.dto.ShelfProductResponseDTO;
 import com.quimia.quimiawebcrud.model.ShelfProduct;
 import org.springframework.stereotype.Component;
 
+/**
+ * Converte produto de uma estante entre entidade e DTO.
+ */
 @Component
 public class ShelfProductMapper implements ResponseMapper<ShelfProduct, ShelfProductResponseDTO> {
 

@@ -2,12 +2,25 @@ package com.quimia.quimiawebcrud.model;
 
 import com.quimia.quimiawebcrud.model.enums.CompanySize;
 import com.quimia.quimiawebcrud.model.enums.Status;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
+/**
+ * Empresa fabricante dos produtos (tabela {@code usuarios_empresas}), identificada pelo CNPJ.
+ */
 @Entity
 @Table(name = "usuarios_empresas")
 @AttributeOverride(name = "id", column = @Column(name = "id_usuario_empresa"))
@@ -16,7 +29,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter
 @Getter
-public class Company extends Model {
+public class Company extends BaseEntity {
 
     @Column(name = "cnpj", nullable = false, unique = true, length = 14)
     private String cnpj;

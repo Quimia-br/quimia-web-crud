@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.mapper.Mapper;
-import com.quimia.quimiawebcrud.model.Model;
+import com.quimia.quimiawebcrud.model.BaseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -12,13 +12,15 @@ import java.util.Map;
  * ({@link #validate}) e registrada no log de edições; a exclusão fica a cargo de cada tabela,
  * que apaga junto o que depende do registro (ver {@link RecordRemovalService}).
  */
-public abstract class CrudService<E extends Model, ID, Req, Res> extends ReadService<E, ID, Res> {
+public abstract class CrudService<E extends BaseEntity, ID, Req, Res> extends ReadService<E, ID, Res> {
 
     @Override
     protected abstract Mapper<E, Req, Res> getMapper();
 
+    /** O registrador do log de edições usado em toda criação e edição. */
     protected abstract EditLog getEditLog();
 
+    /** Valida, grava o registro novo e o anota no log de edições. */
     @Transactional
     public Res create(Req request) {
         validate(request, null);
@@ -27,6 +29,7 @@ public abstract class CrudService<E extends Model, ID, Req, Res> extends ReadSer
         return getMapper().toResponse(entity);
     }
 
+    /** Valida, aplica as mudanças e anota no log o resumo do registro antes da edição. */
     @Transactional
     public Res update(ID id, Req request) {
         E entity = getEntity(id);
@@ -37,6 +40,7 @@ public abstract class CrudService<E extends Model, ID, Req, Res> extends ReadSer
         return getMapper().toResponse(entity);
     }
 
+    /** Exclui o registro. Cada tabela apaga junto o que depende dele e guarda a cópia no log. */
     public abstract void delete(ID id);
 
     /**
@@ -80,10 +84,12 @@ public abstract class CrudService<E extends Model, ID, Req, Res> extends ReadSer
     protected void validate(Req request, ID id) {
     }
 
+    /** Monta a entidade nova a partir do formulário; as tabelas com senha ou foto sobrescrevem. */
     protected E newEntity(Req request) {
         return getMapper().toEntity(request);
     }
 
+    /** Aplica o formulário numa entidade existente; as tabelas com senha ou foto sobrescrevem. */
     protected void applyChanges(E entity, Req request) {
         getMapper().updateEntity(entity, request);
     }

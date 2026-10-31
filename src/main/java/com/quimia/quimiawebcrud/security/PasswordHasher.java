@@ -14,6 +14,7 @@ public class PasswordHasher implements PasswordEncoder {
 
     private final Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
+    /** Gera o hash Argon2id da senha, já com sal e parâmetros embutidos. */
     public String hash(String rawPassword) {
         return encode(rawPassword);
     }

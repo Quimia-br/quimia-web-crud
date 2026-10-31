@@ -7,6 +7,9 @@ import com.quimia.quimiawebcrud.repository.ShelfRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Regras de estantes: somente leitura.
+ */
 @Service
 @RequiredArgsConstructor
 public class ShelfService extends ReadService<Shelf, Integer, ShelfResponseDTO> {

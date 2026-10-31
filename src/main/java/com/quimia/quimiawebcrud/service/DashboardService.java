@@ -64,72 +64,27 @@ public class DashboardService {
         return PERIODS.contains(requested) ? requested : DEFAULT_PERIOD;
     }
 
+    /** Lê a view e monta a tela inicial para o período pedido (7, 30 ou 90 dias). */
     public DashboardDTO build(int requestedPeriod) {
         int period = normalizePeriod(requestedPeriod);
         LocalDate today = LocalDate.now(clock);
-        List<Row> rows = read();
+        Sections view = Sections.from(read());
 
-        long users = 0;
-        long companies = 0;
-        long products = 0;
-        long alerts = 0;
-        LocalDateTime updatedAt = null;
-        List<AlertItem> alertItems = new ArrayList<>();
-        List<ActivityItem> activities = new ArrayList<>();
-        Map<LocalDate, Long> usageByDay = new HashMap<>();
-        Map<LocalDate, Long> userSignupsByDay = new HashMap<>();
-        Map<LocalDate, Long> companySignupsByDay = new HashMap<>();
-        Map<YearMonth, Long> userSignupsByMonth = new HashMap<>();
-        Map<YearMonth, Long> companySignupsByMonth = new HashMap<>();
-        Map<String, Long> productUses = new LinkedHashMap<>();
-        Map<String, Long> queryCounts = new LinkedHashMap<>();
-
-        for (Row row : rows) {
-            if (updatedAt == null) {
-                updatedAt = row.updatedAt();
-            }
-            switch (row.section() == null ? "" : row.section()) {
-                case DashboardRepository.TOTALS -> {
-                    users = orZero(row.users());
-                    companies = orZero(row.companies());
-                    products = orZero(row.products());
-                    alerts = orZero(row.alerts());
-                }
-                case DashboardRepository.ALERT -> alertItems.add(alertOf(row.alert()));
-                case DashboardRepository.ACTIVITY -> activities.add(new ActivityItem(
-                        row.admin() + " " + verb(row.action()) + " um registro em " + row.affectedTable(), row.editDate()));
-                case DashboardRepository.USAGE_ACTIVITY -> activities.add(new ActivityItem(
-                        row.admin() + " registrou: " + row.queryType(), row.editDate()));
-                case DashboardRepository.USAGE_DAY -> addDay(usageByDay, row);
-                case DashboardRepository.USER_SIGNUP_DAY -> addDay(userSignupsByDay, row);
-                case DashboardRepository.COMPANY_SIGNUP_DAY -> addDay(companySignupsByDay, row);
-                case DashboardRepository.USER_SIGNUP_MONTH -> addMonth(userSignupsByMonth, row);
-                case DashboardRepository.COMPANY_SIGNUP_MONTH -> addMonth(companySignupsByMonth, row);
-                case DashboardRepository.PRODUCT ->
-                        productUses.merge(row.productName(), orZero(row.productUses()), Long::sum);
-                case DashboardRepository.QUERY_TYPE ->
-                        queryCounts.merge(row.queryType(), orZero(row.queryCount()), Long::sum);
-                default -> log.warn("Seção desconhecida na mv_dashboard: {}", row.section());
-            }
-        }
-
-        LineChart activity = ActivityChart.build(usageByDay, usageByDay, today, period);
+        LineChart activity = ActivityChart.build(view.usageByDay, view.usageByDay, today, period);
         List<Kpi> kpis = List.of(
-                signupsKpi("Usuários", users, userSignupsByDay, today, period, "/users", true),
-                signupsKpi("Empresas", companies, companySignupsByDay, today, period, "/companies", false),
+                signupsKpi("Usuários", view.users, view.userSignupsByDay, today, period, "/users", true),
+                signupsKpi("Empresas", view.companies, view.companySignupsByDay, today, period, "/companies", false),
                 new Kpi("Consultas", activity.getCurrentTotal(), "registros de uso nos últimos " + period + " dias",
                         activity.getTrendText(), activity.getTrend(), false, "/histories"),
-                new Kpi("Alertas", alerts, "contas pendentes ou bloqueadas", null, Trend.FLAT, false, null));
+                new Kpi("Alertas", view.alerts, "contas pendentes ou bloqueadas", null, Trend.FLAT, false, null));
 
-        activities.sort(Comparator.comparing(ActivityItem::getDate, Comparator.nullsLast(Comparator.reverseOrder())));
-
-        return new DashboardDTO(todayLabel(today), updatedAt, period, users, companies, products, alerts,
+        return new DashboardDTO(todayLabel(today), view.updatedAt, period, view.users, view.companies, view.products, view.alerts,
                 activity.getCurrentTotal(), kpis, activity,
-                DonutChart.build(queryCounts),
-                SignupsChart.build(userSignupsByMonth, companySignupsByMonth, YearMonth.from(today)),
-                activities.stream().limit(ACTIVITY_SIZE).toList(),
-                alertItems.stream().limit(LIST_SIZE).toList(),
-                ranking(productUses));
+                DonutChart.build(view.queryCounts),
+                SignupsChart.build(view.userSignupsByMonth, view.companySignupsByMonth, YearMonth.from(today)),
+                view.recentActivities(),
+                view.alertItems.stream().limit(LIST_SIZE).toList(),
+                ranking(view.productUses));
     }
 
     /**
@@ -245,5 +200,69 @@ public class DashboardService {
         return sorted.stream()
                 .map(entry -> new RankItem(entry.getKey(), entry.getValue(), (int) Math.round(entry.getValue() * 100.0 / highest)))
                 .toList();
+    }
+
+    /**
+     * Cada seção da view separada em sua própria coleção. A view devolve tudo numa tabela só, com uma coluna
+     * dizendo de que lista a linha faz parte; o {@code switch} em {@link #add} faz essa separação.
+     */
+    private static final class Sections {
+        long users;
+        long companies;
+        long products;
+        long alerts;
+        LocalDateTime updatedAt;
+        final List<AlertItem> alertItems = new ArrayList<>();
+        final List<ActivityItem> activities = new ArrayList<>();
+        final Map<LocalDate, Long> usageByDay = new HashMap<>();
+        final Map<LocalDate, Long> userSignupsByDay = new HashMap<>();
+        final Map<LocalDate, Long> companySignupsByDay = new HashMap<>();
+        final Map<YearMonth, Long> userSignupsByMonth = new HashMap<>();
+        final Map<YearMonth, Long> companySignupsByMonth = new HashMap<>();
+        final Map<String, Long> productUses = new LinkedHashMap<>();
+        final Map<String, Long> queryCounts = new LinkedHashMap<>();
+
+        static Sections from(List<Row> rows) {
+            Sections sections = new Sections();
+            rows.forEach(sections::add);
+            return sections;
+        }
+
+        /** As atividades mais recentes primeiro, só as que cabem na tela. */
+        List<ActivityItem> recentActivities() {
+            return activities.stream()
+                    .sorted(Comparator.comparing(ActivityItem::getDate, Comparator.nullsLast(Comparator.reverseOrder())))
+                    .limit(ACTIVITY_SIZE)
+                    .toList();
+        }
+
+        private void add(Row row) {
+            if (updatedAt == null) {
+                updatedAt = row.updatedAt();
+            }
+            switch (row.section() == null ? "" : row.section()) {
+                case DashboardRepository.TOTALS -> {
+                    users = orZero(row.users());
+                    companies = orZero(row.companies());
+                    products = orZero(row.products());
+                    alerts = orZero(row.alerts());
+                }
+                case DashboardRepository.ALERT -> alertItems.add(alertOf(row.alert()));
+                case DashboardRepository.ACTIVITY -> activities.add(new ActivityItem(
+                        row.admin() + " " + verb(row.action()) + " um registro em " + row.affectedTable(), row.editDate()));
+                case DashboardRepository.USAGE_ACTIVITY -> activities.add(new ActivityItem(
+                        row.admin() + " registrou: " + row.queryType(), row.editDate()));
+                case DashboardRepository.USAGE_DAY -> addDay(usageByDay, row);
+                case DashboardRepository.USER_SIGNUP_DAY -> addDay(userSignupsByDay, row);
+                case DashboardRepository.COMPANY_SIGNUP_DAY -> addDay(companySignupsByDay, row);
+                case DashboardRepository.USER_SIGNUP_MONTH -> addMonth(userSignupsByMonth, row);
+                case DashboardRepository.COMPANY_SIGNUP_MONTH -> addMonth(companySignupsByMonth, row);
+                case DashboardRepository.PRODUCT ->
+                        productUses.merge(row.productName(), orZero(row.productUses()), Long::sum);
+                case DashboardRepository.QUERY_TYPE ->
+                        queryCounts.merge(row.queryType(), orZero(row.queryCount()), Long::sum);
+                default -> log.warn("Seção desconhecida na mv_dashboard: {}", row.section());
+            }
+        }
     }
 }

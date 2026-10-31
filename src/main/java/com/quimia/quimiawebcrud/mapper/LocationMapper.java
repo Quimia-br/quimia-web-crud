@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import static com.quimia.quimiawebcrud.mapper.References.idOf;
 
+/**
+ * Converte localização entre entidade e DTO.
+ */
 @Component
 public class LocationMapper implements ResponseMapper<Location, LocationResponseDTO> {
 

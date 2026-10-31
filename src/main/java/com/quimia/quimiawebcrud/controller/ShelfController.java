@@ -1,6 +1,5 @@
 package com.quimia.quimiawebcrud.controller;
 
-import com.quimia.quimiawebcrud.dto.ProductResponseDTO;
 import com.quimia.quimiawebcrud.dto.ShelfProductResponseDTO;
 import com.quimia.quimiawebcrud.dto.ShelfResponseDTO;
 import com.quimia.quimiawebcrud.service.ProductService;

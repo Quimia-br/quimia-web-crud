@@ -15,12 +15,16 @@ public abstract class ListController<Res> {
 
     private static final int PAGE_SIZE = 10;
 
+    /** Todos os registros da tela, antes dos filtros e da paginação. */
     protected abstract List<Res> readAll();
 
+    /** Rota da tela, usada nos links de paginação e nos redirecionamentos (ex.: "/users"). */
     protected abstract String getBasePath();
 
+    /** Pasta do template da tela em templates/ (ex.: "user" para user/list.html). */
     protected abstract String getViewFolder();
 
+    /** Nome com que a lista da página vai no Model (ex.: "users"). */
     protected abstract String getPluralName();
 
     /**
@@ -43,6 +47,7 @@ public abstract class ListController<Res> {
         return List.of();
     }
 
+    /** Abre a lista: filtra pelo Predicate da tela, recorta a página pedida e entrega tudo ao template. */
     @GetMapping
     public String list(@RequestParam Map<String, String> params, Model model) {
         addListAttributes(model);

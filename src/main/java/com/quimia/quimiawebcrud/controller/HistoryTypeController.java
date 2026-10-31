@@ -14,10 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+/**
+ * Telas de tipos de histórico em {@code /history-types}: lista, detalhe, cadastro, edição e remoção.
+ */
 @Controller
 @RequestMapping("/history-types")
 @RequiredArgsConstructor
-public class HistoryTypeController extends GenericController<HistoryType, Integer, HistoryTypeResponseDTO, HistoryTypeRequestDTO> {
+public class HistoryTypeController extends GenericController<HistoryType, Integer, HistoryTypeRequestDTO, HistoryTypeResponseDTO> {
 
     private final HistoryTypeService historyTypeService;
 

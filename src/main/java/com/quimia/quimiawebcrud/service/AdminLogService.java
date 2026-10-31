@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Regras de registros do log de edições: somente leitura.
+ */
 @Service
 @RequiredArgsConstructor
 public class AdminLogService extends ReadService<AdminLog, Integer, AdminLogResponseDTO> {
@@ -32,6 +35,7 @@ public class AdminLogService extends ReadService<AdminLog, Integer, AdminLogResp
         return mapper;
     }
 
+    /** Todo o log, do registro mais novo para o mais antigo. */
     public List<AdminLogResponseDTO> readAllNewestFirst() {
         List<AdminLogResponseDTO> logs = readAll();
         logs.sort(Comparator.comparing(AdminLogResponseDTO::getEditDate,

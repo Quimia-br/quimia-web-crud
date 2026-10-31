@@ -7,8 +7,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static com.quimia.quimiawebcrud.mapper.References.*;
+import static com.quimia.quimiawebcrud.mapper.References.idOf;
 
+/**
+ * Converte histórico entre entidade e DTO.
+ */
 @Component
 public class HistoryMapper implements ResponseMapper<History, HistoryResponseDTO> {
 

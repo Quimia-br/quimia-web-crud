@@ -15,10 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+/**
+ * Telas de administradores em {@code /admins}: lista, detalhe, cadastro, edição e remoção.
+ */
 @Controller
 @RequestMapping("/admins")
 @RequiredArgsConstructor
-public class AdminController extends GenericController<Admin, Integer, AdminResponseDTO, AdminRequestDTO> {
+public class AdminController extends GenericController<Admin, Integer, AdminRequestDTO, AdminResponseDTO> {
 
     private final AdminService adminService;
 

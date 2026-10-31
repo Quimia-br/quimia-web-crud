@@ -17,10 +17,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+/**
+ * Telas de descartes em {@code /disposals}: lista, detalhe, cadastro, edição e remoção.
+ */
 @Controller
 @RequestMapping("/disposals")
 @RequiredArgsConstructor
-public class DisposalController extends GenericController<Disposal, Integer, DisposalResponseDTO, DisposalRequestDTO> {
+public class DisposalController extends GenericController<Disposal, Integer, DisposalRequestDTO, DisposalResponseDTO> {
 
     private final DisposalService disposalService;
     private final ProductService productService;

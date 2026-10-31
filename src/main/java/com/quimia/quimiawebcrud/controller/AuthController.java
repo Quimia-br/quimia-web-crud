@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class AuthController {
 
+    /** Mostra a tela de login; quem já está autenticado vai direto para o painel. */
     @GetMapping("/login")
     public String login(Authentication authentication) {
         boolean loggedIn = authentication != null && authentication.isAuthenticated()

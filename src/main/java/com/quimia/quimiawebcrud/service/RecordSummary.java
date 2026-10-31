@@ -4,7 +4,7 @@ import com.quimia.quimiawebcrud.model.Admin;
 import com.quimia.quimiawebcrud.model.Company;
 import com.quimia.quimiawebcrud.model.Disposal;
 import com.quimia.quimiawebcrud.model.HistoryType;
-import com.quimia.quimiawebcrud.model.Model;
+import com.quimia.quimiawebcrud.model.BaseEntity;
 import com.quimia.quimiawebcrud.model.Product;
 import com.quimia.quimiawebcrud.model.User;
 
@@ -19,11 +19,11 @@ final class RecordSummary {
     private RecordSummary() {
     }
 
-    static String of(Model record) {
+    static String of(BaseEntity record) {
         return String.join("\n", fields(record));
     }
 
-    static List<String> fields(Model record) {
+    static List<String> fields(BaseEntity record) {
         return switch (record) {
             case User user -> List.of(
                     field("Nome", user.getUserName()), field("E-mail", user.getEmail()), field("Status", user.getStatus()),

@@ -129,8 +129,21 @@ class DashboardPageTest {
         String html = page("7", List.of());
 
         assertFalse(html.contains(" style="), "estilos ficam no arquivo CSS, não na página");
-        assertFalse(html.contains("<script"), "o dashboard não usa JavaScript");
+        String[] afterEachScriptTag = html.split("<script", -1);   // o item 0 é o que vem antes do primeiro <script
+        for (int i = 1; i < afterEachScriptTag.length; i++) {
+            String tag = afterEachScriptTag[i].substring(0, afterEachScriptTag[i].indexOf('>'));
+            assertTrue(tag.contains(" src="), "só arquivos .js próprios são permitidos (script-src 'self'), nunca script dentro da página");
+        }
         assertFalse(html.contains("onclick=") || html.contains("onload="));
+    }
+
+    @Test
+    void sidebarHighlightsOnlyTheDashboard() throws Exception {
+        String html = page("7", List.of());
+
+        assertTrue(html.matches("(?s).*<a href=\"/\"[^>]*title=\"Dashboard\"[^>]*aria-current=\"page\".*"), "o dashboard fica destacado");
+        assertTrue(html.split("aria-current=\"page\"", -1).length - 1 >= 1);
+        assertFalse(html.matches("(?s).*<a href=\"/users\"[^>]*aria-current=\"page\".*"), "as outras telas não");
     }
 
     @Test

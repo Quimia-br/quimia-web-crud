@@ -34,10 +34,12 @@ public class PageResult<T> {
         return new PageResult<>(new ArrayList<>(all.subList(from, to)), number, totalPages);
     }
 
+    /** Existe uma página antes desta? */
     public boolean hasPrevious() {
         return number > 1;
     }
 
+    /** Existe uma página depois desta? */
     public boolean hasNext() {
         return number < totalPages;
     }
