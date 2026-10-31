@@ -19,10 +19,12 @@ public class EditLog {
     private final CurrentAdmin currentAdmin;
     private final AdminLogRepository logs;
 
+    /** Anota que o administrador logado criou o registro. */
     public void created(BaseEntity record) {
         save(record, AdminAction.INSERT, null);
     }
 
+    /** Anota que o administrador logado editou o registro, guardando o resumo de como era antes. */
     public void updated(BaseEntity record, String before) {
         save(record, AdminAction.UPDATE, before);
     }

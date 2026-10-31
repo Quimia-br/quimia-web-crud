@@ -35,6 +35,7 @@ public class AdminLogService extends ReadService<AdminLog, Integer, AdminLogResp
         return mapper;
     }
 
+    /** Todo o log, do registro mais novo para o mais antigo. */
     public List<AdminLogResponseDTO> readAllNewestFirst() {
         List<AdminLogResponseDTO> logs = readAll();
         logs.sort(Comparator.comparing(AdminLogResponseDTO::getEditDate,

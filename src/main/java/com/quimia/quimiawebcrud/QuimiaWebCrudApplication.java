@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class QuimiaWebCrudApplication {
 
+    /** Sobe o servidor e cria todos os beans do Spring. */
     public static void main(String[] args) {
         SpringApplication.run(QuimiaWebCrudApplication.class, args);
     }

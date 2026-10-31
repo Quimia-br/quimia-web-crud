@@ -47,6 +47,9 @@ public class RecordRestoreService {
     private final AdminLogRepository logs;
     private final AdminLogService adminLogService;
 
+    /**
+     * Restaura a exclusão registrada no log: reinsere o registro e o que foi apagado junto, e anota a restauração.
+     */
     @Transactional
     public void restore(Integer logId) {
         Admin author = currentAdmin.require();

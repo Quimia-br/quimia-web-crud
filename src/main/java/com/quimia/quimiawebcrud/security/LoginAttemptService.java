@@ -27,6 +27,9 @@ public class LoginAttemptService {
 
     private final Map<String, Attempts> attempts = new ConcurrentHashMap<>();
 
+    /**
+     * A conta está bloqueada por erros seguidos de senha? Passado o tempo de bloqueio, o contador é zerado.
+     */
     public boolean isBlocked(String email) {
         Attempts current = attempts.get(key(email));
         if (current == null) {
@@ -39,6 +42,7 @@ public class LoginAttemptService {
         return current.failures() >= MAX_FAILURES;
     }
 
+    /** Soma um erro de senha para o e-mail (o Spring Security publica o evento a cada falha de login). */
     @EventListener
     public void onFailure(AuthenticationFailureBadCredentialsEvent event) {
         String key = key(event.getAuthentication().getName());
@@ -52,6 +56,7 @@ public class LoginAttemptService {
                 (old, fresh) -> isExpired(old) ? fresh : new Attempts(old.failures() + 1, fresh.lastFailure()));
     }
 
+    /** Login correto: zera os erros do e-mail. */
     @EventListener
     public void onSuccess(AuthenticationSuccessEvent event) {
         attempts.remove(key(event.getAuthentication().getName()));

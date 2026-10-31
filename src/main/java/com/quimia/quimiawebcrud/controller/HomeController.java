@@ -21,6 +21,9 @@ public class HomeController {
     private final DashboardService dashboardService;
     private final CurrentAdmin currentAdmin;
 
+    /**
+     * Tela inicial: monta o dashboard do período pedido (7, 30 ou 90 dias) com a saudação ao administrador logado.
+     */
     @GetMapping("/")
     public String home(@RequestParam(name = "periodo", defaultValue = "7") int period, Model model) {
         String name = currentAdmin.require().getUserName();

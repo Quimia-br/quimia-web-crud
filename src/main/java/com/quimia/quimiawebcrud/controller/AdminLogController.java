@@ -73,6 +73,7 @@ public class AdminLogController extends ListController<AdminLogResponseDTO> {
         };
     }
 
+    /** Restaura a exclusão da linha do log e volta para a lista com o resultado como aviso. */
     @PostMapping("/{id}/restore")
     public String restore(@PathVariable("id") Integer id, RedirectAttributes redirect) {
         try {

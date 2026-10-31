@@ -25,16 +25,19 @@ public class GlobalExceptionHandler {
 
     private static final String ERROR_VIEW = "error";
 
+    /** Registro inexistente: 404 com a mensagem da própria exceção. */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ModelAndView handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
+    /** Registro repetido (e-mail, CNPJ, CAS...): 409 com a mensagem da exceção. */
     @ExceptionHandler(DuplicateResourceException.class)
     public ModelAndView handleDuplicate(DuplicateResourceException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
+    /** Dado que quebra uma regra de negócio: 400 com a mensagem da exceção. */
     @ExceptionHandler(InvalidDataException.class)
     public ModelAndView handleInvalidData(InvalidDataException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
@@ -56,11 +59,13 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.PAYLOAD_TOO_LARGE, "A foto deve ter no máximo 2 MB.", request);
     }
 
+    /** Parâmetro de URL com tipo errado (ex.: id que não é número): 400 com mensagem genérica. */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ModelAndView handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, "O valor informado na URL é inválido.", request);
     }
 
+    /** O banco recusou a operação (registro em uso, valor repetido): 409 com mensagem amigável. */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ModelAndView handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest request) {
         log.warn("Violação de integridade em {}: {}", request.getRequestURI(), ex.getMostSpecificCause().getMessage());
@@ -68,6 +73,7 @@ public class GlobalExceptionHandler {
                 "A operação não pôde ser concluída: o registro está em uso por outros dados ou já existe.", request);
     }
 
+    /** Os números do dashboard não puderam ser lidos: 503 com o motivo. */
     @ExceptionHandler(DashboardUnavailableException.class)
     public ModelAndView handleDashboardUnavailable(DashboardUnavailableException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request);

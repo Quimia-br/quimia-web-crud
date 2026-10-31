@@ -80,6 +80,7 @@ public abstract class GenericController<T extends BaseEntity, ID, Res, Req> exte
     @Override
     protected abstract List<ColumnField> getColumnFields();
 
+    /** Popup "Atualizar por...": altera uma coluna em todos os registros que têm o valor filtrado. */
     @PostMapping("/update-by")
     public String updateBy(@RequestParam("filterColumn") String filterColumn,
                            @RequestParam(name = "filterValue", defaultValue = "") String filterValue,
@@ -100,6 +101,7 @@ public abstract class GenericController<T extends BaseEntity, ID, Res, Req> exte
                         "atualizado"));
     }
 
+    /** Popup "Apagar por...": exclui todos os registros que têm o valor filtrado na coluna escolhida. */
     @PostMapping("/delete-by")
     public String deleteBy(@RequestParam("filterColumn") String filterColumn,
                            @RequestParam(name = "filterValue", defaultValue = "") String filterValue,
@@ -162,6 +164,7 @@ public abstract class GenericController<T extends BaseEntity, ID, Res, Req> exte
         return messages.stream().limit(MAX_MESSAGES).collect(Collectors.joining(" "));
     }
 
+    /** Volta para a lista da tela; o aviso de sucesso ou erro segue como flash attribute. */
     protected String redirectToList() {
         return "redirect:" + getBasePath();
     }

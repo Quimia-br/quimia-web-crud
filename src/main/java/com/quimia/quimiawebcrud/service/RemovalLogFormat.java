@@ -31,6 +31,7 @@ public final class RemovalLogFormat {
         return at < 0 ? stored : stored.substring(0, at);
     }
 
+    /** A cópia JSON que vem depois do marcador, se o texto guardado tiver uma. */
     public static Optional<String> payloadOf(String stored) {
         if (stored == null) {
             return Optional.empty();
@@ -39,6 +40,7 @@ public final class RemovalLogFormat {
         return at < 0 ? Optional.empty() : Optional.of(stored.substring(at + MARKER.length()));
     }
 
+    /** O texto guardado tem a cópia para restaurar? */
     public static boolean hasPayload(String stored) {
         return payloadOf(stored).isPresent();
     }
