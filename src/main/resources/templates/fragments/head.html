@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Cabeçalho comum das telas do painel. Parâmetros: o título da aba (sem o " | Quimia"), os CSS extras da tela
+         (nomes sem .css, como 'detail') e se a tela tem campo de senha (carrega o botão de mostrar/ocultar). -->
+    <head th:fragment="head(title, styles, passwordToggle)">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title th:text="${title} + ' | Quimia'">Quimia</title>
+        <link rel="icon" type="image/svg+xml" th:href="@{/icons/logo.svg}">
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
+
+        <link rel="stylesheet" th:href="@{/css/style.css}">
+        <link rel="stylesheet" th:each="name : ${styles}" th:href="@{/css/{name}.css(name=${name})}">
+
+        <script th:if="${passwordToggle}" th:src="@{/js/password-toggle.js}" defer></script>
+        <script th:src="@{/js/sidebar.js}"></script>
+    </head>
+</body>
+</html>

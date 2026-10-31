@@ -1,17 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tipos de histórico | Quimia</title>
-    <link rel="icon" type="image/svg+xml" href="../../static/icons/logo.svg" th:href="@{/icons/logo.svg}">
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap">
-
-    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
-    <link rel="stylesheet" href="../../static/css/detail.css" th:href="@{/css/detail.css}">
-    <script src="../../static/js/sidebar.js" th:src="@{/js/sidebar.js}"></script>
-</head>
+    <head th:replace="~{fragments/head :: head('Tipos de histórico', ${ {'detail'} }, false)}"></head>
 
 <body>
     <th:block th:replace="~{fragments/sidebar :: sidebar('/history-types')}"></th:block>
