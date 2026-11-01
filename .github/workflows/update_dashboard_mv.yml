@@ -1,0 +1,18 @@
+name: Executar Comando SQL a cada 2 horas
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+  executar-sql:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Instalar cliente PostgreSQL
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Executar Query no PostgreSQL da Aiven
+        run: |
+          psql "postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/defaultdb?sslmode=require" -c "REFRESH MATERIALIZED VIEW mv_dashboard;"
