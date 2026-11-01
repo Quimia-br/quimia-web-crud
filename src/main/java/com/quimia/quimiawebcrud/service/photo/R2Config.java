@@ -16,7 +16,7 @@ import java.net.URI;
 
 /**
  * Cliente do R2, criado só quando as fotos vão para ele. As chaves vêm de variáveis de ambiente
- * (R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY) e nunca ficam no código.
+ * (R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_REGION) e nunca ficam no código.
  */
 @Configuration
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "r2")
@@ -25,7 +25,8 @@ public class R2Config {
     @Bean
     S3Client r2Client(@Value("${app.r2.endpoint}") String endpoint,
                       @Value("${app.r2.access-key-id}") String accessKeyId,
-                      @Value("${app.r2.secret-access-key}") String secretAccessKey) {
+                      @Value("${app.r2.secret-access-key}") String secretAccessKey,
+                      @Value("${app.r2.region:auto}") String region) {
         if (endpoint.isBlank() || accessKeyId.isBlank() || secretAccessKey.isBlank()) {
             throw new IllegalStateException(
                     "Com app.storage.type=r2, informe R2_ENDPOINT, R2_ACCESS_KEY_ID e R2_SECRET_ACCESS_KEY.");
