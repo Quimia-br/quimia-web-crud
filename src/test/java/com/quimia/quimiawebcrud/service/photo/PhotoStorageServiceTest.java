@@ -48,7 +48,7 @@ class PhotoStorageServiceTest {
     Path dir;
 
     private PhotoStorageService storage() {
-        return new PhotoStorageService(dir.toString(), "http://app.test");
+        return new PhotoStorageService(new DiskPhotoStore(dir.toString(), "http://app.test"));
     }
 
     private static byte[] image(String format, int width, int height) throws IOException {
