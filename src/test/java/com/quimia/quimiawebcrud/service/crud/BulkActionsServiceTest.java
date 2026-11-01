@@ -13,6 +13,7 @@ import com.quimia.quimiawebcrud.repository.ProductRepository;
 import com.quimia.quimiawebcrud.service.CurrentAdmin;
 import com.quimia.quimiawebcrud.service.EditLog;
 import com.quimia.quimiawebcrud.service.removal.RecordRemovalService;
+import com.quimia.quimiawebcrud.service.verification.ExternalChecks;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -44,7 +45,7 @@ class BulkActionsServiceTest {
     private final ProductRepository products = mock(ProductRepository.class);
     private final RecordRemovalService removal = mock(RecordRemovalService.class);
     private final ProductService service = new ProductService(products, new ProductMapper(), mock(CompanyRepository.class),
-            removal, new EditLog(currentAdmin, logs));
+            removal, new EditLog(currentAdmin, logs), mock(ExternalChecks.class));
 
     private final Product acetone = Product.builder().id(1).name("Acetona").brand("Velha").build();
     private final Product ethanol = Product.builder().id(2).name("Etanol").brand("Velha").build();

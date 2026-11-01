@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import com.quimia.quimiawebcrud.validation.ValidCas;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class ProductRequestDTO {
     private Integer companyId;
     @NotBlank(message = "Informe o número CAS.")
     @Pattern(regexp = FormPatterns.CAS, message = "O número CAS deve ter o formato 0000-00-0.")
+    @ValidCas
     private String casNumber;
     @NotBlank(message = "Informe o nome.")
     @Size(max = 150, message = "O nome deve ter no máximo 150 caracteres.")

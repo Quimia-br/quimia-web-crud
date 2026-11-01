@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import com.quimia.quimiawebcrud.validation.ValidCnpj;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,6 +27,7 @@ public class CompanyRequestDTO {
 
     @NotBlank(message = "Informe o CNPJ.")
     @Pattern(regexp = FormPatterns.CNPJ, message = "O CNPJ deve ter 14 números.")
+    @ValidCnpj
     private String cnpj;
     @NotBlank(message = "Informe o nome.")
     @Size(max = 150, message = "O nome deve ter no máximo 150 caracteres.")
