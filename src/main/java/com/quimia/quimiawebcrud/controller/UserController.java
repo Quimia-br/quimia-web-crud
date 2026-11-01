@@ -1,11 +1,14 @@
 package com.quimia.quimiawebcrud.controller;
 
+import com.quimia.quimiawebcrud.controller.support.ColumnField;
+import com.quimia.quimiawebcrud.controller.support.Filters;
+import com.quimia.quimiawebcrud.controller.support.GenericController;
 import com.quimia.quimiawebcrud.dto.UserRequestDTO;
 import com.quimia.quimiawebcrud.dto.UserResponseDTO;
 import com.quimia.quimiawebcrud.model.User;
 import com.quimia.quimiawebcrud.model.enums.Status;
 import com.quimia.quimiawebcrud.service.CrudService;
-import com.quimia.quimiawebcrud.service.UserService;
+import com.quimia.quimiawebcrud.service.crud.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,10 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+/**
+ * Telas de usuários em {@code /users}: lista, detalhe, cadastro, edição e remoção.
+ */
 @Controller
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class UserController extends GenericController<User, Integer, UserResponseDTO, UserRequestDTO> {
+public class UserController extends GenericController<User, Integer, UserRequestDTO, UserResponseDTO> {
 
     private final UserService userService;
 

@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Acesso ao banco para registros do log de edições; herda as consultas por coluna do {@link ColumnFilterRepository}.
+ */
 @Repository
 public interface AdminLogRepository extends ColumnFilterRepository<AdminLog, Integer> {
 

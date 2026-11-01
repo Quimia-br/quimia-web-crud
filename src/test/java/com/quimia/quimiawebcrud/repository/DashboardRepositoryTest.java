@@ -49,6 +49,16 @@ class DashboardRepositoryTest {
     }
 
     @Test
+    void refreshRunsTheConcurrentRefreshOfTheView() {
+        when(entityManager.createNativeQuery(org.mockito.ArgumentMatchers.anyString())).thenReturn(query);
+
+        repository.refresh();
+
+        verify(entityManager).createNativeQuery("refresh materialized view concurrently mv_dashboard");
+        verify(query).executeUpdate();
+    }
+
+    @Test
     void mapsTotalsAndActivityRowsWhateverDateTypeTheDriverReturns() {
         Timestamp editedAt = Timestamp.valueOf(LocalDateTime.of(2026, 10, 20, 9, 30));
         OffsetDateTime updatedAt = OffsetDateTime.of(2026, 10, 20, 15, 0, 0, 0, ZoneOffset.UTC);

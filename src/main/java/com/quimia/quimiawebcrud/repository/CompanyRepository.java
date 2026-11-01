@@ -3,6 +3,9 @@ package com.quimia.quimiawebcrud.repository;
 import com.quimia.quimiawebcrud.model.Company;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Acesso ao banco para empresas; herda as consultas por coluna do {@link ColumnFilterRepository}.
+ */
 @Repository
 public interface CompanyRepository extends ColumnFilterRepository<Company, Integer> {
 

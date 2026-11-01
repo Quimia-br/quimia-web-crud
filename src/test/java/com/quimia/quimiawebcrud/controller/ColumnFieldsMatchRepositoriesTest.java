@@ -1,5 +1,6 @@
 package com.quimia.quimiawebcrud.controller;
 
+import com.quimia.quimiawebcrud.controller.support.ColumnField;
 import com.quimia.quimiawebcrud.repository.AdminRepository;
 import com.quimia.quimiawebcrud.repository.ColumnFilterRepository;
 import com.quimia.quimiawebcrud.repository.CompanyRepository;

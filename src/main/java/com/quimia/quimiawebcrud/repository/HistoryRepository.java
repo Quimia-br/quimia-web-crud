@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Acesso ao banco para históricos; herda as consultas por coluna do {@link ColumnFilterRepository}.
+ */
 @Repository
 public interface HistoryRepository extends ColumnFilterRepository<History, Integer> {
 

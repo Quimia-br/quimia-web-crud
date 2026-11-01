@@ -1,12 +1,15 @@
 package com.quimia.quimiawebcrud.controller;
 
+import com.quimia.quimiawebcrud.controller.support.Filters;
+import com.quimia.quimiawebcrud.controller.support.ListController;
+import com.quimia.quimiawebcrud.controller.support.Lookups;
 import com.quimia.quimiawebcrud.dto.AdminLogResponseDTO;
 import com.quimia.quimiawebcrud.dto.AdminResponseDTO;
 import com.quimia.quimiawebcrud.exception.BusinessException;
 import com.quimia.quimiawebcrud.model.enums.AdminAction;
-import com.quimia.quimiawebcrud.service.RecordRestoreService;
-import com.quimia.quimiawebcrud.service.AdminLogService;
-import com.quimia.quimiawebcrud.service.AdminService;
+import com.quimia.quimiawebcrud.service.crud.AdminService;
+import com.quimia.quimiawebcrud.service.removal.AdminLogService;
+import com.quimia.quimiawebcrud.service.removal.RecordRestoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -73,6 +76,7 @@ public class AdminLogController extends ListController<AdminLogResponseDTO> {
         };
     }
 
+    /** Restaura a exclusão da linha do log e volta para a lista com o resultado como aviso. */
     @PostMapping("/{id}/restore")
     public String restore(@PathVariable("id") Integer id, RedirectAttributes redirect) {
         try {

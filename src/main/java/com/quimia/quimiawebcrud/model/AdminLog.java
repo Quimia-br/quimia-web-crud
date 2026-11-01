@@ -1,16 +1,27 @@
 package com.quimia.quimiawebcrud.model;
 
 import com.quimia.quimiawebcrud.model.enums.AdminAction;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 /**
- * Uma linha do log de edições: qual administrador fez o quê, em qual tabela e em qual registro.
- * Nas edições, {@code previousData} guarda o resumo do registro antes da mudança; nas exclusões, guarda também a
- * cópia das linhas apagadas, que é o que permite restaurar (ver {@code RemovalLogFormat}).
+ * Registro do que um administrador fez: tabela afetada, id do registro, ação e o dado anterior (tabela {@code admin_log_edicoes}). É o que permite desfazer uma remoção.
  */
 @Entity
 @Table(name = "admin_log_edicoes")
@@ -20,11 +31,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter
 @Getter
-public class AdminLog extends Model {
+public class AdminLog extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_admin", nullable = false)
-    @ToString.Exclude
     private Admin admin;
 
     @Column(name = "tabela_afetada", nullable = false, length = 150)

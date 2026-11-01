@@ -3,10 +3,10 @@ package com.quimia.quimiawebcrud.controller;
 import com.quimia.quimiawebcrud.exception.DashboardUnavailableException;
 import com.quimia.quimiawebcrud.exception.GlobalExceptionHandler;
 import com.quimia.quimiawebcrud.model.Admin;
-import com.quimia.quimiawebcrud.repository.DashboardRepository;
 import com.quimia.quimiawebcrud.repository.DashboardRepository.Row;
+import com.quimia.quimiawebcrud.repository.DashboardRepository;
 import com.quimia.quimiawebcrud.service.CurrentAdmin;
-import com.quimia.quimiawebcrud.service.DashboardService;
+import com.quimia.quimiawebcrud.service.dashboard.DashboardService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -25,9 +25,14 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -124,8 +129,30 @@ class DashboardPageTest {
         String html = page("7", List.of());
 
         assertFalse(html.contains(" style="), "estilos ficam no arquivo CSS, não na página");
-        assertFalse(html.contains("<script"), "o dashboard não usa JavaScript");
+        String[] afterEachScriptTag = html.split("<script", -1);   // o item 0 é o que vem antes do primeiro <script
+        for (int i = 1; i < afterEachScriptTag.length; i++) {
+            String tag = afterEachScriptTag[i].substring(0, afterEachScriptTag[i].indexOf('>'));
+            assertTrue(tag.contains(" src="), "só arquivos .js próprios são permitidos (script-src 'self'), nunca script dentro da página");
+        }
         assertFalse(html.contains("onclick=") || html.contains("onload="));
+    }
+
+    @Test
+    void headLoadsTheDashboardStyles() throws Exception {
+        String html = page("7", List.of());
+
+        assertTrue(html.contains("<title>Dashboard | Quimia</title>"));
+        assertTrue(html.contains("/css/dashboard.css"));
+        assertFalse(html.contains("/css/detail.css"), "o dashboard não usa o CSS dos popups de detalhe");
+    }
+
+    @Test
+    void sidebarHighlightsOnlyTheDashboard() throws Exception {
+        String html = page("7", List.of());
+
+        assertTrue(html.matches("(?s).*<a href=\"/\"[^>]*title=\"Dashboard\"[^>]*aria-current=\"page\".*"), "o dashboard fica destacado");
+        assertTrue(html.split("aria-current=\"page\"", -1).length - 1 >= 1);
+        assertFalse(html.matches("(?s).*<a href=\"/users\"[^>]*aria-current=\"page\".*"), "as outras telas não");
     }
 
     @Test
@@ -144,6 +171,36 @@ class DashboardPageTest {
         assertTrue(html.contains("href=\"/users?busca=Ana&amp;status=BLOQUEADO\""));
         assertTrue(html.contains("href=\"/admins?busca=Adm&amp;status=PENDENTE\""));
         assertTrue(html.contains("algo diferente"));
+    }
+
+    @Test
+    void theRefreshButtonPostsToTheRefreshRouteKeepingThePeriod() throws Exception {
+        String html = page("30", List.of());
+
+        assertTrue(html.contains("Atualizar dashboard"));
+        assertTrue(html.contains("action=\"/dashboard/refresh\""));
+        assertTrue(html.contains("name=\"periodo\" value=\"30\""), "volta para o mesmo período");
+    }
+
+    @Test
+    void refreshingRecalculatesTheViewAndComesBackToTheSamePeriod() throws Exception {
+        mvc.perform(post("/dashboard/refresh").param("periodo", "30"))
+                .andExpect(redirectedUrl("/?periodo=30"))
+                .andExpect(flash().attribute("message", "Dashboard atualizado."));
+        verify(dashboardService).refresh();
+
+        mvc.perform(post("/dashboard/refresh").param("periodo", "5"))
+                .andExpect(redirectedUrl("/?periodo=7"));
+    }
+
+    @Test
+    void whenTheRefreshFailsTheReasonShowsAsANoticeInsteadOfAnErrorPage() throws Exception {
+        doThrow(new DashboardUnavailableException("Não foi possível atualizar o dashboard agora. Tente novamente em instantes."))
+                .when(dashboardService).refresh();
+
+        mvc.perform(post("/dashboard/refresh"))
+                .andExpect(redirectedUrl("/?periodo=7"))
+                .andExpect(flash().attribute("error", "Não foi possível atualizar o dashboard agora. Tente novamente em instantes."));
     }
 
     @Test

@@ -1,15 +1,25 @@
 package com.quimia.quimiawebcrud.model;
 
 import com.quimia.quimiawebcrud.model.enums.Status;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Usuário do aplicativo. O e-mail não se repete e a senha é guardada só como hash ({@code senha_hash}).
+ * Pessoa que usa o aplicativo da Quimia (tabela {@code usuarios}). O painel lista, edita e remove; o cadastro vem do aplicativo.
  */
 @Entity
 @Table(name = "usuarios")
@@ -19,7 +29,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter
 @Getter
-public class User extends Model {
+public class User extends BaseEntity {
 
     @Column(name = "nome", nullable = false, length = 150)
     private String userName;
@@ -43,7 +53,6 @@ public class User extends Model {
     @Column(name = "url_foto", columnDefinition = "TEXT")
     private String photoUrl;
 
-    // Valores padrão para o registro criado sem eles (data de cadastro de agora e conta ativa).
     @PrePersist
     private void prePersist() {
         if (signUpDate == null) signUpDate = LocalDateTime.now();

@@ -1,8 +1,11 @@
 package com.quimia.quimiawebcrud.controller;
 
+import com.quimia.quimiawebcrud.controller.support.Filters;
+import com.quimia.quimiawebcrud.controller.support.ListController;
+import com.quimia.quimiawebcrud.controller.support.Lookups;
 import com.quimia.quimiawebcrud.dto.LocationResponseDTO;
-import com.quimia.quimiawebcrud.service.LocationService;
-import com.quimia.quimiawebcrud.service.UserService;
+import com.quimia.quimiawebcrud.service.crud.LocationService;
+import com.quimia.quimiawebcrud.service.crud.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,11 +1,22 @@
 package com.quimia.quimiawebcrud.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Produto químico cadastrado por uma empresa, identificado pelo número CAS (único), com instruções de uso e dosagem.
+ * Produto químico cadastrado por uma empresa (tabela {@code produtos}), com o número CAS único.
  */
 @Entity
 @Table(name = "produtos")
@@ -15,11 +26,10 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter
 @Getter
-public class Product extends Model {
+public class Product extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_usuario_empresa", nullable = false)
-    @ToString.Exclude
     private Company company;
 
     @Column(name = "cas_number", nullable = false, unique = true, length = 12)
@@ -37,9 +47,8 @@ public class Product extends Model {
     @Column(name = "dosagem_tecnica", nullable = false, columnDefinition = "TEXT")
     private String dosage;
 
-    // A marca é obrigatória no banco: sem ela, o produto fica com "DESCONHECIDO".
     @PrePersist
     private void prePersist() {
-        if (brand == null || brand.isBlank()) brand = "DESCONHECIDO";
+        if (brand == null || brand.isBlank()) brand = UNKNOWN;
     }
 }

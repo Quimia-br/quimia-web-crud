@@ -1,15 +1,24 @@
 package com.quimia.quimiawebcrud.model;
 
 import com.quimia.quimiawebcrud.model.enums.Status;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 /**
- * Administrador do painel: é quem entra no sistema (pelo e-mail e senha) e cadastra, edita e exclui os dados.
- * A senha é guardada só como hash ({@code senha_hash}).
+ * Administrador do painel (tabela {@code admins}). É quem faz login aqui e quem aparece no log de edições.
  */
 @Entity
 @Table(name = "admins")
@@ -19,7 +28,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter
 @Getter
-public class Admin extends Model {
+public class Admin extends BaseEntity {
 
     @Column(name = "nome", nullable = false, length = 150)
     private String userName;
@@ -37,7 +46,6 @@ public class Admin extends Model {
     @Column(name = "status", nullable = false, length = 50)
     private Status status;
 
-    // Valores padrão para o registro criado sem eles (data de cadastro de agora e conta ativa).
     @PrePersist
     private void prePersist() {
         if (signUpDate == null) signUpDate = LocalDateTime.now();

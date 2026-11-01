@@ -1,15 +1,17 @@
 package com.quimia.quimiawebcrud.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.session.DisableEncodeUrlFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 
 /**
  * Todas as telas do painel exigem login de administrador; só ficam abertos o login, os arquivos visuais
- * (CSS, JS, ícones, imagens) e as fotos, que o aplicativo também lê. A proteção contra CSRF fica ligada
+ * (CSS, JS, ícones, imagens), as fotos, que o aplicativo também lê, e o /health, que o Render consulta. A proteção contra CSRF fica ligada
  * (os formulários Thymeleaf enviam o token sozinhos) e a saída (logout) só funciona por POST.
  */
 @Configuration
@@ -28,11 +30,13 @@ public class SecurityConfig {
             "frame-ancestors 'none'");
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, @Value("${app.origin-secret:}") String originSecret) throws Exception {
         http
+                // Primeiro de todos: pedido que não veio pelo proxy nem chega à tela de login
+                .addFilterBefore(new OriginSecretFilter(originSecret), DisableEncodeUrlFilter.class)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/login", "/error", "/css/**", "/js/**", "/icons/**", "/images/**",
-                                "/uploads/photos/**").permitAll()
+                                "/uploads/photos/**", OriginSecretFilter.HEALTH_PATH).permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")

@@ -1,12 +1,14 @@
 package com.quimia.quimiawebcrud.controller;
 
-import com.quimia.quimiawebcrud.dto.ProductResponseDTO;
+import com.quimia.quimiawebcrud.controller.support.Filters;
+import com.quimia.quimiawebcrud.controller.support.ListController;
+import com.quimia.quimiawebcrud.controller.support.Lookups;
 import com.quimia.quimiawebcrud.dto.ShelfProductResponseDTO;
 import com.quimia.quimiawebcrud.dto.ShelfResponseDTO;
-import com.quimia.quimiawebcrud.service.ProductService;
-import com.quimia.quimiawebcrud.service.ShelfProductService;
-import com.quimia.quimiawebcrud.service.ShelfService;
-import com.quimia.quimiawebcrud.service.UserService;
+import com.quimia.quimiawebcrud.service.crud.ProductService;
+import com.quimia.quimiawebcrud.service.crud.ShelfProductService;
+import com.quimia.quimiawebcrud.service.crud.ShelfService;
+import com.quimia.quimiawebcrud.service.crud.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

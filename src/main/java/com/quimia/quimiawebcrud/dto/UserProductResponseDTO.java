@@ -1,7 +1,14 @@
 package com.quimia.quimiawebcrud.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+/**
+ * Dados de produto de um usuário que as telas mostram.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

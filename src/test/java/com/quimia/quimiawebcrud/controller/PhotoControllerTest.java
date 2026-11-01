@@ -1,6 +1,7 @@
 package com.quimia.quimiawebcrud.controller;
 
-import com.quimia.quimiawebcrud.service.PhotoStorageService;
+import com.quimia.quimiawebcrud.service.photo.DiskPhotoStore;
+import com.quimia.quimiawebcrud.service.photo.PhotoStorageService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -10,10 +11,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Path;
+import javax.imageio.ImageIO;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(PhotoController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Import(PhotoStorageService.class)
+@Import({PhotoStorageService.class, DiskPhotoStore.class})
 @TestPropertySource(properties = {"app.upload.dir=target/test-uploads", "app.upload.public-base-url=http://app.test"})
 class PhotoControllerTest {
 

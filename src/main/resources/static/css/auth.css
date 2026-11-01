@@ -1,6 +1,7 @@
 .auth {
   --auth-bg: #F8F8F8;
   --auth-card: #FFFFFF;
+  --auth-accent: #2AADB9;
   --auth-field: rgba(255, 255, 255, 0.09);
   --auth-border: #C9C9C9;
   --auth-text: #464646;
@@ -149,22 +150,6 @@
   text-transform: uppercase;
 }
 
-.auth-switch {
-  margin: 1rem 0 0;
-  font-size: 1.12rem;
-  text-align: center;
-}
-
-.auth-switch a {
-  color: inherit;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.auth-switch a:hover {
-  text-decoration: underline;
-}
-
 @media (max-width: 1024px) {
   .auth {
     --auth-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
@@ -187,7 +172,7 @@
     padding: 3rem 1rem;
     background:
       url("../images/auth-pattern.svg") repeat 0 0 / 3.6rem auto,
-      linear-gradient(90deg, #2AADB9, rgba(50, 187, 202, 0.54));
+      linear-gradient(90deg, var(--auth-accent), rgba(50, 187, 202, 0.54));
   }
 
   .auth-logo {

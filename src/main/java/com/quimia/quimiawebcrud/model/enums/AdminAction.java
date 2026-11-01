@@ -1,8 +1,8 @@
 package com.quimia.quimiawebcrud.model.enums;
 
 /**
- * Ação registrada no log de edições. Uma restauração é gravada como INSERT, com um texto próprio em
- * {@code dado_anterior} que a identifica.
+ * Tipo de alteração registrada no log de edições. São os únicos valores que a regra {@code chk_acao} do banco aceita;
+ * por isso uma restauração é gravada como INSERT (ver {@link com.quimia.quimiawebcrud.service.RemovalLogFormat}).
  */
 public enum AdminAction {
     INSERT,

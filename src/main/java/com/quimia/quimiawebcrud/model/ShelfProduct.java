@@ -1,13 +1,25 @@
 package com.quimia.quimiawebcrud.model;
 
 import com.quimia.quimiawebcrud.model.id.ShelfProductId;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 /**
- * Produto guardado em uma estante, com a data em que foi colocado. A chave é a dupla estante + produto.
+ * Produto guardado numa estante (tabela {@code produtos_estantes}). A chave é composta; as colunas do id também alimentam as associações, por isso elas são só de leitura ({@code insertable = false, updatable = false}).
  */
 @Entity
 @Table(name = "produtos_estantes")
@@ -18,19 +30,15 @@ import java.time.LocalDateTime;
 @Getter
 public class ShelfProduct {
 
-    // As colunas de estante e produto são gravadas pela chave; as relações abaixo só servem para leitura
-    // (insertable/updatable = false), para o Hibernate não gravar a mesma coluna duas vezes.
     @EmbeddedId
     private ShelfProductId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_estante", insertable = false, updatable = false)
-    @ToString.Exclude
     private Shelf shelf;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_produto", insertable = false, updatable = false)
-    @ToString.Exclude
     private Product product;
 
     @Column(name = "data_adicao", nullable = false)

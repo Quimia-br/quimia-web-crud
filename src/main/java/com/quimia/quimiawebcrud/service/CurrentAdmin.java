@@ -18,6 +18,7 @@ public class CurrentAdmin {
 
     private final AdminRepository admins;
 
+    /** O administrador logado; falha se a sessão não tiver ninguém autenticado. */
     public Admin require() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken

@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.model.AdminLog;
-import com.quimia.quimiawebcrud.model.Model;
+import com.quimia.quimiawebcrud.model.BaseEntity;
 import com.quimia.quimiawebcrud.model.enums.AdminAction;
 import com.quimia.quimiawebcrud.repository.AdminLogRepository;
 import jakarta.persistence.Table;
@@ -19,15 +19,17 @@ public class EditLog {
     private final CurrentAdmin currentAdmin;
     private final AdminLogRepository logs;
 
-    public void created(Model record) {
+    /** Anota que o administrador logado criou o registro. */
+    public void created(BaseEntity record) {
         save(record, AdminAction.INSERT, null);
     }
 
-    public void updated(Model record, String before) {
+    /** Anota que o administrador logado editou o registro, guardando o resumo de como era antes. */
+    public void updated(BaseEntity record, String before) {
         save(record, AdminAction.UPDATE, before);
     }
 
-    private void save(Model record, AdminAction action, String previousData) {
+    private void save(BaseEntity record, AdminAction action, String previousData) {
         logs.save(AdminLog.builder()
                 .admin(currentAdmin.require())
                 .affectedTable(tableOf(record))
@@ -37,7 +39,7 @@ public class EditLog {
                 .build());
     }
 
-    static String tableOf(Model record) {
+    static String tableOf(BaseEntity record) {
         return record.getClass().getAnnotation(Table.class).name();
     }
 }

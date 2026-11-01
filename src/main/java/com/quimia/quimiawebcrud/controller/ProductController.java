@@ -1,11 +1,15 @@
 package com.quimia.quimiawebcrud.controller;
 
+import com.quimia.quimiawebcrud.controller.support.ColumnField;
+import com.quimia.quimiawebcrud.controller.support.Filters;
+import com.quimia.quimiawebcrud.controller.support.GenericController;
+import com.quimia.quimiawebcrud.controller.support.Lookups;
 import com.quimia.quimiawebcrud.dto.ProductRequestDTO;
 import com.quimia.quimiawebcrud.dto.ProductResponseDTO;
 import com.quimia.quimiawebcrud.model.Product;
-import com.quimia.quimiawebcrud.service.CompanyService;
 import com.quimia.quimiawebcrud.service.CrudService;
-import com.quimia.quimiawebcrud.service.ProductService;
+import com.quimia.quimiawebcrud.service.crud.CompanyService;
+import com.quimia.quimiawebcrud.service.crud.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,10 +19,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+/**
+ * Telas de produtos em {@code /products}: lista, detalhe, cadastro, edição e remoção.
+ */
 @Controller
 @RequestMapping("/products")
 @RequiredArgsConstructor
-public class ProductController extends GenericController<Product, Integer, ProductResponseDTO, ProductRequestDTO> {
+public class ProductController extends GenericController<Product, Integer, ProductRequestDTO, ProductResponseDTO> {
 
     private final ProductService productService;
     private final CompanyService companyService;

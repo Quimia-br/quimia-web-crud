@@ -15,10 +15,13 @@ import java.util.List;
 @Transactional(readOnly = true)
 public abstract class ReadService<E, ID, Res> {
 
+    /** O repositório da tabela. */
     protected abstract ColumnFilterRepository<E, ID> getRepository();
 
+    /** O mapper que converte a entidade no que a tela mostra. */
     protected abstract ResponseMapper<E, Res> getMapper();
 
+    /** Todos os registros da tabela, já convertidos para a tela. */
     public List<Res> readAll() {
         List<Res> all = new ArrayList<>();
         for (E e : getRepository().findAll()) {
@@ -27,15 +30,20 @@ public abstract class ReadService<E, ID, Res> {
         return all;
     }
 
+    /** Um registro pelo id; ResourceNotFoundException se não existir. */
     public Res findById(ID id) {
         return getMapper().toResponse(getEntity(id));
     }
 
+    /** A entidade pelo id, para quem precisa alterá-la; ResourceNotFoundException se não existir. */
     protected E getEntity(ID id) {
         return getRepository().findById(id)
                 .orElseThrow(() -> notFound(id));
     }
 
+    /**
+     * A exceção de registro inexistente; as tabelas de chave composta sobrescrevem para citar as duas partes.
+     */
     protected ResourceNotFoundException notFound(ID id) {
         return new ResourceNotFoundException("Registro não encontrado com o ID: " + id);
     }

@@ -1,0 +1,38 @@
+name: Release
+
+# Quando algo entra na main, cria a tag da nova versão e o release no GitHub.
+# A versão é calculada pelos commits (Conventional Commits) em .github/scripts/next-version.sh.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o repositório com o histórico e as tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Calcular a próxima versão
+        id: version
+        run: echo "next=$(.github/scripts/next-version.sh)" >> "$GITHUB_OUTPUT"
+
+      - name: Criar a tag e o release
+        if: steps.version.outputs.next != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.next }}
+        run: |
+          gh release create "v${VERSION}" \
+            --target "${GITHUB_SHA}" \
+            --title "v${VERSION}" \
+            --generate-notes

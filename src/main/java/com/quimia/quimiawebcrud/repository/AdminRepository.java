@@ -5,6 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Acesso ao banco para administradores; herda as consultas por coluna do {@link ColumnFilterRepository}.
+ */
 @Repository
 public interface AdminRepository extends ColumnFilterRepository<Admin, Integer> {
 

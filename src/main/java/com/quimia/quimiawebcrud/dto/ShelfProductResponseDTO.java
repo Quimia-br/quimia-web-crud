@@ -1,9 +1,16 @@
 package com.quimia.quimiawebcrud.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+/**
+ * Dados de produto de uma estante que as telas mostram.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

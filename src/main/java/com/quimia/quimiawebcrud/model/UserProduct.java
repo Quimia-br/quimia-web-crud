@@ -1,12 +1,21 @@
 package com.quimia.quimiawebcrud.model;
 
 import com.quimia.quimiawebcrud.model.id.UserProductId;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
- * Produto na lista de um usuário. A chave é a dupla usuário + produto; é a esta lista que os itens do histórico se
- * ligam ({@code HistoryProduct}).
+ * Produto que um usuário possui (tabela {@code produtos_usuarios}). Mesma ideia do {@link ShelfProduct}: chave composta e associações só de leitura.
  */
 @Entity
 @Table(name = "produtos_usuarios")
@@ -17,18 +26,14 @@ import lombok.*;
 @Getter
 public class UserProduct {
 
-    // As colunas de usuário e produto são gravadas pela chave; as relações abaixo só servem para leitura
-    // (insertable/updatable = false), para o Hibernate não gravar a mesma coluna duas vezes.
     @EmbeddedId
     private UserProductId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
-    @ToString.Exclude
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_produto", insertable = false, updatable = false)
-    @ToString.Exclude
     private Product product;
 }

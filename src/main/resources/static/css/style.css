@@ -1,8 +1,10 @@
 :root {
-  --color-sidebar: #3EC5D4;
-  --color-sidebar-text: #12343A;
+  --color-sidebar: #0F6B78;
+  --color-sidebar-text: #FFFFFF;
+  --color-on-primary: #FFFFFF;
   --color-primary: #0F6B78;
   --color-primary-hover: #0B5560;
+  --color-primary-dark: #12343A;
   --color-bg: #F4F6F5;
   --color-surface: #FFFFFF;
   --color-surface-muted: #F7F9F8;
@@ -78,7 +80,7 @@ select {
   width: var(--sidebar-width);
   flex-shrink: 0;
   background: var(--color-sidebar);
-  padding: 24px 16px;
+  padding: 24px 12px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -104,14 +106,18 @@ select {
   margin-inline: auto;
 }
 
+.sidebar :focus-visible {
+  outline-color: var(--color-on-primary);
+}
+
 .sidebar-logo {
   align-self: center;
   margin-bottom: 12px;
 }
 
 .sidebar-logo img {
-  width: 72px;
-  height: 72px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   box-shadow: 0 4px 14px rgba(18, 52, 58, 0.25);
 }
@@ -120,10 +126,11 @@ select {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding-right: 8px;
-  scrollbar-width: thin;
-  scrollbar-gutter: stable;
-  scrollbar-color: rgba(18, 52, 58, 0.45) transparent;
+  scrollbar-width: none;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .sidebar-nav ul {
@@ -140,7 +147,7 @@ select {
   align-items: center;
   gap: 12px;
   min-height: var(--control-height);
-  padding: 0 12px;
+  padding: 0 14px;
   border-radius: var(--radius);
   color: var(--color-sidebar-text);
   text-decoration: none;
@@ -151,14 +158,15 @@ select {
 .nav-link img {
   width: 20px;
   height: 20px;
+  filter: brightness(0) invert(1);
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .nav-link[aria-current="page"] {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.22);
   font-weight: 700;
 }
 
@@ -229,9 +237,14 @@ select {
 
 .toolbar-filter {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   color: var(--color-text-muted);
+}
+
+.toolbar-filter label {
+  white-space: nowrap;
 }
 
 .btn {
@@ -252,7 +265,7 @@ select {
 
 .btn-primary {
   background: var(--color-primary);
-  color: #FFFFFF;
+  color: var(--color-on-primary);
 }
 
 .btn-primary:hover {
@@ -271,7 +284,7 @@ select {
 
 .btn-danger {
   background: var(--color-danger);
-  color: #FFFFFF;
+  color: var(--color-on-primary);
 }
 
 .btn-danger:hover {
@@ -426,7 +439,7 @@ select {
 .pagination a[aria-current="page"] {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: #FFFFFF;
+  color: var(--color-on-primary);
   font-weight: 700;
 }
 
@@ -562,22 +575,140 @@ select {
   }
 }
 
-@media (max-width: 768px) {
-  body {
-    flex-direction: column;
+@media (min-width: 1025px) {
+  :root:not(.sidebar-pinned) .sidebar {
+    width: 72px;
+    overflow-x: hidden;
+    z-index: 2;
+    transition: width var(--transition);
+  }
+
+  :root:not(.sidebar-pinned) .sidebar:hover,
+  :root:not(.sidebar-pinned) .sidebar:has(:focus-visible) {
+    width: var(--sidebar-width);
+  }
+
+  :root:not(.sidebar-pinned) .sidebar .sidebar-nav {
+    overflow-x: hidden;
+  }
+
+  :root:not(.sidebar-pinned) .sidebar .nav-link {
+    white-space: nowrap;
+  }
+
+  :root:not(.sidebar-pinned) .sidebar .nav-label,
+  :root:not(.sidebar-pinned) .sidebar .nav-group summary::after {
+    transition: opacity var(--transition);
+  }
+
+  :root:not(.sidebar-pinned) .sidebar:not(:hover):not(:has(:focus-visible)) .nav-label,
+  :root:not(.sidebar-pinned) .sidebar:not(:hover):not(:has(:focus-visible)) .nav-group summary::after {
+    opacity: 0;
+  }
+
+  :root:not(.sidebar-pinned) .sidebar:not(:hover):not(:has(:focus-visible)) .nav-group ul {
+    display: none;
+  }
+
+  :root:not(.sidebar-pinned) .sidebar:not(:hover):not(:has(:focus-visible)) .nav-group:has([aria-current="page"]) > summary {
+    background: rgba(255, 255, 255, 0.22);
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 72px;
   }
 
   .sidebar {
-    width: auto;
+    z-index: 1;
+  }
+
+  .nav-link {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .nav-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .nav-group summary::after {
+    display: none;
+  }
+
+  .sidebar-pin {
+    display: none;
+  }
+
+  .nav-group ul {
+    position: absolute;
+    left: calc(100% + 8px);
+    min-width: 184px;
+    margin-top: calc(-1 * var(--control-height));
+    padding: 8px;
+    background: var(--color-sidebar);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-modal);
+  }
+
+  .nav-group ul .nav-link {
+    justify-content: flex-start;
+    padding: 0 12px;
+  }
+
+  .nav-group ul .nav-label {
     position: static;
+    width: auto;
     height: auto;
-    align-self: stretch;
+    overflow: visible;
+    clip: auto;
   }
 
-  .sidebar-nav {
-    overflow-y: visible;
+  .nav-group::details-content {
+    content-visibility: visible;
   }
 
+  .nav-group:not(:hover):not(:focus-within) ul {
+    display: none;
+  }
+
+  .nav-group ul::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 100%;
+    bottom: 0;
+    width: 24px;
+  }
+
+  .nav-group:has([aria-current="page"]) > summary {
+    background: rgba(255, 255, 255, 0.22);
+    font-weight: 700;
+  }
+
+  @supports (anchor-name: --nav-reports) {
+    .nav-group summary {
+      anchor-name: --nav-reports;
+    }
+
+    .nav-group ul {
+      position-anchor: --nav-reports;
+      top: anchor(top);
+      margin-top: 0;
+      position-try-fallbacks: flip-block;
+      position-visibility: anchors-visible;
+    }
+  }
+}
+
+@media (max-width: 768px) {
   .content {
     padding: 16px;
   }
@@ -594,6 +725,29 @@ select {
   background: transparent;
   font: inherit;
   text-align: left;
+}
+
+.sidebar-pin {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+}
+
+.sidebar-pin img {
+  opacity: 0.7;
+  transform: rotate(45deg);
+  transition: transform var(--transition), opacity var(--transition);
+}
+
+.sidebar-pin[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-pin[aria-pressed="true"] img {
+  opacity: 1;
+  transform: none;
 }
 
 /* Avisos de sucesso e erro no topo das listas */
