@@ -473,3 +473,7 @@ Projeto desenvolvido para a **ExpoTech 2026**.
 | [`quimia-landingpage`](https://github.com/Quimia-br/quimia-landingpage) | Site institucional, publicado em [quimia.tech](https://quimia.tech) |
 
 <p align="right"><a href="#top">voltar ao topo</a></p>
+
+## Licença
+
+Distribuído sob a licença MIT. Veja [LICENSE](LICENSE).
