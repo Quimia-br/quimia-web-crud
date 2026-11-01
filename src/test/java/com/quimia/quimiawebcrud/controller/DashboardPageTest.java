@@ -3,8 +3,8 @@ package com.quimia.quimiawebcrud.controller;
 import com.quimia.quimiawebcrud.exception.DashboardUnavailableException;
 import com.quimia.quimiawebcrud.exception.GlobalExceptionHandler;
 import com.quimia.quimiawebcrud.model.Admin;
-import com.quimia.quimiawebcrud.repository.DashboardRepository.Row;
-import com.quimia.quimiawebcrud.repository.DashboardRepository;
+import com.quimia.quimiawebcrud.repository.support.DashboardRepository.Row;
+import com.quimia.quimiawebcrud.repository.support.DashboardRepository;
 import com.quimia.quimiawebcrud.service.CurrentAdmin;
 import com.quimia.quimiawebcrud.service.dashboard.DashboardService;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -87,12 +89,13 @@ class DashboardPageTest {
         rows.addAll(extra);
         DashboardRepository repository = mock(DashboardRepository.class);
         when(repository.findAll()).thenReturn(rows);
-        return new DashboardService(repository, Clock.fixed(TODAY.atTime(12, 0).atZone(ZONE).toInstant(), ZONE));
+        return new DashboardService(repository, Clock.fixed(TODAY.atTime(12, 0).atZone(ZONE).toInstant(), ZONE),
+                com.quimia.quimiawebcrud.TestMessages.source());
     }
 
     private String page(String period, List<Row> extra) throws Exception {
         DashboardService real = serviceWithSomeData(extra);
-        when(dashboardService.build(anyInt())).thenAnswer(invocation -> real.build(invocation.getArgument(0)));
+        doAnswer(invocation -> real.build(invocation.getArgument(0), invocation.getArgument(1))).when(dashboardService).build(anyInt(), any());
         when(currentAdmin.require()).thenReturn(Admin.builder().id(1).userName("Nicolas Delecrode").email("n@x.com").build());
         return mvc.perform(get("/").param("periodo", period)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
     }
@@ -102,7 +105,7 @@ class DashboardPageTest {
         for (String period : new String[]{"7", "30", "90"}) {
             String html = page(period, List.of());
 
-            assertTrue(html.contains("Bem-vindo de volta, <span>Nicolas</span>"), "saudação com o primeiro nome");
+            assertTrue(html.contains("Bem-vindo de volta, Nicolas"), "saudação com o primeiro nome");
             assertTrue(html.contains("Quinta-feira, 22 de outubro de 2026"));
             for (String label : new String[]{">Usuários<", ">Empresas<", ">Consultas<", ">Alertas<"}) {
                 assertTrue(html.contains(label), label);
@@ -187,7 +190,7 @@ class DashboardPageTest {
         mvc.perform(post("/dashboard/refresh").param("periodo", "30"))
                 .andExpect(redirectedUrl("/?periodo=30"))
                 .andExpect(flash().attribute("message", "Dashboard atualizado."));
-        verify(dashboardService).refresh();
+        verify(dashboardService).refresh(any());
 
         mvc.perform(post("/dashboard/refresh").param("periodo", "5"))
                 .andExpect(redirectedUrl("/?periodo=7"));
@@ -196,7 +199,7 @@ class DashboardPageTest {
     @Test
     void whenTheRefreshFailsTheReasonShowsAsANoticeInsteadOfAnErrorPage() throws Exception {
         doThrow(new DashboardUnavailableException("Não foi possível atualizar o dashboard agora. Tente novamente em instantes."))
-                .when(dashboardService).refresh();
+                .when(dashboardService).refresh(any());
 
         mvc.perform(post("/dashboard/refresh"))
                 .andExpect(redirectedUrl("/?periodo=7"))
@@ -206,11 +209,86 @@ class DashboardPageTest {
     @Test
     void whenTheViewCannotBeReadTheScreenSaysSoWith503() throws Exception {
         when(currentAdmin.require()).thenReturn(Admin.builder().id(1).userName("Nicolas").email("n@x.com").build());
-        when(dashboardService.build(anyInt())).thenThrow(new DashboardUnavailableException(
+        when(dashboardService.build(anyInt(), any())).thenThrow(new DashboardUnavailableException(
                 "Não foi possível carregar o dashboard agora. Tente novamente em instantes."));
 
         String html = mvc.perform(get("/")).andExpect(status().isServiceUnavailable()).andReturn().getResponse().getContentAsString();
 
         assertTrue(html.contains("Não foi possível carregar o dashboard agora."));
+    }
+
+    private String pageIn(String language) throws Exception {
+        DashboardService real = serviceWithSomeData(List.of(alert("Ana Usuário (BLOQUEADO)")));
+        doAnswer(invocation -> real.build(invocation.getArgument(0), invocation.getArgument(1))).when(dashboardService).build(anyInt(), any());
+        when(currentAdmin.require()).thenReturn(Admin.builder().id(1).userName("Nicolas Delecrode").email("n@x.com").build());
+        return mvc.perform(get("/").param("periodo", "7").cookie(new jakarta.servlet.http.Cookie("quimia.lang", language)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+    }
+
+    @Test
+    void withoutAChoiceTheScreenIsInPortugueseEvenIfTheBrowserAsksForEnglish() throws Exception {
+        DashboardService real = serviceWithSomeData(List.of());
+        doAnswer(invocation -> real.build(invocation.getArgument(0), invocation.getArgument(1))).when(dashboardService).build(anyInt(), any());
+        when(currentAdmin.require()).thenReturn(Admin.builder().id(1).userName("Nicolas").email("n@x.com").build());
+
+        String html = mvc.perform(get("/").header("Accept-Language", "en-US,en;q=0.9")).andReturn().getResponse().getContentAsString();
+
+        assertTrue(html.contains("Bem-vindo de volta, Nicolas") && html.contains("lang=\"pt-BR\""));
+    }
+
+    @Test
+    void theChosenLanguageTranslatesTheMenuTheScreenAndTheTextsTheServiceBuilds() throws Exception {
+        String html = pageIn("en");
+
+        assertTrue(html.contains("lang=\"en\""), "o <html> acompanha o idioma");
+        assertTrue(html.contains("Welcome back, Nicolas"));
+        assertTrue(html.contains("Thursday, October 22, 2026"), "a data no formato do idioma");
+        assertTrue(html.contains("Refresh dashboard") && html.contains(">7 days<") && html.contains(">30 days<"));
+        assertTrue(html.contains(">Administrators<") && html.contains(">Companies<") && html.contains(">Log out<") && html.contains(">Pin menu<"));
+        assertTrue(html.contains(">Users<") && html.contains(">Alerts<") && html.contains(">Queries<"), "rótulos dos cartões, montados pelo serviço");
+        assertTrue(html.contains("usage records in the last 7 days") && html.contains("pending or blocked accounts"));
+        assertTrue(html.contains("Usage activity") && html.contains("Most used products") && html.contains("Recent alerts"));
+        assertTrue(html.contains("Adm deleted a record in produtos") && html.contains("Ana registered: Descarte"), "frases das atividades");
+        assertTrue(html.contains("10/22/2026") || html.contains("10/21/2026"), "datas dos gráficos no formato do idioma");
+        assertTrue(html.contains(">User<"), "tipo do alerta traduzido");
+        assertFalse(html.contains("Bem-vindo") || html.contains("Atualizar dashboard") || html.contains("Alertas recentes"));
+    }
+
+    @Test
+    void anUnknownLanguageCookieFallsBackToPortuguese() throws Exception {
+        String html = pageIn("fr");
+
+        assertTrue(html.contains("Bem-vindo de volta, Nicolas"));
+    }
+
+    @Test
+    void theProfileOpensTheSettingsPanelWithLanguageAndTheme() throws Exception {
+        String html = pageIn("pt-BR");
+
+        assertTrue(html.contains("<button type=\"button\" class=\"profile-chip\" popovertarget=\"configuracoes\""), "o perfil é um botão que abre o painel");
+        assertTrue(html.contains("id=\"configuracoes\"") && html.contains("popover"));
+        assertTrue(html.contains(">Configurações<") && html.contains(">Idioma<") && html.contains(">Aparência<"));
+        assertTrue(html.contains("action=\"/settings/language\""));
+        assertTrue(html.contains("name=\"lang\" value=\"pt-BR\"") && html.contains("name=\"lang\" value=\"en\""));
+        for (String theme : new String[]{"light", "dark", "system"}) {
+            assertTrue(html.contains("name=\"theme\" value=\"" + theme + "\""), theme);
+        }
+        assertTrue(html.contains(">Claro<") && html.contains(">Escuro<") && html.contains(">Sistema<"));
+    }
+
+    @Test
+    void theCurrentLanguageIsMarkedInTheSettings() throws Exception {
+        assertTrue(pageIn("en").matches("(?s).*value=\"en\"[^>]*aria-pressed=\"true\".*"));
+        assertTrue(pageIn("pt-BR").matches("(?s).*value=\"pt-BR\"[^>]*aria-pressed=\"true\".*"));
+    }
+
+    @Test
+    void everyScreenLoadsTheThemeScriptBeforeThePageIsPainted() throws Exception {
+        String html = pageIn("pt-BR");
+
+        int theme = html.indexOf("/js/theme.js");
+        int firstStyle = html.indexOf("rel=\"stylesheet\"");
+        assertTrue(theme > 0 && theme < firstStyle, "theme.js vem antes dos estilos, para o tema certo valer desde o primeiro quadro");
+        assertFalse(html.substring(theme - 40, theme + 20).contains("defer"), "sem defer: precisa rodar antes de pintar");
     }
 }

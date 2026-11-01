@@ -1,8 +1,8 @@
 package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.exception.ResourceNotFoundException;
-import com.quimia.quimiawebcrud.mapper.ResponseMapper;
-import com.quimia.quimiawebcrud.repository.ColumnFilterRepository;
+import com.quimia.quimiawebcrud.mapper.support.ResponseMapper;
+import com.quimia.quimiawebcrud.repository.support.ColumnFilterRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;

@@ -14,6 +14,12 @@
   max-width: 1280px;
 }
 
+/* As colunas e o cabeçalho respondem à largura do conteúdo, e não à da janela: com o menu aberto (fixo ou ao passar
+   o mouse) o conteúdo fica mais estreito e antes o cabeçalho quebrava e empurrava tudo para baixo. */
+.dashboard {
+  container: dashboard / inline-size;
+}
+
 /* ---------- Cabeçalho ---------- */
 .dash-header {
   display: flex;
@@ -21,6 +27,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+}
+
+.dash-welcome {
+  flex: 1 1 300px;
+  min-width: 0;
 }
 
 .dash-welcome h1 {
@@ -37,8 +48,10 @@
 
 .dash-tools {
   display: flex;
+  flex: 0 1 auto;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: 16px;
 }
 
@@ -51,6 +64,28 @@
   border-radius: 999px;
   background: var(--color-surface);
   box-shadow: var(--card-shadow);
+}
+
+/* O perfil é um botão: abre o painel de configurações */
+button.profile-chip {
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.profile-chip:hover {
+  background: var(--color-hover);
+}
+
+button.profile-chip::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin: 0 6px 3px 2px;
+  border-right: 2px solid var(--color-text-muted);
+  border-bottom: 2px solid var(--color-text-muted);
+  transform: rotate(45deg);
 }
 
 .avatar {
@@ -275,7 +310,7 @@
   grid-column: span 8;
 }
 
-@media (max-width: 1100px) {
+@container dashboard (max-width: 1000px) {
   .span-4,
   .span-6,
   .span-8 {
@@ -591,11 +626,22 @@
 }
 
 .dash-list a {
-  color: var(--color-primary);
+  color: var(--color-accent);
   font-weight: 600;
   text-decoration: none;
 }
 
 .dash-list a:hover {
   text-decoration: underline;
+}
+
+/* ---------- Tema escuro ---------- */
+:root[data-theme="dark"] .dashboard {
+  --chart-1: #3EC5D4;
+  --chart-2: #F2B84B;
+  --chart-3: #7C8DB5;
+  --chart-4: #E8837A;
+  --chart-5: #6CE9B8;
+  --chart-6: #5B6B66;
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 18px rgba(0, 0, 0, 0.35);
 }

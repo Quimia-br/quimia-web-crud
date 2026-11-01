@@ -1,8 +1,8 @@
 package com.quimia.quimiawebcrud.service.dashboard;
 
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Donut;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Slice;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Trend;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Donut;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Slice;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Trend;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashMap;
@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Contas dos gráficos: escala "redonda", variação entre períodos, fatias da rosca e curva suave.
  */
 class DashboardChartsTest {
+
+    private static final DashboardTexts TEXTS = new DashboardTexts(com.quimia.quimiawebcrud.TestMessages.source(), com.quimia.quimiawebcrud.TestMessages.PT);
 
     @Test
     void scaleUsesRoundStepsSoFourGridLinesAlwaysCoverTheHighestValue() {
@@ -31,11 +33,11 @@ class DashboardChartsTest {
 
     @Test
     void trendTextAndDirectionComparePeriods() {
-        assertEquals("+20%", ChartScale.trendText(12, 10));
-        assertEquals("-20%", ChartScale.trendText(8, 10));
-        assertEquals("0%", ChartScale.trendText(5, 5));
-        assertEquals("0%", ChartScale.trendText(0, 0));
-        assertEquals("novo", ChartScale.trendText(3, 0), "antes não havia nada, não dá para calcular a porcentagem");
+        assertEquals("+20%", ChartScale.trendText(12, 10, "novo"));
+        assertEquals("-20%", ChartScale.trendText(8, 10, "novo"));
+        assertEquals("0%", ChartScale.trendText(5, 5, "novo"));
+        assertEquals("0%", ChartScale.trendText(0, 0, "novo"));
+        assertEquals("novo", ChartScale.trendText(3, 0, "novo"), "antes não havia nada, não dá para calcular a porcentagem");
         assertEquals(Trend.UP, ChartScale.trend(3, 0));
         assertEquals(Trend.DOWN, ChartScale.trend(1, 2));
         assertEquals(Trend.FLAT, ChartScale.trend(2, 2));
@@ -49,7 +51,7 @@ class DashboardChartsTest {
         counts.put("C", 1L);
         counts.put("Zero", 0L);
 
-        Donut donut = DonutChart.build(counts);
+        Donut donut = DonutChart.build(counts, TEXTS);
 
         assertEquals(10, donut.getTotal());
         assertEquals(3, donut.getSlices().size(), "categoria sem registros não aparece");
@@ -73,7 +75,7 @@ class DashboardChartsTest {
             counts.put("Tipo " + i, (long) (10 - i));
         }
 
-        Donut donut = DonutChart.build(counts);
+        Donut donut = DonutChart.build(counts, TEXTS);
 
         assertEquals(6, donut.getSlices().size());
         Slice others = donut.getSlices().get(5);
@@ -84,7 +86,7 @@ class DashboardChartsTest {
 
     @Test
     void emptyDonutHasNoSlices() {
-        Donut donut = DonutChart.build(Map.of());
+        Donut donut = DonutChart.build(Map.of(), TEXTS);
 
         assertEquals(0, donut.getTotal());
         assertTrue(donut.getSlices().isEmpty());

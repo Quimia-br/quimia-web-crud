@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.service.crud;
 
-import com.quimia.quimiawebcrud.dto.AdminRequestDTO;
-import com.quimia.quimiawebcrud.dto.AdminResponseDTO;
+import com.quimia.quimiawebcrud.dto.request.AdminRequestDTO;
+import com.quimia.quimiawebcrud.dto.response.AdminResponseDTO;
 import com.quimia.quimiawebcrud.exception.DuplicateResourceException;
 import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.AdminMapper;
@@ -13,8 +13,10 @@ import com.quimia.quimiawebcrud.service.CrudService;
 import com.quimia.quimiawebcrud.service.CurrentAdmin;
 import com.quimia.quimiawebcrud.service.EditLog;
 import com.quimia.quimiawebcrud.service.removal.RecordRemovalService;
+import com.quimia.quimiawebcrud.service.verification.ExternalChecks;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -30,6 +32,7 @@ public class AdminService extends CrudService<Admin, Integer, AdminRequestDTO, A
     private final RecordRemovalService removal;
     private final EditLog editLog;
     private final CurrentAdmin currentAdmin;
+    private final ExternalChecks checks;
 
     @Override
     protected AdminRepository getRepository() {
@@ -44,6 +47,14 @@ public class AdminService extends CrudService<Admin, Integer, AdminRequestDTO, A
     @Override
     protected EditLog getEditLog() {
         return editLog;
+    }
+
+    /** O domínio do e-mail precisa existir; só é conferido quando o e-mail mudou. */
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void verifyBeforeSave(AdminRequestDTO request, Integer id) {
+        Admin current = id == null ? null : repository.findById(id).orElse(null);
+        checks.requireEmailDomain(request.getEmail(), current == null ? null : current.getEmail());
     }
 
     /**

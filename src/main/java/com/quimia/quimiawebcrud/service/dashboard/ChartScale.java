@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.service.dashboard;
 
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Tick;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Trend;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Tick;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Trend;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +47,10 @@ final class ChartScale {
         return current < previous ? Trend.DOWN : Trend.FLAT;
     }
 
-    /** "+12%", "-8%", "0%" ou "novo" (quando antes não havia nada). */
-    static String trendText(long current, long previous) {
+    /** "+12%", "-8%", "0%" ou o texto de "novo" (quando antes não havia nada). */
+    static String trendText(long current, long previous, String newLabel) {
         if (previous == 0) {
-            return current > 0 ? "novo" : "0%";
+            return current > 0 ? newLabel : "0%";
         }
         long percent = Math.round((current - previous) * 100.0 / previous);
         return (percent > 0 ? "+" : "") + percent + "%";

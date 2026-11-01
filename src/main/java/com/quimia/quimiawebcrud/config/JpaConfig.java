@@ -1,6 +1,6 @@
 package com.quimia.quimiawebcrud.config;
 
-import com.quimia.quimiawebcrud.repository.ColumnFilterRepositoryImpl;
+import com.quimia.quimiawebcrud.repository.support.ColumnFilterRepositoryImpl;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 

@@ -1,6 +1,6 @@
 package com.quimia.quimiawebcrud.service.crud;
 
-import com.quimia.quimiawebcrud.dto.ShelfProductResponseDTO;
+import com.quimia.quimiawebcrud.dto.response.ShelfProductResponseDTO;
 import com.quimia.quimiawebcrud.exception.ResourceNotFoundException;
 import com.quimia.quimiawebcrud.mapper.ShelfProductMapper;
 import com.quimia.quimiawebcrud.model.ShelfProduct;

@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.service.crud;
 
-import com.quimia.quimiawebcrud.dto.DisposalRequestDTO;
-import com.quimia.quimiawebcrud.dto.DisposalResponseDTO;
+import com.quimia.quimiawebcrud.dto.request.DisposalRequestDTO;
+import com.quimia.quimiawebcrud.dto.response.DisposalResponseDTO;
 import com.quimia.quimiawebcrud.exception.DuplicateResourceException;
 import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.DisposalMapper;

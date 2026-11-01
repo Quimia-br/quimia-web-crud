@@ -1,14 +1,13 @@
 package com.quimia.quimiawebcrud.service.dashboard;
 
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Bar;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.MonthGroup;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.MonthlyChart;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Bar;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.MonthGroup;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.MonthlyChart;
 
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -23,7 +22,6 @@ final class SignupsChart {
     static final int BOTTOM = 250;
     private static final int BAR_WIDTH = 22;
     private static final int BAR_GAP = 6;
-    private static final Locale PT_BR = Locale.forLanguageTag("pt-BR");
 
     private SignupsChart() {
     }
@@ -32,8 +30,10 @@ final class SignupsChart {
      * @param users     cadastros de usuários por mês (meses fora dos últimos {@value #MONTHS} são ignorados)
      * @param companies o mesmo para empresas
      * @param lastMonth último mês do gráfico (o atual)
+     * @param texts     os textos do gráfico no idioma do pedido
      */
-    static MonthlyChart build(Map<YearMonth, Long> users, Map<YearMonth, Long> companies, YearMonth lastMonth) {
+    static MonthlyChart build(Map<YearMonth, Long> users, Map<YearMonth, Long> companies, YearMonth lastMonth,
+                              DashboardTexts texts) {
         List<YearMonth> months = new ArrayList<>();
         long highest = 0;
         for (int i = MONTHS - 1; i >= 0; i--) {
@@ -49,21 +49,21 @@ final class SignupsChart {
         for (int i = 0; i < months.size(); i++) {
             YearMonth month = months.get(i);
             int center = LEFT + i * slot + slot / 2;
-            groups.add(new MonthGroup(labelOf(month), center,
-                    bar(center - BAR_GAP / 2 - BAR_WIDTH, users.getOrDefault(month, 0L), max, "usuários", month),
-                    bar(center + BAR_GAP / 2, companies.getOrDefault(month, 0L), max, "empresas", month)));
+            groups.add(new MonthGroup(labelOf(month, texts), center,
+                    bar(center - BAR_GAP / 2 - BAR_WIDTH, users.getOrDefault(month, 0L), max, texts.get("dash.signups.usersWord"), month, texts),
+                    bar(center + BAR_GAP / 2, companies.getOrDefault(month, 0L), max, texts.get("dash.signups.companiesWord"), month, texts)));
         }
         return new MonthlyChart(ChartScale.yTicks(step, TOP, BOTTOM), groups, max);
     }
 
-    private static Bar bar(int x, long count, int max, String what, YearMonth month) {
+    private static Bar bar(int x, long count, int max, String what, YearMonth month, DashboardTexts texts) {
         int height = (int) Math.round(count * (BOTTOM - TOP) / (double) max);
         return new Bar(x, BOTTOM - height, BAR_WIDTH, height, count,
-                labelOf(month) + "/" + month.getYear() + ": " + count + " " + what);
+                labelOf(month, texts) + "/" + month.getYear() + ": " + count + " " + what);
     }
 
-    private static String labelOf(YearMonth month) {
-        String name = month.getMonth().getDisplayName(TextStyle.SHORT, PT_BR).replace(".", "");
-        return name.substring(0, 1).toUpperCase(PT_BR) + name.substring(1);
+    private static String labelOf(YearMonth month, DashboardTexts texts) {
+        String name = month.getMonth().getDisplayName(TextStyle.SHORT, texts.locale()).replace(".", "");
+        return name.substring(0, 1).toUpperCase(texts.locale()) + name.substring(1);
     }
 }

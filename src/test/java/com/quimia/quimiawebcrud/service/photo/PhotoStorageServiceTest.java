@@ -1,6 +1,6 @@
 package com.quimia.quimiawebcrud.service.photo;
 
-import com.quimia.quimiawebcrud.dto.UserRequestDTO;
+import com.quimia.quimiawebcrud.dto.request.UserRequestDTO;
 import com.quimia.quimiawebcrud.exception.PhotoException;
 import com.quimia.quimiawebcrud.mapper.UserMapper;
 import com.quimia.quimiawebcrud.model.User;
@@ -10,6 +10,7 @@ import com.quimia.quimiawebcrud.security.PasswordHasher;
 import com.quimia.quimiawebcrud.service.EditLog;
 import com.quimia.quimiawebcrud.service.crud.UserService;
 import com.quimia.quimiawebcrud.service.removal.RecordRemovalService;
+import com.quimia.quimiawebcrud.service.verification.ExternalChecks;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
@@ -176,7 +177,7 @@ class PhotoStorageServiceTest {
         UserRepository repository = mock(UserRepository.class);
         when(repository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
         UserService service = new UserService(repository, new UserMapper(), new PasswordHasher(), storage, mock(RecordRemovalService.class),
-                mock(EditLog.class));
+                mock(EditLog.class), mock(ExternalChecks.class));
 
         UserRequestDTO forged = UserRequestDTO.builder().userName("Ana").email("a@x.com").password("s3nha-forte")
                 .status(Status.ATIVO).photoUrl("https://forjado.com/x.png").build();

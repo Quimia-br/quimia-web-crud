@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.service.crud;
 
-import com.quimia.quimiawebcrud.dto.UserRequestDTO;
-import com.quimia.quimiawebcrud.dto.UserResponseDTO;
+import com.quimia.quimiawebcrud.dto.request.UserRequestDTO;
+import com.quimia.quimiawebcrud.dto.response.UserResponseDTO;
 import com.quimia.quimiawebcrud.exception.DuplicateResourceException;
 import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.UserMapper;
@@ -12,8 +12,10 @@ import com.quimia.quimiawebcrud.service.CrudService;
 import com.quimia.quimiawebcrud.service.EditLog;
 import com.quimia.quimiawebcrud.service.photo.PhotoStorageService;
 import com.quimia.quimiawebcrud.service.removal.RecordRemovalService;
+import com.quimia.quimiawebcrud.service.verification.ExternalChecks;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -29,6 +31,7 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
     private final PhotoStorageService photoStorage;
     private final RecordRemovalService removal;
     private final EditLog editLog;
+    private final ExternalChecks checks;
 
     @Override
     protected UserRepository getRepository() {
@@ -43,6 +46,14 @@ public class UserService extends CrudService<User, Integer, UserRequestDTO, User
     @Override
     protected EditLog getEditLog() {
         return editLog;
+    }
+
+    /** O domínio do e-mail precisa existir; só é conferido quando o e-mail mudou. */
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void verifyBeforeSave(UserRequestDTO request, Integer id) {
+        User current = id == null ? null : repository.findById(id).orElse(null);
+        checks.requireEmailDomain(request.getEmail(), current == null ? null : current.getEmail());
     }
 
     @Override

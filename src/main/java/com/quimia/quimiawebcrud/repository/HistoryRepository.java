@@ -1,6 +1,7 @@
 package com.quimia.quimiawebcrud.repository;
 
 import com.quimia.quimiawebcrud.model.History;
+import com.quimia.quimiawebcrud.repository.support.ColumnFilterRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Repository;
 

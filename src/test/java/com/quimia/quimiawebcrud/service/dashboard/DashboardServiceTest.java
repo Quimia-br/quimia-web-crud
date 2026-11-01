@@ -1,10 +1,11 @@
 package com.quimia.quimiawebcrud.service.dashboard;
 
-import com.quimia.quimiawebcrud.dto.DashboardDTO;
+import com.quimia.quimiawebcrud.TestMessages;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO;
 import com.quimia.quimiawebcrud.exception.DashboardUnavailableException;
 import com.quimia.quimiawebcrud.model.enums.Status;
-import com.quimia.quimiawebcrud.repository.DashboardRepository;
-import com.quimia.quimiawebcrud.repository.DashboardRepository.Row;
+import com.quimia.quimiawebcrud.repository.support.DashboardRepository.Row;
+import com.quimia.quimiawebcrud.repository.support.DashboardRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -34,13 +35,15 @@ import static org.mockito.Mockito.when;
  */
 class DashboardServiceTest {
 
+    private static final java.util.Locale PT = TestMessages.PT;
+
     private static final ZoneId ZONE = ZoneId.of("America/Sao_Paulo");
     private static final LocalDate TODAY = LocalDate.of(2026, 10, 20);
     private static final LocalDateTime UPDATED = LocalDateTime.of(2026, 10, 20, 12, 0);
 
     private final DashboardRepository repository = mock(DashboardRepository.class);
     private final Clock clock = Clock.fixed(TODAY.atTime(12, 0).atZone(ZONE).toInstant(), ZONE);
-    private final DashboardService service = new DashboardService(repository, clock);
+    private final DashboardService service = new DashboardService(repository, clock, TestMessages.source());
 
     private static Row row(String section, Long users, Long products, Long companies, Long alerts, String admin,
                            String action, LocalDateTime editDate, String table, String alert, Long uses, String productName,
@@ -81,7 +84,7 @@ class DashboardServiceTest {
     void emptyViewShowsZerosAndEmptyLists() {
         when(repository.findAll()).thenReturn(List.of());
 
-        DashboardDTO dashboard = service.build(7);
+        DashboardDTO dashboard = service.build(7, PT);
 
         assertEquals(0, dashboard.getTotalUsers());
         assertEquals(0, dashboard.getTotalAlerts());
@@ -100,7 +103,7 @@ class DashboardServiceTest {
     void totalsComeFromTheTotalsRowAndTheUpdateTimeFromTheView() {
         when(repository.findAll()).thenReturn(List.of(totals(123, 500, 2, 90)));
 
-        DashboardDTO dashboard = service.build(7);
+        DashboardDTO dashboard = service.build(7, PT);
 
         assertEquals(123, dashboard.getTotalUsers());
         assertEquals(500, dashboard.getTotalProducts());
@@ -118,7 +121,7 @@ class DashboardServiceTest {
                 series("uso_dia", TODAY.minusDays(7), 1),
                 series("uso_dia", TODAY.plusDays(1), 3)));
 
-        DashboardDTO week = service.build(7);
+        DashboardDTO week = service.build(7, PT);
         DashboardDTO.LineChart chart = week.getActivity();
 
         assertEquals(7, chart.getDots().size());
@@ -137,8 +140,8 @@ class DashboardServiceTest {
         assertTrue(chart.getCurrentLine().startsWith("M44.0,191.5 C"));
         assertTrue(chart.getCurrentArea().endsWith("Z"));
 
-        assertEquals(4, service.build(30).getPeriodTotal());
-        assertEquals(30, service.build(30).getActivity().getDots().size());
+        assertEquals(4, service.build(30, PT).getPeriodTotal());
+        assertEquals(30, service.build(30, PT).getActivity().getDots().size());
     }
 
     @Test
@@ -154,7 +157,7 @@ class DashboardServiceTest {
                 series("uso_dia", TODAY.minusDays(8), 1),
                 series("uso_dia", TODAY.minusDays(9), 1)));
 
-        List<DashboardDTO.Kpi> kpis = service.build(7).getKpis();
+        List<DashboardDTO.Kpi> kpis = service.build(7, PT).getKpis();
 
         assertEquals(List.of("Usuários", "Empresas", "Consultas", "Alertas"), kpis.stream().map(DashboardDTO.Kpi::getLabel).toList());
         DashboardDTO.Kpi usersCard = kpis.get(0);
@@ -180,7 +183,7 @@ class DashboardServiceTest {
                 series("cadastro_usuario_mes", LocalDate.of(2025, 1, 1), 9),
                 series("cadastro_empresa_mes", LocalDate.of(2026, 10, 1), 1)));
 
-        DashboardDTO.MonthlyChart chart = service.build(7).getSignups();
+        DashboardDTO.MonthlyChart chart = service.build(7, PT).getSignups();
 
         assertEquals(6, chart.getMonths().size());
         assertEquals(List.of("Mai", "Jun", "Jul", "Ago", "Set", "Out"), chart.getMonths().stream().map(DashboardDTO.MonthGroup::getLabel).toList());
@@ -201,17 +204,17 @@ class DashboardServiceTest {
         assertEquals(7, DashboardService.normalizePeriod(-1));
         assertEquals(30, DashboardService.normalizePeriod(30));
         assertEquals(90, DashboardService.normalizePeriod(90));
-        assertEquals(7, service.build(9999).getPeriodDays());
+        assertEquals(7, service.build(9999, PT).getPeriodDays());
     }
 
     @Test
     void usesTheInjectedClockForToday() {
         Instant other = LocalDate.of(2027, 1, 15).atTime(9, 0).atZone(ZONE).toInstant();
-        DashboardService later = new DashboardService(repository, Clock.fixed(other, ZONE));
+        DashboardService later = new DashboardService(repository, Clock.fixed(other, ZONE), TestMessages.source());
         when(repository.findAll()).thenReturn(List.of(series("uso_dia", LocalDate.of(2027, 1, 15), 4)));
 
-        assertEquals(4, later.build(7).getPeriodTotal());
-        assertEquals(0, service.build(7).getPeriodTotal());
+        assertEquals(4, later.build(7, PT).getPeriodTotal());
+        assertEquals(0, service.build(7, PT).getPeriodTotal());
     }
 
     @Test
@@ -220,7 +223,7 @@ class DashboardServiceTest {
                 product("Detergente", 1), product("Cloro", 4), product("Soda", 2),
                 queryType("Mistura", 2), queryType("Descarte", 4)));
 
-        DashboardDTO dashboard = service.build(7);
+        DashboardDTO dashboard = service.build(7, PT);
 
         assertEquals(6, dashboard.getQueriesByType().getTotal());
         assertEquals("Descarte", dashboard.getQueriesByType().getSlices().get(0).getName());
@@ -242,7 +245,7 @@ class DashboardServiceTest {
         rows.add(adminActivity("Adm", "INSERT", "usuarios", TODAY.atTime(7, 0)));
         when(repository.findAll()).thenReturn(rows);
 
-        List<DashboardDTO.ActivityItem> items = service.build(7).getLatestActivities();
+        List<DashboardDTO.ActivityItem> items = service.build(7, PT).getLatestActivities();
 
         assertEquals(6, items.size());
         assertEquals("Adm excluiu um registro em produtos", items.get(0).getText());
@@ -256,7 +259,7 @@ class DashboardServiceTest {
                 adminActivity("Adm", "INSERT", "usuarios", TODAY.atTime(10, 0)),
                 adminActivity("Bia", "UPDATE", "empresas", TODAY.atTime(9, 0))));
 
-        List<DashboardDTO.ActivityItem> items = service.build(7).getLatestActivities();
+        List<DashboardDTO.ActivityItem> items = service.build(7, PT).getLatestActivities();
 
         assertEquals("Adm criou um registro em usuarios", items.get(0).getText());
         assertEquals("Bia alterou um registro em empresas", items.get(1).getText());
@@ -268,7 +271,7 @@ class DashboardServiceTest {
                 alert("Ana Souza Usuário (BLOQUEADO)"), alert("Limpa Bem (Filial) Empresa (PENDENTE)"),
                 alert("Adm Administrador (PENDENTE)")));
 
-        List<DashboardDTO.AlertItem> alerts = service.build(7).getRecentAlerts();
+        List<DashboardDTO.AlertItem> alerts = service.build(7, PT).getRecentAlerts();
 
         assertEquals("Ana Souza", alerts.get(0).getName());
         assertEquals("Usuário", alerts.get(0).getKind());
@@ -284,7 +287,7 @@ class DashboardServiceTest {
     void anAlertInAnUnexpectedFormatIsShownAsPlainText() {
         when(repository.findAll()).thenReturn(List.of(alert("algo diferente"), alert("Ana Usuário (OUTRO)")));
 
-        List<DashboardDTO.AlertItem> alerts = service.build(7).getRecentAlerts();
+        List<DashboardDTO.AlertItem> alerts = service.build(7, PT).getRecentAlerts();
 
         assertEquals("algo diferente", alerts.get(0).getName());
         assertNull(alerts.get(0).getStatus());
@@ -300,7 +303,7 @@ class DashboardServiceTest {
         }
         when(repository.findAll()).thenReturn(rows);
 
-        assertEquals(5, service.build(7).getRecentAlerts().size());
+        assertEquals(5, service.build(7, PT).getRecentAlerts().size());
     }
 
     @Test
@@ -309,12 +312,12 @@ class DashboardServiceTest {
                 row("nova", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null),
                 totals(1, 2, 3, 4)));
 
-        assertEquals(1, service.build(7).getTotalUsers());
+        assertEquals(1, service.build(7, PT).getTotalUsers());
     }
 
     @Test
     void refreshAsksTheDatabaseToRecalculateTheView() {
-        service.refresh();
+        service.refresh(PT);
 
         verify(repository).refresh();
     }
@@ -324,13 +327,13 @@ class DashboardServiceTest {
         doThrow(new BadSqlGrammarException("atualiza a view", "refresh materialized view concurrently mv_dashboard",
                 new java.sql.SQLException("must be owner of materialized view mv_dashboard"))).when(repository).refresh();
 
-        DashboardUnavailableException error = assertThrows(DashboardUnavailableException.class, service::refresh);
+        DashboardUnavailableException error = assertThrows(DashboardUnavailableException.class, () -> service.refresh(PT));
 
         assertEquals("Não foi possível atualizar o dashboard agora. Tente novamente em instantes.", error.getMessage());
         assertTrue(!error.getMessage().contains("owner"), "o detalhe do banco não chega à tela");
         // a trava é liberada: a próxima tentativa roda normalmente
         doNothing().when(repository).refresh();
-        service.refresh();
+        service.refresh(PT);
     }
 
     @Test
@@ -339,7 +342,7 @@ class DashboardServiceTest {
         doAnswer(invocation -> {
             Thread other = new Thread(() -> {
                 try {
-                    service.refresh();
+                    service.refresh(PT);
                 } catch (Throwable e) {
                     second.set(e);
                 }
@@ -349,7 +352,7 @@ class DashboardServiceTest {
             return null;
         }).when(repository).refresh();
 
-        service.refresh();
+        service.refresh(PT);
 
         assertTrue(second.get() instanceof DashboardUnavailableException);
         assertEquals("Já existe uma atualização do dashboard em andamento. Aguarde alguns instantes.", second.get().getMessage());
@@ -360,12 +363,12 @@ class DashboardServiceTest {
         when(repository.findAll()).thenThrow(new BadSqlGrammarException("lê a view", "select ... from mv_dashboard",
                 new java.sql.SQLException("relation \"mv_dashboard\" does not exist")));
 
-        DashboardUnavailableException error = assertThrows(DashboardUnavailableException.class, () -> service.build(7));
+        DashboardUnavailableException error = assertThrows(DashboardUnavailableException.class, () -> service.build(7, PT));
 
         assertEquals("Não foi possível carregar o dashboard agora. Tente novamente em instantes.", error.getMessage());
         assertTrue(!error.getMessage().contains("mv_dashboard"), "o detalhe do banco não chega à tela");
 
         doThrow(new DataAccessResourceFailureException("sem conexão")).when(repository).findAll();
-        assertThrows(DashboardUnavailableException.class, () -> service.build(7));
+        assertThrows(DashboardUnavailableException.class, () -> service.build(7, PT));
     }
 }

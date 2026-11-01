@@ -1,6 +1,6 @@
 package com.quimia.quimiawebcrud.service.crud;
 
-import com.quimia.quimiawebcrud.dto.ShelfResponseDTO;
+import com.quimia.quimiawebcrud.dto.response.ShelfResponseDTO;
 import com.quimia.quimiawebcrud.mapper.ShelfMapper;
 import com.quimia.quimiawebcrud.model.Shelf;
 import com.quimia.quimiawebcrud.repository.ShelfRepository;

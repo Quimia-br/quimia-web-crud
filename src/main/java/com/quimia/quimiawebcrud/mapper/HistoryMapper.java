@@ -1,13 +1,14 @@
 package com.quimia.quimiawebcrud.mapper;
 
-import com.quimia.quimiawebcrud.dto.HistoryResponseDTO;
+import com.quimia.quimiawebcrud.dto.response.HistoryResponseDTO;
+import com.quimia.quimiawebcrud.mapper.support.ResponseMapper;
 import com.quimia.quimiawebcrud.model.History;
 import com.quimia.quimiawebcrud.model.Product;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static com.quimia.quimiawebcrud.mapper.References.idOf;
+import static com.quimia.quimiawebcrud.mapper.support.References.idOf;
 
 /**
  * Converte histórico entre entidade e DTO.

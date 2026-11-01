@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.service.crud;
 
-import com.quimia.quimiawebcrud.dto.CompanyRequestDTO;
-import com.quimia.quimiawebcrud.dto.CompanyResponseDTO;
+import com.quimia.quimiawebcrud.dto.request.CompanyRequestDTO;
+import com.quimia.quimiawebcrud.dto.response.CompanyResponseDTO;
 import com.quimia.quimiawebcrud.exception.DuplicateResourceException;
 import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.CompanyMapper;
@@ -12,8 +12,10 @@ import com.quimia.quimiawebcrud.service.CrudService;
 import com.quimia.quimiawebcrud.service.EditLog;
 import com.quimia.quimiawebcrud.service.photo.PhotoStorageService;
 import com.quimia.quimiawebcrud.service.removal.RecordRemovalService;
+import com.quimia.quimiawebcrud.service.verification.ExternalChecks;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -29,6 +31,7 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
     private final PhotoStorageService photoStorage;
     private final RecordRemovalService removal;
     private final EditLog editLog;
+    private final ExternalChecks checks;
 
     @Override
     protected CompanyRepository getRepository() {
@@ -43,6 +46,15 @@ public class CompanyService extends CrudService<Company, Integer, CompanyRequest
     @Override
     protected EditLog getEditLog() {
         return editLog;
+    }
+
+    /** E-mail (domínio) e CNPJ precisam existir; só são conferidos quando mudaram. */
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void verifyBeforeSave(CompanyRequestDTO request, Integer id) {
+        Company current = id == null ? null : repository.findById(id).orElse(null);
+        checks.requireEmailDomain(request.getEmail(), current == null ? null : current.getEmail());
+        checks.requireCnpj(request.getCnpj(), current == null ? null : current.getCnpj());
     }
 
     @Override

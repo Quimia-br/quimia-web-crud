@@ -1,6 +1,6 @@
 package com.quimia.quimiawebcrud.controller.support;
 
-import com.quimia.quimiawebcrud.dto.BaseResponseDTO;
+import com.quimia.quimiawebcrud.dto.response.BaseResponseDTO;
 import org.springframework.ui.Model;
 
 import java.util.Collections;

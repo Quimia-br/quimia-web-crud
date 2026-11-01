@@ -1,10 +1,10 @@
 package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.model.Admin;
+import com.quimia.quimiawebcrud.model.BaseEntity;
 import com.quimia.quimiawebcrud.model.Company;
 import com.quimia.quimiawebcrud.model.Disposal;
 import com.quimia.quimiawebcrud.model.HistoryType;
-import com.quimia.quimiawebcrud.model.BaseEntity;
 import com.quimia.quimiawebcrud.model.Product;
 import com.quimia.quimiawebcrud.model.User;
 

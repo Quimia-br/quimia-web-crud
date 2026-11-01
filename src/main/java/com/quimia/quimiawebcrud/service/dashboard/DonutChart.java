@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.service.dashboard;
 
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Donut;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Slice;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Donut;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Slice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ final class DonutChart {
     private DonutChart() {
     }
 
-    static Donut build(Map<String, Long> counts) {
+    static Donut build(Map<String, Long> counts, DashboardTexts texts) {
         List<Map.Entry<String, Long>> sorted = counts.entrySet().stream()
                 .filter(entry -> entry.getValue() > 0)
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
@@ -35,7 +35,7 @@ final class DonutChart {
         List<Map.Entry<String, Long>> shown = new ArrayList<>(sorted.stream().limit(MAX_SLICES).toList());
         long others = sorted.stream().skip(MAX_SLICES).mapToLong(Map.Entry::getValue).sum();
         if (others > 0) {
-            shown.add(Map.entry("Outros", others));
+            shown.add(Map.entry(texts.get("dash.other"), others));
         }
 
         List<Slice> slices = new ArrayList<>();

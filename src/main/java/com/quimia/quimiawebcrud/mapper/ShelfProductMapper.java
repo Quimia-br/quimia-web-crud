@@ -1,6 +1,7 @@
 package com.quimia.quimiawebcrud.mapper;
 
-import com.quimia.quimiawebcrud.dto.ShelfProductResponseDTO;
+import com.quimia.quimiawebcrud.dto.response.ShelfProductResponseDTO;
+import com.quimia.quimiawebcrud.mapper.support.ResponseMapper;
 import com.quimia.quimiawebcrud.model.ShelfProduct;
 import org.springframework.stereotype.Component;
 

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="auth" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" th:lang="${#locale.toLanguageTag()}" class="auth" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <!-- Sem o theme.js de propósito: o login e a saída ficam sempre no tema claro, qualquer que seja a escolha do painel -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entrar | Quimia</title>
+    <title th:text="#{login.pageTitle} + ' | Quimia'">Entrar | Quimia</title>
     <link rel="icon" type="image/svg+xml" href="../../static/icons/logo.svg" th:href="@{/icons/logo.svg}">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap">
@@ -17,31 +18,31 @@
 <body>
     <header class="auth-brand">
         <img class="auth-logo" src="../../static/icons/logo.svg" th:src="@{/icons/logo.svg}" alt="Quimia">
-        <p class="auth-welcome">Bem-vindo!</p>
+        <p class="auth-welcome" th:text="#{login.welcome}">Bem-vindo!</p>
     </header>
 
     <main class="auth-card">
-        <h1>Acessar conta</h1>
+        <h1 th:text="#{login.heading}">Acessar conta</h1>
 
-        <p class="auth-message auth-message-error" role="alert" hidden th:hidden="${param.error == null}">E-mail ou senha inválidos.</p>
-        <p class="auth-message auth-message-error" role="alert" hidden th:hidden="${param.blocked == null}">Muitas tentativas. Aguarde alguns minutos e tente de novo.</p>
-        <p class="auth-message" role="status" hidden th:hidden="${param.logout == null}">Você saiu do painel.</p>
+        <p class="auth-message auth-message-error" role="alert" hidden th:hidden="${param.error == null}" th:text="#{login.error}">E-mail ou senha inválidos.</p>
+        <p class="auth-message auth-message-error" role="alert" hidden th:hidden="${param.blocked == null}" th:text="#{login.blocked}">Muitas tentativas. Aguarde alguns minutos e tente de novo.</p>
+        <p class="auth-message" role="status" hidden th:hidden="${param.logout == null}" th:text="#{login.loggedOut}">Você saiu do painel.</p>
 
         <form class="auth-form" method="post" action="#" th:action="@{/login}">
             <label class="auth-field">
                 <img src="../../static/icons/field-mail.svg" th:src="@{/icons/field-mail.svg}" alt="">
-                <span class="sr-only">Email</span>
-                <input type="email" name="email" placeholder="Email" autocomplete="username" maxlength="150" required autofocus>
+                <span class="sr-only" th:text="#{login.email}">Email</span>
+                <input type="email" name="email" placeholder="Email" th:placeholder="#{login.email}" autocomplete="username" maxlength="150" required autofocus>
             </label>
 
             <label class="auth-field">
                 <img src="../../static/icons/field-password.svg" th:src="@{/icons/field-password.svg}" alt="">
-                <span class="sr-only">Senha</span>
-                <input type="password" name="password" placeholder="Senha" autocomplete="current-password" required>
-                <button type="button" class="btn-icon password-toggle" data-password-toggle aria-pressed="false" aria-label="Mostrar senha"><img class="icon-eye" src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""><img class="icon-eye-off" src="../../static/icons/eye-off.svg" th:src="@{/icons/eye-off.svg}" alt=""></button>
+                <span class="sr-only" th:text="#{login.password}">Senha</span>
+                <input type="password" name="password" placeholder="Senha" th:placeholder="#{login.password}" autocomplete="current-password" required>
+                <button type="button" class="btn-icon password-toggle" data-password-toggle aria-pressed="false" aria-label="Mostrar senha" th:attr="aria-label=#{login.showPassword},data-label-show=#{login.showPassword},data-label-hide=#{login.hidePassword}"><img class="icon-eye" src="../../static/icons/view.svg" th:src="@{/icons/view.svg}" alt=""><img class="icon-eye-off" src="../../static/icons/eye-off.svg" th:src="@{/icons/eye-off.svg}" alt=""></button>
             </label>
 
-            <button type="submit" class="btn btn-primary auth-submit">Entrar</button>
+            <button type="submit" class="btn btn-primary auth-submit" th:text="#{login.submit}">Entrar</button>
         </form>
     </main>
 </body>

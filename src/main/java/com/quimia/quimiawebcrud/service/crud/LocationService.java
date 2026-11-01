@@ -1,6 +1,6 @@
 package com.quimia.quimiawebcrud.service.crud;
 
-import com.quimia.quimiawebcrud.dto.LocationResponseDTO;
+import com.quimia.quimiawebcrud.dto.response.LocationResponseDTO;
 import com.quimia.quimiawebcrud.mapper.LocationMapper;
 import com.quimia.quimiawebcrud.model.Location;
 import com.quimia.quimiawebcrud.repository.LocationRepository;

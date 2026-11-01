@@ -1,6 +1,7 @@
 package com.quimia.quimiawebcrud.repository;
 
 import com.quimia.quimiawebcrud.model.Admin;
+import com.quimia.quimiawebcrud.repository.support.ColumnFilterRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;

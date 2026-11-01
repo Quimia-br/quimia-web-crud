@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Painel de configurações: abre no perfil do dashboard (botão com popovertarget="configuracoes"), sem JavaScript.
+         Idioma: um formulário que envia a escolha ao servidor (POST /settings/language) e volta para a mesma tela.
+         Aparência: três opções que o theme.js lê e grava no navegador (nenhuma vai ao servidor). -->
+    <dialog class="modal settings-modal" id="configuracoes" popover aria-labelledby="configuracoes-titulo" th:fragment="settings">
+        <header class="modal-header">
+            <div>
+                <h2 id="configuracoes-titulo" th:text="#{settings.title}">Configurações</h2>
+                <p th:text="#{settings.subtitle}">Idioma e aparência do painel</p>
+            </div>
+            <button type="button" class="btn-icon" aria-label="Fechar" th:attr="aria-label=#{settings.close}" popovertarget="configuracoes" popovertargetaction="hide"><img src="../../static/icons/close.svg" th:src="@{/icons/close.svg}" alt=""></button>
+        </header>
+
+        <div class="settings-body">
+            <form class="settings-group" method="post" action="#" th:action="@{/settings/language}">
+                <span class="settings-label" id="idioma-rotulo" th:text="#{settings.language}">Idioma</span>
+                <div class="segmented" role="group" aria-labelledby="idioma-rotulo">
+                    <button type="submit" name="lang" value="pt-BR" class="segment-button" th:text="#{lang.pt-BR}"
+                            th:attr="aria-pressed=${#locale.toLanguageTag() == 'pt-BR'}" aria-pressed="true">Português</button>
+                    <button type="submit" name="lang" value="en" class="segment-button" th:text="#{lang.en}"
+                            th:attr="aria-pressed=${#locale.toLanguageTag() == 'en'}" aria-pressed="false">English</button>
+                </div>
+                <p class="settings-hint" th:text="#{settings.language.hint}">O idioma vale para o menu, o login e o dashboard.</p>
+            </form>
+
+            <fieldset class="settings-group">
+                <legend th:text="#{settings.theme}">Aparência</legend>
+                <div class="segmented">
+                    <label class="segment"><input type="radio" name="theme" value="light" data-theme-option><span th:text="#{settings.theme.light}">Claro</span></label>
+                    <label class="segment"><input type="radio" name="theme" value="dark" data-theme-option><span th:text="#{settings.theme.dark}">Escuro</span></label>
+                    <label class="segment"><input type="radio" name="theme" value="system" data-theme-option checked><span th:text="#{settings.theme.system}">Sistema</span></label>
+                </div>
+                <p class="settings-hint" th:text="#{settings.theme.hint}">Fica salva neste navegador.</p>
+            </fieldset>
+        </div>
+    </dialog>
+</body>
+</html>
