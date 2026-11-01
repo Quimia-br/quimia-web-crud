@@ -6,7 +6,7 @@
     var input = button.closest('.password-field, .auth-field').querySelector('input');
     input.type = visible ? 'text' : 'password';
     button.setAttribute('aria-pressed', String(visible));
-    button.setAttribute('aria-label', visible ? 'Ocultar senha' : 'Mostrar senha');
+    button.setAttribute('aria-label', (visible ? button.dataset.labelHide : button.dataset.labelShow) || (visible ? 'Ocultar senha' : 'Mostrar senha'));
     return input;
   }
 

@@ -5,6 +5,7 @@
   --color-primary: #0F6B78;
   --color-primary-hover: #0B5560;
   --color-primary-dark: #12343A;
+  --color-accent: #0F6B78;
   --color-bg: #F4F6F5;
   --color-surface: #FFFFFF;
   --color-surface-muted: #F7F9F8;
@@ -404,7 +405,7 @@ select {
 
 .badge-info {
   background: rgba(15, 107, 120, 0.12);
-  color: var(--color-primary);
+  color: var(--color-accent);
 }
 
 .badge-danger {
@@ -800,4 +801,133 @@ select:user-invalid,
 textarea:user-invalid {
   border-color: var(--color-danger);
   outline-color: var(--color-danger);
+}
+
+/* ---------- Configurações (painel aberto pelo perfil do dashboard) ---------- */
+.settings-modal {
+  width: min(440px, 100% - 32px);
+}
+
+.settings-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.settings-group legend,
+.settings-label {
+  padding: 0;
+  font-weight: 700;
+}
+
+.settings-hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.segmented {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-muted);
+}
+
+.segment {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.segment input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.segment span,
+.segment-button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.segment-button {
+  flex: 1;
+}
+
+.segment span:hover,
+.segment-button:hover {
+  background: var(--color-hover);
+}
+
+.segment input:checked + span,
+.segment-button[aria-pressed="true"] {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.segment input:focus-visible + span {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ---------- Tema escuro: só troca as variáveis; o tema é escolhido em theme.js (data-theme no <html>) ---------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-sidebar: #0A2E34;
+  --color-primary: #1A8794;
+  --color-primary-hover: #15717C;
+  --color-primary-dark: #0B2A30;
+  --color-accent: #4FD1DF;
+  --color-bg: #0E1513;
+  --color-surface: #172220;
+  --color-surface-muted: #1C2A27;
+  --color-border: #2A3B38;
+  --color-border-strong: #43564F;
+  --color-hover: #22322F;
+  --color-text: #E6EEEB;
+  --color-text-muted: #9FB0AA;
+  --color-danger: #F97066;
+  --color-danger-hover: #FDA29B;
+  --color-danger-bg: #3B1613;
+  --color-success-bg: #12342B;
+  --color-success-text: #6CE9B8;
+  --color-backdrop: rgba(0, 0, 0, 0.65);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* Os ícones do conteúdo são escuros: no tema escuro viram claros, sem mudar de matiz */
+:root[data-theme="dark"] .btn-icon img,
+:root[data-theme="dark"] .pagination img,
+:root[data-theme="dark"] .password-field img,
+:root[data-theme="dark"] .auth-field img {
+  filter: invert(1) hue-rotate(180deg);
 }

@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -24,8 +23,6 @@ final class ActivityChart {
     static final int TOP = 16;
     static final int BOTTOM = 250;
     private static final int MAX_LABELS = 8;
-    private static final Locale PT_BR = Locale.forLanguageTag("pt-BR");
-    private static final DateTimeFormatter FULL = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private ActivityChart() {
     }
@@ -35,8 +32,10 @@ final class ActivityChart {
      * @param previous o mesmo para o período imediatamente anterior
      * @param lastDay  último dia do gráfico (hoje)
      * @param days     quantidade de dias de cada período (7, 30 ou 90)
+     * @param texts    os textos do gráfico no idioma do pedido
      */
-    static LineChart build(Map<LocalDate, Long> current, Map<LocalDate, Long> previous, LocalDate lastDay, int days) {
+    static LineChart build(Map<LocalDate, Long> current, Map<LocalDate, Long> previous, LocalDate lastDay, int days,
+                           DashboardTexts texts) {
         long[] now = new long[days];
         long[] before = new long[days];
         long highest = 0;
@@ -64,10 +63,10 @@ final class ActivityChart {
             beforePoints[i] = new double[]{x, yOf(before[i], max)};
             LocalDate day = lastDay.minusDays(days - 1L - i);
             dots.add(new Dot(ChartScale.number(x), ChartScale.number(nowPoints[i][1]),
-                    day.format(FULL) + ": " + now[i] + (now[i] == 1 ? " registro" : " registros")
-                            + " (período anterior: " + before[i] + ")"));
+                    day.format(DateTimeFormatter.ofPattern(texts.get("dash.date.short"))) + ": " + texts.records(now[i])
+                            + " (" + texts.get("dash.records.previousWord") + ": " + before[i] + ")"));
             if ((days - 1 - i) % labelStep == 0) {
-                xLabels.add(new Tick((int) Math.round(x), labelOf(day, days)));
+                xLabels.add(new Tick((int) Math.round(x), labelOf(day, days, texts)));
             }
         }
 
@@ -75,7 +74,7 @@ final class ActivityChart {
         String area = line + " L" + ChartScale.number(nowPoints[days - 1][0]) + "," + BOTTOM
                 + " L" + ChartScale.number(nowPoints[0][0]) + "," + BOTTOM + " Z";
         return new LineChart(ChartScale.yTicks(step, TOP, BOTTOM), xLabels, line, area, smoothPath(beforePoints), dots,
-                max, currentTotal, previousTotal, ChartScale.trendText(currentTotal, previousTotal),
+                max, currentTotal, previousTotal, ChartScale.trendText(currentTotal, previousTotal, texts.get("dash.trend.new")),
                 ChartScale.trend(currentTotal, previousTotal));
     }
 
@@ -110,11 +109,11 @@ final class ActivityChart {
         return Math.max(TOP, Math.min(BOTTOM, y));
     }
 
-    private static String labelOf(LocalDate day, int days) {
+    private static String labelOf(LocalDate day, int days, DashboardTexts texts) {
         if (days <= 7) {
-            String name = day.getDayOfWeek().getDisplayName(TextStyle.SHORT, PT_BR);
-            return name.substring(0, 1).toUpperCase(PT_BR) + name.substring(1).replace(".", "");
+            String name = day.getDayOfWeek().getDisplayName(TextStyle.SHORT, texts.locale());
+            return name.substring(0, 1).toUpperCase(texts.locale()) + name.substring(1).replace(".", "");
         }
-        return day.format(DateTimeFormatter.ofPattern("dd/MM"));
+        return day.format(DateTimeFormatter.ofPattern(texts.get("dash.date.dayMonth")));
     }
 }

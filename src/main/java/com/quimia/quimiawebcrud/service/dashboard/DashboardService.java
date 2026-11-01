@@ -13,6 +13,7 @@ import com.quimia.quimiawebcrud.repository.DashboardRepository;
 import com.quimia.quimiawebcrud.repository.DashboardRepository.Row;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -48,13 +49,13 @@ public class DashboardService {
     private static final Set<Integer> PERIODS = Set.of(7, 30, 90);
     private static final int LIST_SIZE = 5;
     private static final int ACTIVITY_SIZE = 6;
-    private static final Locale PT_BR = Locale.forLanguageTag("pt-BR");
 
     /** "Ana Usuário (BLOQUEADO)", "Limpa Bem Empresa (PENDENTE)": o texto de cada alerta da view. */
     private static final Pattern ALERT_TEXT = Pattern.compile("^(.*) (Usuário|Empresa|Administrador) \\((\\w+)\\)$");
 
     private final DashboardRepository repository;
     private final Clock clock;
+    private final MessageSource messages;
     private final ReentrantLock refreshLock = new ReentrantLock();
 
     /**
@@ -64,24 +65,25 @@ public class DashboardService {
         return PERIODS.contains(requested) ? requested : DEFAULT_PERIOD;
     }
 
-    /** Lê a view e monta a tela inicial para o período pedido (7, 30 ou 90 dias). */
-    public DashboardDTO build(int requestedPeriod) {
+    /** Lê a view e monta a tela inicial para o período pedido (7, 30 ou 90 dias), com os textos no idioma pedido. */
+    public DashboardDTO build(int requestedPeriod, Locale locale) {
         int period = normalizePeriod(requestedPeriod);
+        DashboardTexts texts = new DashboardTexts(messages, locale);
         LocalDate today = LocalDate.now(clock);
-        Sections view = Sections.from(read());
+        Sections view = Sections.from(read(texts), texts);
 
-        LineChart activity = ActivityChart.build(view.usageByDay, view.usageByDay, today, period);
+        LineChart activity = ActivityChart.build(view.usageByDay, view.usageByDay, today, period, texts);
         List<Kpi> kpis = List.of(
-                signupsKpi("Usuários", view.users, view.userSignupsByDay, today, period, "/users", true),
-                signupsKpi("Empresas", view.companies, view.companySignupsByDay, today, period, "/companies", false),
-                new Kpi("Consultas", activity.getCurrentTotal(), "registros de uso nos últimos " + period + " dias",
+                signupsKpi(texts.get("dash.kpi.users"), view.users, view.userSignupsByDay, today, period, "/users", true, texts),
+                signupsKpi(texts.get("dash.kpi.companies"), view.companies, view.companySignupsByDay, today, period, "/companies", false, texts),
+                new Kpi(texts.get("dash.kpi.queries"), activity.getCurrentTotal(), texts.get("dash.kpi.queriesCaption", period),
                         activity.getTrendText(), activity.getTrend(), false, "/histories"),
-                new Kpi("Alertas", view.alerts, "contas pendentes ou bloqueadas", null, Trend.FLAT, false, null));
+                new Kpi(texts.get("dash.kpi.alerts"), view.alerts, texts.get("dash.kpi.alertsCaption"), null, Trend.FLAT, false, null));
 
-        return new DashboardDTO(todayLabel(today), view.updatedAt, period, view.users, view.companies, view.products, view.alerts,
+        return new DashboardDTO(todayLabel(today, texts), view.updatedAt, period, view.users, view.companies, view.products, view.alerts,
                 activity.getCurrentTotal(), kpis, activity,
-                DonutChart.build(view.queryCounts),
-                SignupsChart.build(view.userSignupsByMonth, view.companySignupsByMonth, YearMonth.from(today)),
+                DonutChart.build(view.queryCounts, texts),
+                SignupsChart.build(view.userSignupsByMonth, view.companySignupsByMonth, YearMonth.from(today), texts),
                 view.recentActivities(),
                 view.alertItems.stream().limit(LIST_SIZE).toList(),
                 ranking(view.productUses));
@@ -91,30 +93,27 @@ public class DashboardService {
      * Atualiza a view com os dados de agora. Só uma atualização roda por vez: um segundo clique enquanto a primeira
      * ainda está em andamento é recusado em vez de enfileirar outro cálculo pesado no banco.
      */
-    public void refresh() {
+    public void refresh(Locale locale) {
         if (!refreshLock.tryLock()) {
-            throw new DashboardUnavailableException(
-                    "Já existe uma atualização do dashboard em andamento. Aguarde alguns instantes.");
+            throw new DashboardUnavailableException(messages.getMessage("dash.error.refreshing", null, locale));
         }
         try {
             repository.refresh();
         } catch (DataAccessException e) {
             log.error("Não foi possível atualizar a mv_dashboard", e);
-            throw new DashboardUnavailableException(
-                    "Não foi possível atualizar o dashboard agora. Tente novamente em instantes.");
+            throw new DashboardUnavailableException(messages.getMessage("dash.error.refreshFailed", null, locale));
         } finally {
             refreshLock.unlock();
         }
     }
 
     /** Falha ao ler a view (ela não existe, não foi populada, banco fora do ar...) vira um aviso para a tela. */
-    private List<Row> read() {
+    private List<Row> read(DashboardTexts texts) {
         try {
             return repository.findAll();
         } catch (DataAccessException e) {
             log.error("Não foi possível ler a mv_dashboard", e);
-            throw new DashboardUnavailableException(
-                    "Não foi possível carregar o dashboard agora. Tente novamente em instantes.");
+            throw new DashboardUnavailableException(texts.get("dash.error.loadFailed"));
         }
     }
 
@@ -137,11 +136,12 @@ public class DashboardService {
 
     /** Cartão de total com a variação dos cadastros do período contra o período anterior. */
     private static Kpi signupsKpi(String label, long total, Map<LocalDate, Long> signupsByDay, LocalDate today, int period,
-                                  String path, boolean highlight) {
+                                  String path, boolean highlight, DashboardTexts texts) {
         long current = countBetween(signupsByDay, today.minusDays(period - 1L), today);
         long previous = countBetween(signupsByDay, today.minusDays(2L * period - 1), today.minusDays(period));
-        return new Kpi(label, total, current + (current == 1 ? " novo" : " novos") + " nos últimos " + period + " dias",
-                ChartScale.trendText(current, previous), ChartScale.trend(current, previous), highlight, path);
+        return new Kpi(label, total, texts.get(current == 1 ? "dash.kpi.newOne" : "dash.kpi.newMany", current, period),
+                ChartScale.trendText(current, previous, texts.get("dash.trend.new")), ChartScale.trend(current, previous),
+                highlight, path);
     }
 
     private static long countBetween(Map<LocalDate, Long> countsByDay, LocalDate from, LocalDate to) {
@@ -151,25 +151,34 @@ public class DashboardService {
                 .sum();
     }
 
-    private static String todayLabel(LocalDate today) {
-        String text = today.format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", PT_BR));
-        return text.substring(0, 1).toUpperCase(PT_BR) + text.substring(1);
+    private static String todayLabel(LocalDate today, DashboardTexts texts) {
+        String text = today.format(DateTimeFormatter.ofPattern(texts.get("dash.date.pattern"), texts.locale()));
+        return text.substring(0, 1).toUpperCase(texts.locale()) + text.substring(1);
     }
 
     /**
      * Separa o tipo, o nome e o status do texto do alerta para a tela mostrar o selo e o link da lista de origem.
      */
-    private static AlertItem alertOf(String text) {
+    private static AlertItem alertOf(String text, DashboardTexts texts) {
         Matcher matcher = text == null ? null : ALERT_TEXT.matcher(text);
         if (matcher != null && matcher.matches()) {
             try {
                 Status status = Status.valueOf(matcher.group(3));
-                return new AlertItem(matcher.group(2), matcher.group(1), status, pathOf(matcher.group(2)));
+                return new AlertItem(kindLabel(matcher.group(2), texts), matcher.group(1), status, pathOf(matcher.group(2)));
             } catch (IllegalArgumentException e) {
                 // status que o sistema não conhece: cai no texto inteiro, abaixo
             }
         }
         return new AlertItem(null, text == null ? "" : text, null, null);
+    }
+
+    /** O tipo que a view escreve em português (Usuário, Empresa, Administrador), no idioma do pedido. */
+    private static String kindLabel(String kind, DashboardTexts texts) {
+        return switch (kind) {
+            case "Usuário" -> texts.get("dash.kind.user");
+            case "Empresa" -> texts.get("dash.kind.company");
+            default -> texts.get("dash.kind.admin");
+        };
     }
 
     private static String pathOf(String kind) {
@@ -180,15 +189,14 @@ public class DashboardService {
         };
     }
 
-    private static String verb(String action) {
-        if (action == null) {
-            return "alterou";
-        }
-        return switch (action) {
-            case "INSERT" -> "criou";
-            case "DELETE" -> "excluiu";
-            default -> "alterou";
+    /** A frase de uma edição do log: quem criou, alterou ou excluiu um registro e em qual tabela. */
+    private static String editSentence(String admin, String action, String table, DashboardTexts texts) {
+        String key = switch (action == null ? "" : action) {
+            case "INSERT" -> "dash.activity.created";
+            case "DELETE" -> "dash.activity.deleted";
+            default -> "dash.activity.updated";
         };
+        return texts.get(key, admin, table);
     }
 
     private static List<RankItem> ranking(Map<String, Long> counts) {
@@ -222,8 +230,14 @@ public class DashboardService {
         final Map<String, Long> productUses = new LinkedHashMap<>();
         final Map<String, Long> queryCounts = new LinkedHashMap<>();
 
-        static Sections from(List<Row> rows) {
-            Sections sections = new Sections();
+        private final DashboardTexts texts;
+
+        private Sections(DashboardTexts texts) {
+            this.texts = texts;
+        }
+
+        static Sections from(List<Row> rows, DashboardTexts texts) {
+            Sections sections = new Sections(texts);
             rows.forEach(sections::add);
             return sections;
         }
@@ -247,11 +261,11 @@ public class DashboardService {
                     products = orZero(row.products());
                     alerts = orZero(row.alerts());
                 }
-                case DashboardRepository.ALERT -> alertItems.add(alertOf(row.alert()));
+                case DashboardRepository.ALERT -> alertItems.add(alertOf(row.alert(), texts));
                 case DashboardRepository.ACTIVITY -> activities.add(new ActivityItem(
-                        row.admin() + " " + verb(row.action()) + " um registro em " + row.affectedTable(), row.editDate()));
+                        editSentence(row.admin(), row.action(), row.affectedTable(), texts), row.editDate()));
                 case DashboardRepository.USAGE_ACTIVITY -> activities.add(new ActivityItem(
-                        row.admin() + " registrou: " + row.queryType(), row.editDate()));
+                        texts.get("dash.activity.usage", row.admin(), row.queryType()), row.editDate()));
                 case DashboardRepository.USAGE_DAY -> addDay(usageByDay, row);
                 case DashboardRepository.USER_SIGNUP_DAY -> addDay(userSignupsByDay, row);
                 case DashboardRepository.COMPANY_SIGNUP_DAY -> addDay(companySignupsByDay, row);

@@ -28,7 +28,7 @@
   font-size: 3rem;
   font-weight: 700;
   line-height: 1;
-  color: var(--color-primary);
+  color: var(--color-accent);
 }
 
 .error-card h1 {
