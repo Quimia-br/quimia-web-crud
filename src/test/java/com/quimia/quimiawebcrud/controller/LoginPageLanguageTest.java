@@ -62,4 +62,13 @@ class LoginPageLanguageTest {
         assertFalse(login(null, "").contains("/js/theme.js"));
         assertFalse(login(null, "?logout").contains("/js/theme.js"));
     }
+
+    @Test
+    void theLoginAndTheLogoutNoticeOfferABackLinkToTheLandingPageInBothLanguages() throws Exception {
+        for (String query : new String[] {"", "?logout"}) {
+            String pt = login(null, query);
+            assertTrue(pt.contains("class=\"auth-back\" href=\"https://quimia.tech\"") && pt.contains("Voltar ao site"));
+            assertTrue(login("en", query).contains("Back to the website"));
+        }
+    }
 }

@@ -231,3 +231,66 @@
   width: 1.6rem;
   height: 1.6rem;
 }
+
+.auth-back {
+  position: absolute;
+  top: 2.4rem;
+  left: 3rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1.8rem 0.8rem 1.1rem;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: var(--auth-text);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 0.3rem 1rem rgba(18, 52, 58, 0.18);
+  transition: transform var(--transition), box-shadow var(--transition);
+  animation: auth-enter 400ms ease-out both;
+}
+
+.auth-back-icon {
+  width: 1.7rem;
+  height: 1.7rem;
+  background: var(--auth-accent);
+  -webkit-mask: url("../icons/chevron-left.svg") no-repeat center / contain;
+  mask: url("../icons/chevron-left.svg") no-repeat center / contain;
+  transition: transform var(--transition);
+}
+
+.auth-back:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0.5rem 1.4rem rgba(18, 52, 58, 0.24);
+}
+
+.auth-back:hover .auth-back-icon {
+  transform: translateX(-0.2rem);
+}
+
+.auth-back:focus-visible {
+  outline: 2px solid #FFFFFF;
+  outline-offset: 3px;
+}
+
+@media (max-width: 1024px) {
+  .auth-back {
+    top: 1.2rem;
+    left: 1.2rem;
+  }
+
+  .auth-brand {
+    padding-top: 5.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-back,
+  .auth-back-icon {
+    animation: none;
+    transition: none;
+  }
+}
