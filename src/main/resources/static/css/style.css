@@ -1,3 +1,5 @@
+/* Estilo base de todas as telas: cores, menu lateral, listas, formulários e popups, com o tema escuro. */
+
 :root {
   --color-sidebar: #0F6B78;
   --color-sidebar-text: #FFFFFF;
@@ -199,7 +201,6 @@ select {
   padding-left: 32px;
 }
 
-/* Título à esquerda e o botão de criar à direita */
 .page-header {
   display: flex;
   flex-wrap: wrap;
@@ -715,7 +716,6 @@ select {
   }
 }
 
-/* "Sair" é um formulário (POST), para o logout não poder ser disparado por um link de outro site */
 .sidebar-logout-form {
   margin-top: auto;
 }
@@ -751,7 +751,6 @@ select {
   transform: none;
 }
 
-/* Avisos de sucesso e erro no topo das listas */
 .alert {
   margin: 0 auto;
   padding: 12px 16px;
@@ -769,7 +768,6 @@ select {
   color: var(--color-danger);
 }
 
-/* ---------- Campo de senha com botão de olho ---------- */
 .password-field {
   position: relative;
   display: flex;
@@ -795,7 +793,6 @@ select {
   display: none;
 }
 
-/* Campo com valor inválido: borda vermelha depois que a pessoa mexeu nele */
 input:user-invalid,
 select:user-invalid,
 textarea:user-invalid {
@@ -803,7 +800,6 @@ textarea:user-invalid {
   outline-color: var(--color-danger);
 }
 
-/* ---------- Configurações (painel aberto pelo perfil do dashboard) ---------- */
 .settings-modal {
   width: min(440px, 100% - 32px);
 }
@@ -898,7 +894,6 @@ textarea:user-invalid {
   outline-offset: 2px;
 }
 
-/* ---------- Tema escuro: só troca as variáveis; o tema é escolhido em theme.js (data-theme no <html>) ---------- */
 :root[data-theme="dark"] {
   color-scheme: dark;
   --color-sidebar: #0A2E34;
@@ -924,7 +919,6 @@ textarea:user-invalid {
   --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.6);
 }
 
-/* Os ícones do conteúdo são escuros: no tema escuro viram claros, sem mudar de matiz */
 :root[data-theme="dark"] .btn-icon img,
 :root[data-theme="dark"] .pagination img,
 :root[data-theme="dark"] .password-field img,

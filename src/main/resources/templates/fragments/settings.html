@@ -1,9 +1,7 @@
 <!DOCTYPE html>
+<!-- Painel de configurações do perfil: idioma e tema. -->
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <body>
-    <!-- Painel de configurações: abre no perfil do dashboard (botão com popovertarget="configuracoes"), sem JavaScript.
-         Idioma: um formulário que envia a escolha ao servidor (POST /settings/language) e volta para a mesma tela.
-         Aparência: três opções que o theme.js lê e grava no navegador (nenhuma vai ao servidor). -->
     <dialog class="modal settings-modal" id="configuracoes" popover aria-labelledby="configuracoes-titulo" th:fragment="settings">
         <header class="modal-header">
             <div>
