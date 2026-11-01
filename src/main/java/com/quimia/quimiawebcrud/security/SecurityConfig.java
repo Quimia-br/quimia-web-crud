@@ -6,8 +6,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.DisableEncodeUrlFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
+
+import java.time.Clock;
 
 /**
  * Todas as telas do painel exigem login de administrador; só ficam abertos o login, os arquivos visuais
@@ -34,6 +37,8 @@ public class SecurityConfig {
         http
                 // Primeiro de todos: pedido que não veio pelo proxy nem chega à tela de login
                 .addFilterBefore(new OriginSecretFilter(originSecret), DisableEncodeUrlFilter.class)
+                // Antes de conferir a senha (passo caro): limita erros por IP e logins em paralelo
+                .addFilterBefore(new LoginThrottleFilter(Clock.systemUTC()), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/login", "/error", "/css/**", "/js/**", "/icons/**", "/images/**",
                                 "/uploads/photos/**", OriginSecretFilter.HEALTH_PATH).permitAll()
