@@ -452,6 +452,8 @@ gitGraph
 3. Rode `./mvnw test` antes de abrir a PR.
 4. Abra a PR para a `develop` e peça a revisão de alguém da equipe. Nada vai direto para a `main`.
 
+Os detalhes do fluxo estão em [CONTRIBUTING.md](CONTRIBUTING.md). Para reportar uma falha de segurança, leia o [SECURITY.md](SECURITY.md).
+
 > [!TIP]
 > Uma tela nova costuma precisar de entidade em `model/`, DTOs e mapper, um service que estende `CrudService`, um controller que estende `GenericController` (ou `ListController`, se for só consulta) e o template em `templates/<tela>/list.html`. Os testes `ColumnFieldsMatchRepositoriesTest` e `FormAttributesTest` avisam se algo ficou desalinhado.
 
@@ -473,3 +475,7 @@ Projeto desenvolvido para a **ExpoTech 2026**.
 | [`quimia-landingpage`](https://github.com/Quimia-br/quimia-landingpage) | Site institucional, publicado em [quimia.tech](https://quimia.tech) |
 
 <p align="right"><a href="#top">voltar ao topo</a></p>
+
+## Licença
+
+Distribuído sob a licença MIT. Veja [LICENSE](LICENSE).
