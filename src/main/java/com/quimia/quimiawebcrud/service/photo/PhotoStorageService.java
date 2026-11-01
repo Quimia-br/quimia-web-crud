@@ -2,7 +2,6 @@ package com.quimia.quimiawebcrud.service.photo;
 
 import com.quimia.quimiawebcrud.exception.PhotoException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -18,16 +17,14 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 /**
- * Guarda as fotos enviadas (usuários e empresas) numa pasta do servidor.
+ * Recebe as fotos enviadas (usuários e empresas), confere e as entrega a um {@link PhotoStore}, que as guarda numa
+ * pasta do servidor ou no R2.
  * <p>
  * Cada foto é validada pelo conteúdo real (não pela extensão), decodificada e gravada de novo pelo servidor
  * (o que descarta metadados e qualquer conteúdo escondido) e salva com nome aleatório.
@@ -41,31 +38,26 @@ public class PhotoStorageService {
     private static final long MAX_BYTES = 2L * 1024 * 1024;
     private static final int MAX_SIDE = 4096;
     private static final long MAX_PIXELS = 16_000_000L;
-    private static final Pattern STORED_NAME = Pattern.compile(
-            "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(png|jpg)$");
 
     private enum Format {
-        JPEG("jpg", "jpeg"),
-        PNG("png", "png");
+        JPEG("jpg", "jpeg", "image/jpeg"),
+        PNG("png", "png", "image/png");
 
         private final String extension;
         private final String imageIoName;
+        private final String contentType;
 
-        Format(String extension, String imageIoName) {
+        Format(String extension, String imageIoName, String contentType) {
             this.extension = extension;
             this.imageIoName = imageIoName;
+            this.contentType = contentType;
         }
     }
 
-    private final Path directory;
-    private final String publicBaseUrl;
+    private final PhotoStore store;
 
-    public PhotoStorageService(@Value("${app.upload.dir}") String uploadDir,
-                               @Value("${app.upload.public-base-url}") String publicBaseUrl) {
-        this.directory = Path.of(uploadDir).toAbsolutePath().normalize().resolve("photos");
-        this.publicBaseUrl = publicBaseUrl.endsWith("/")
-                ? publicBaseUrl.substring(0, publicBaseUrl.length() - 1)
-                : publicBaseUrl;
+    public PhotoStorageService(PhotoStore store) {
+        this.store = store;
     }
 
     /**
@@ -77,7 +69,7 @@ public class PhotoStorageService {
         if (newPhoto == null || newPhoto.isEmpty()) {
             return currentUrl;
         }
-        String newUrl = store(newPhoto);
+        String newUrl = save(newPhoto);
         afterTransaction(currentUrl, newUrl);
         return newUrl;
     }
@@ -90,33 +82,26 @@ public class PhotoStorageService {
     }
 
     /**
-     * Procura o arquivo de uma foto salva por este sistema; nomes fora do padrão nunca são aceitos.
+     * Procura o arquivo de uma foto salva em disco por este sistema; nomes fora do padrão nunca são aceitos.
+     * Com o R2 não há arquivo local: as fotos são entregues pelo próprio bucket.
      */
     public Optional<Path> find(String fileName) {
-        if (fileName == null || !STORED_NAME.matcher(fileName).matches()) {
-            return Optional.empty();
-        }
-        Path file = directory.resolve(fileName).normalize();
-        return file.startsWith(directory) && Files.isRegularFile(file) ? Optional.of(file) : Optional.empty();
+        return store.find(fileName);
     }
 
-    private String store(MultipartFile photo) {
+    private String save(MultipartFile photo) {
         byte[] original = readBytes(photo);
         Format format = detectFormat(original);
         byte[] clean = reencode(original, format);
         String fileName = UUID.randomUUID() + "." + format.extension;
-        Path target = directory.resolve(fileName).normalize();
-        if (!target.startsWith(directory)) {
-            throw new PhotoException("Não foi possível salvar a foto.");
-        }
         try {
-            Files.createDirectories(directory);
-            Files.write(target, clean, StandardOpenOption.CREATE_NEW);
-        } catch (IOException e) {
-            log.error("Falha ao gravar a foto em {}", target, e);
+            return store.save(fileName, clean, format.contentType);
+        } catch (PhotoException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            log.error("Falha ao guardar a foto {}", fileName, e);
             throw new PhotoException("Não foi possível salvar a foto. Tente novamente.");
         }
-        return publicBaseUrl + URL_PREFIX + fileName;
     }
 
     private byte[] readBytes(MultipartFile photo) {
@@ -217,29 +202,15 @@ public class PhotoStorageService {
     }
 
     /**
-     * Só apaga arquivos que este sistema criou; URLs externas e valores estranhos são ignorados.
+     * Só apaga fotos que este sistema criou; URLs externas e valores estranhos são ignorados.
      */
     private void delete(String photoUrl) {
-        Optional<String> fileName = ownFileName(photoUrl);
-        if (fileName.isEmpty()) {
-            return;
-        }
-        try {
-            Files.deleteIfExists(directory.resolve(fileName.get()));
-        } catch (IOException e) {
-            log.warn("Não foi possível apagar a foto {}", fileName.get(), e);
-        }
-    }
-
-    private Optional<String> ownFileName(String photoUrl) {
-        if (photoUrl == null) {
-            return Optional.empty();
-        }
-        String path = photoUrl.startsWith(publicBaseUrl) ? photoUrl.substring(publicBaseUrl.length()) : photoUrl;
-        if (!path.startsWith(URL_PREFIX)) {
-            return Optional.empty();
-        }
-        String fileName = path.substring(URL_PREFIX.length());
-        return STORED_NAME.matcher(fileName).matches() ? Optional.of(fileName) : Optional.empty();
+        store.ownFileName(photoUrl).ifPresent(fileName -> {
+            try {
+                store.delete(fileName);
+            } catch (RuntimeException e) {
+                log.warn("Não foi possível apagar a foto {}", fileName, e);
+            }
+        });
     }
 }

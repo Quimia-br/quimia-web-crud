@@ -17,7 +17,21 @@
         <java.version>25</java.version>
         <!-- O Spring Boot não gerencia esta biblioteca, então a versão é definida aqui -->
         <bouncycastle.version>1.84</bouncycastle.version>
+        <!-- Cliente S3 usado para falar com o bucket R2 da Cloudflare (fotos) -->
+        <awssdk.version>2.56.0</awssdk.version>
     </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${awssdk.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- Aplicação -->
         <dependency>
@@ -50,6 +64,17 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
+        </dependency>
+        <!-- Guarda as fotos no R2 (compativel com S3). O cliente assincrono (Netty) nao e usado, entao fica de fora -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>software.amazon.awssdk</groupId>
+                    <artifactId>netty-nio-client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Só no compilador: gera getters, construtores e builders -->
         <dependency>
