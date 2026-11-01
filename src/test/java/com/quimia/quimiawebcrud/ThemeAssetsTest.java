@@ -83,9 +83,9 @@ class ThemeAssetsTest {
     }
 
     @Test
-    void theLoginAndTheDashboardChartsHaveTheirOwnDarkColors() throws IOException {
-        assertTrue(read("css/auth.css").contains(":root.auth[data-theme=\"dark\"]"));
+    void theDashboardChartsHaveTheirOwnDarkColorsAndTheLoginHasNone() throws IOException {
         assertTrue(read("css/dashboard.css").contains(":root[data-theme=\"dark\"] .dashboard"));
+        assertFalse(read("css/auth.css").contains("data-theme"), "o login é sempre claro");
     }
 
     @Test
