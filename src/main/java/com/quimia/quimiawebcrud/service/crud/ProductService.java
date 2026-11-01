@@ -11,8 +11,10 @@ import com.quimia.quimiawebcrud.repository.ProductRepository;
 import com.quimia.quimiawebcrud.service.CrudService;
 import com.quimia.quimiawebcrud.service.EditLog;
 import com.quimia.quimiawebcrud.service.removal.RecordRemovalService;
+import com.quimia.quimiawebcrud.service.verification.ExternalChecks;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -27,6 +29,7 @@ public class ProductService extends CrudService<Product, Integer, ProductRequest
     private final CompanyRepository companies;
     private final RecordRemovalService removal;
     private final EditLog editLog;
+    private final ExternalChecks checks;
 
     @Override
     protected ProductRepository getRepository() {
@@ -41,6 +44,14 @@ public class ProductService extends CrudService<Product, Integer, ProductRequest
     @Override
     protected EditLog getEditLog() {
         return editLog;
+    }
+
+    /** A substância do número CAS precisa existir no PubChem; só é conferida quando o número mudou. */
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void verifyBeforeSave(ProductRequestDTO request, Integer id) {
+        Product current = id == null ? null : repository.findById(id).orElse(null);
+        checks.requireCas(request.getCasNumber(), current == null ? null : current.getCasNumber());
     }
 
     /** Todo produto pertence a uma empresa cadastrada, e o número CAS identifica um único produto. */

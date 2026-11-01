@@ -26,6 +26,7 @@ import com.quimia.quimiawebcrud.service.CurrentAdmin;
 import com.quimia.quimiawebcrud.service.EditLog;
 import com.quimia.quimiawebcrud.service.photo.PhotoStorageService;
 import com.quimia.quimiawebcrud.service.removal.RecordRemovalService;
+import com.quimia.quimiawebcrud.service.verification.ExternalChecks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -54,14 +55,16 @@ class BusinessRulesTest {
     private final EditLog editLog = new EditLog(currentAdmin, logs);
     private final Admin me = Admin.builder().id(3).userName("Eu").email("eu@quimia.com").status(Status.ATIVO).build();
 
+    private final ExternalChecks checks = mock(ExternalChecks.class);
+
     private final UserRepository users = mock(UserRepository.class);
     private final UserService userService = new UserService(users, new UserMapper(), new PasswordHasher(),
-            mock(PhotoStorageService.class), mock(RecordRemovalService.class), editLog);
+            mock(PhotoStorageService.class), mock(RecordRemovalService.class), editLog, checks);
 
     private final ProductRepository products = mock(ProductRepository.class);
     private final CompanyRepository companies = mock(CompanyRepository.class);
     private final ProductService productService = new ProductService(products, new ProductMapper(), companies,
-            mock(RecordRemovalService.class), editLog);
+            mock(RecordRemovalService.class), editLog, checks);
 
     private final DisposalRepository disposals = mock(DisposalRepository.class);
     private final DisposalService disposalService = new DisposalService(disposals, new DisposalMapper(), products,
@@ -69,7 +72,7 @@ class BusinessRulesTest {
 
     private final AdminRepository admins = mock(AdminRepository.class);
     private final AdminService adminService = new AdminService(admins, new AdminMapper(), new PasswordHasher(),
-            mock(RecordRemovalService.class), editLog, currentAdmin);
+            mock(RecordRemovalService.class), editLog, currentAdmin, checks);
 
     @BeforeEach
     void setUp() {

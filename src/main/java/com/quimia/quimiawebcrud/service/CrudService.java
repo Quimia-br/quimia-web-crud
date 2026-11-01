@@ -2,6 +2,7 @@ package com.quimia.quimiawebcrud.service;
 
 import com.quimia.quimiawebcrud.mapper.Mapper;
 import com.quimia.quimiawebcrud.model.BaseEntity;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,6 +20,16 @@ public abstract class CrudService<E extends BaseEntity, ID, Req, Res> extends Re
 
     /** O registrador do log de edições usado em toda criação e edição. */
     protected abstract EditLog getEditLog();
+
+    /**
+     * Conferências que consultam fontes externas (DNS, Receita Federal, PubChem). Rodam ANTES de {@link #create} e
+     * {@link #update} e fora de qualquer transação, porque são lentas e numa transação segurariam uma das poucas
+     * conexões do banco. As telas que têm e-mail, CNPJ ou CAS sobrescrevem; as outras não conferem nada.
+     * {@code id} é nulo na criação.
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void verifyBeforeSave(Req request, ID id) {
+    }
 
     /** Valida, grava o registro novo e o anota no log de edições. */
     @Transactional

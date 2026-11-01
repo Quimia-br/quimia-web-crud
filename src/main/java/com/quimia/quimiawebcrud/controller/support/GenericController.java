@@ -55,6 +55,7 @@ public abstract class GenericController<E extends BaseEntity, ID, Req, Res> exte
         return attempt(redirect, "salvar",
                 "Não foi possível salvar: já existe um registro com esses dados ou algum dado relacionado é inválido.",
                 () -> {
+                    getService().verifyBeforeSave(request, id);
                     if (id == null) {
                         getService().create(request);
                         return "Registro criado com sucesso.";

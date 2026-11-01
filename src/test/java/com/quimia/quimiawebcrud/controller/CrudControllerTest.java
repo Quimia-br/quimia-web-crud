@@ -9,6 +9,7 @@ import com.quimia.quimiawebcrud.model.enums.Status;
 import com.quimia.quimiawebcrud.service.crud.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -24,7 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -73,6 +76,33 @@ class CrudControllerTest {
                 .andExpect(redirectedUrl("/users"))
                 .andExpect(flash().attribute("message", "Registro excluído com sucesso."));
         verify(userService).delete(7);
+    }
+
+    @Test
+    void theExternalChecksRunBeforeCreatingAndBeforeUpdating() throws Exception {
+        mvc.perform(post("/users/save").param("userName", "Ana").param("email", "ana@email.com").param("status", "ATIVO"));
+        mvc.perform(post("/users/save").param("id", "7").param("userName", "Ana").param("email", "ana@email.com").param("status", "ATIVO"));
+
+        InOrder order = inOrder(userService);
+        order.verify(userService).verifyBeforeSave(any(UserRequestDTO.class), isNull());
+        order.verify(userService).create(any(UserRequestDTO.class));
+        order.verify(userService).verifyBeforeSave(any(UserRequestDTO.class), eq(7));
+        order.verify(userService).update(eq(7), any(UserRequestDTO.class));
+    }
+
+    @Test
+    void aFailedExternalCheckShowsItsMessageAndNothingIsSaved() throws Exception {
+        doThrow(new InvalidDataException("Este CNPJ não foi encontrado na base da Receita Federal. Confira os números."))
+                .when(userService).verifyBeforeSave(any(), any());
+
+        mvc.perform(post("/users/save").param("userName", "Ana").param("email", "ana@email.com").param("status", "ATIVO"))
+                .andExpect(redirectedUrl("/users"))
+                .andExpect(flash().attribute("error", "Este CNPJ não foi encontrado na base da Receita Federal. Confira os números."));
+        mvc.perform(post("/users/save").param("id", "7").param("userName", "Ana").param("email", "ana@email.com").param("status", "ATIVO"))
+                .andExpect(flash().attribute("error", "Este CNPJ não foi encontrado na base da Receita Federal. Confira os números."));
+
+        verify(userService, never()).create(any());
+        verify(userService, never()).update(anyInt(), any());
     }
 
     @Test

@@ -76,7 +76,7 @@ class InputValidationTest {
                     .andExpect(errorContains("e-mail completo"));
             mvc.perform(post("/admins/save").param("userName", "Ana").param("email", email).param("status", "ATIVO"))
                     .andExpect(errorContains("e-mail completo"));
-            mvc.perform(post("/companies/save").param("cnpj", "12345678000190").param("name", "Limpa Bem")
+            mvc.perform(post("/companies/save").param("cnpj", "12345678000195").param("name", "Limpa Bem")
                             .param("email", email).param("size", "MICRO").param("status", "ATIVO"))
                     .andExpect(errorContains("e-mail completo"));
         }
@@ -136,12 +136,31 @@ class InputValidationTest {
                 .andExpect(errorContains("O CNPJ deve ter 14 números."));
         verify(companyService, never()).create(any());
 
-        mvc.perform(post("/companies/save").param("cnpj", "12345678000190").param("name", "Limpa Bem")
+        mvc.perform(post("/companies/save").param("cnpj", "12345678000195").param("name", "Limpa Bem")
                         .param("email", "c@x.com").param("password", "s3nha-forte").param("size", "MICRO").param("status", "ATIVO"))
                 .andExpect(flash().attribute("message", "Registro criado com sucesso."));
         ArgumentCaptor<CompanyRequestDTO> request = ArgumentCaptor.forClass(CompanyRequestDTO.class);
         verify(companyService).create(request.capture());
-        assertEquals("12345678000190", request.getValue().getCnpj());
+        assertEquals("12345678000195", request.getValue().getCnpj());
+    }
+
+    @Test
+    void companyCnpjWithWrongCheckDigitsIsRefusedBeforeReachingTheService() throws Exception {
+        mvc.perform(post("/companies/save").param("cnpj", "12345678000190").param("name", "Limpa Bem")
+                        .param("email", "c@x.com").param("password", "s3nha-forte").param("size", "MICRO").param("status", "ATIVO"))
+                .andExpect(errorContains("O CNPJ não é válido"));
+        mvc.perform(post("/companies/save").param("cnpj", "11111111111111").param("name", "Limpa Bem")
+                        .param("email", "c@x.com").param("password", "s3nha-forte").param("size", "MICRO").param("status", "ATIVO"))
+                .andExpect(errorContains("O CNPJ não é válido"));
+        verifyNoInteractions(companyService);
+    }
+
+    @Test
+    void productCasWithWrongCheckDigitIsRefusedBeforeReachingTheService() throws Exception {
+        mvc.perform(post("/products/save").param("companyId", "1").param("name", "Cloro").param("casNumber", "7681-52-8")
+                        .param("instructions", "Diluir").param("dosage", "1 ml"))
+                .andExpect(errorContains("O número CAS não é válido"));
+        verifyNoInteractions(productService);
     }
 
     @Test
