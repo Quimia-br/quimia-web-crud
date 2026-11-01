@@ -231,13 +231,3 @@
   width: 1.6rem;
   height: 1.6rem;
 }
-
-/* ---------- Tema escuro (o tema é escolhido em theme.js, nas configurações do dashboard) ---------- */
-:root.auth[data-theme="dark"] {
-  --auth-bg: #0E1513;
-  --auth-card: #172220;
-  --auth-border: #43564F;
-  --auth-text: #E6EEEB;
-  --auth-text-muted: #9FB0AA;
-  --auth-shadow: 0 1.2rem 3.2rem rgba(0, 0, 0, 0.5), 0 0.2rem 0.6rem rgba(0, 0, 0, 0.35);
-}

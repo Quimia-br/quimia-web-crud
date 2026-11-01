@@ -58,10 +58,8 @@ class LoginPageLanguageTest {
     }
 
     @Test
-    void theThemeScriptRunsBeforeTheStylesSoTheLoginDoesNotFlash() throws Exception {
-        String html = login(null, "");
-
-        int theme = html.indexOf("/js/theme.js");
-        assertTrue(theme > 0 && theme < html.indexOf("rel=\"stylesheet\""));
+    void theLoginAndTheLogoutNoticeNeverLoadTheThemeScriptSoTheyStayLight() throws Exception {
+        assertFalse(login(null, "").contains("/js/theme.js"));
+        assertFalse(login(null, "?logout").contains("/js/theme.js"));
     }
 }
