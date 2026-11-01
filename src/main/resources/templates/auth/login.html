@@ -1,8 +1,8 @@
 <!DOCTYPE html>
+<!-- Tela de login, sempre no tema claro (sem theme.js). -->
 <html lang="pt-BR" th:lang="${#locale.toLanguageTag()}" class="auth" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <!-- Sem o theme.js de propósito: o login e a saída ficam sempre no tema claro, qualquer que seja a escolha do painel -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="#{login.pageTitle} + ' | Quimia'">Entrar | Quimia</title>
     <link rel="icon" type="image/svg+xml" href="../../static/icons/logo.svg" th:href="@{/icons/logo.svg}">

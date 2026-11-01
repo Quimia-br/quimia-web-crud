@@ -1,3 +1,5 @@
+/* Tela de login: faixa turquesa, cartão e campos. */
+
 .auth {
   --auth-bg: #F8F8F8;
   --auth-card: #FFFFFF;
@@ -22,7 +24,6 @@
   isolation: isolate;
 }
 
-/* Hexágonos por cima da faixa turquesa, recortados no mesmo formato dela */
 .auth body::before {
   content: "";
   position: absolute;
@@ -218,7 +219,6 @@
   font-weight: 700;
 }
 
-/* Botão de olho dentro do campo de senha do login */
 .auth-field .password-toggle {
   position: static;
   flex: none;
