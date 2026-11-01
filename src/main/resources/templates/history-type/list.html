@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Lista de tipos de histórico, com cadastro, edição e exclusão em popups. -->
 <html lang="pt-BR" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
     <head th:replace="~{fragments/head :: head('Tipos de histórico', ${ {'detail'} }, false)}"></head>
 
@@ -55,11 +56,6 @@
         <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
 
-    <!-- ========== POPUPS ========== -->
-    <!-- Sem JavaScript: um botão com popovertarget="x" abre o elemento
-         que tem id="x" e o atributo popover. -->
-
-    <!-- Novo tipo de histórico -->
     <dialog class="modal" id="novo-history-type" popover aria-labelledby="novo-history-type-titulo">
         <header class="modal-header">
             <div>
@@ -81,8 +77,6 @@
             </footer>
         </form>
     </dialog>
-
-    <!-- Editar e excluir: um par de popups para cada registro da lista. -->
 
     <th:block th:each="item : ${historyTypes}">
     <dialog class="modal" popover th:attr="id=|ver-history-type-${item.id}|,aria-labelledby=|ver-history-type-${item.id}-titulo|">

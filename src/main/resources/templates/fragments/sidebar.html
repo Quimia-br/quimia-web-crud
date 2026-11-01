@@ -1,7 +1,7 @@
 <!DOCTYPE html>
+<!-- Menu lateral do painel. -->
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <body>
-    <!-- Menu lateral de todas as telas. Parâmetro: o caminho da tela atual (ex.: '/users'), que fica destacada; o grupo Relatórios abre sozinho quando a tela é uma das dele. -->
     <aside class="sidebar" th:fragment="sidebar(active)">
         <a href="../dashboard/index.html" th:href="@{/}" class="sidebar-logo">
             <img src="../../static/icons/logo.svg" th:src="@{/icons/logo.svg}" alt="Quimia">

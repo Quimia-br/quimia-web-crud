@@ -1,4 +1,4 @@
-/* Dashboard (tela inicial). Usa as cores e medidas do style.css; os gráficos são SVG e as cores vêm daqui. */
+/* Dashboard (tela inicial): cartões, gráficos em SVG e listas. */
 
 .dashboard {
   --chart-1: #0F6B78;
@@ -14,13 +14,10 @@
   max-width: 1280px;
 }
 
-/* As colunas e o cabeçalho respondem à largura do conteúdo, e não à da janela: com o menu aberto (fixo ou ao passar
-   o mouse) o conteúdo fica mais estreito e antes o cabeçalho quebrava e empurrava tudo para baixo. */
 .dashboard {
   container: dashboard / inline-size;
 }
 
-/* ---------- Cabeçalho ---------- */
 .dash-header {
   display: flex;
   flex-wrap: wrap;
@@ -66,7 +63,6 @@
   box-shadow: var(--card-shadow);
 }
 
-/* O perfil é um botão: abre o painel de configurações */
 button.profile-chip {
   color: var(--color-text);
   font: inherit;
@@ -111,7 +107,6 @@ button.profile-chip::after {
   font-size: 0.75rem;
 }
 
-/* Seletor de período (links, sem JavaScript) */
 .period-nav {
   display: inline-flex;
   padding: 4px;
@@ -139,7 +134,6 @@ button.profile-chip::after {
   color: var(--color-on-primary);
 }
 
-/* ---------- Cartões de números ---------- */
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -230,7 +224,6 @@ button.profile-chip::after {
   background: rgba(255, 255, 255, 0.28);
 }
 
-/* Selo de variação: seta feita só com CSS */
 .trend {
   display: inline-flex;
   align-items: center;
@@ -285,7 +278,6 @@ button.profile-chip::after {
   color: var(--color-on-primary);
 }
 
-/* ---------- Grade dos cartões grandes ---------- */
 .dash-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -352,7 +344,6 @@ button.profile-chip::after {
   color: var(--color-text-muted);
 }
 
-/* ---------- Legendas ---------- */
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -397,7 +388,6 @@ button.profile-chip::after {
   border-top: 2px dashed var(--chart-6);
 }
 
-/* ---------- Gráficos (SVG) ---------- */
 .chart {
   display: block;
   width: 100%;
@@ -443,7 +433,6 @@ button.profile-chip::after {
   stop-opacity: 0;
 }
 
-/* Pontos aparecem ao passar o mouse; o texto vem do <title> */
 .chart-dot {
   fill: var(--color-surface);
   stroke: var(--chart-1);
@@ -467,7 +456,6 @@ button.profile-chip::after {
   opacity: 0.8;
 }
 
-/* Rosca */
 .donut-wrap {
   display: flex;
   flex-direction: column;
@@ -541,8 +529,6 @@ button.profile-chip::after {
   color: var(--color-text-muted);
 }
 
-/* ---------- Tabela de produtos ---------- */
-/* O .table global tem largura mínima de 760px; aqui a tabela ocupa o cartão, de ponta a ponta */
 .dash-table {
   width: calc(100% + 48px);
   min-width: 0;
@@ -598,7 +584,6 @@ button.profile-chip::after {
   border-radius: 999px;
 }
 
-/* ---------- Listas de atividades e alertas ---------- */
 .dash-list {
   list-style: none;
   margin: 0;
@@ -635,7 +620,6 @@ button.profile-chip::after {
   text-decoration: underline;
 }
 
-/* ---------- Tema escuro ---------- */
 :root[data-theme="dark"] .dashboard {
   --chart-1: #3EC5D4;
   --chart-2: #F2B84B;

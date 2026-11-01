@@ -1,4 +1,5 @@
-/* Pré-visualização da foto atual nos popups de usuário e empresa */
+/* Pré-visualização da foto nos popups de usuário e empresa. */
+
 .field-photo {
     display: block;
     width: 64px;

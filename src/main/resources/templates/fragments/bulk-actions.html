@@ -1,14 +1,12 @@
 <!DOCTYPE html>
+<!-- Botões "Atualizar por..." e "Apagar por..." das listas. -->
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <body>
-    <!-- Botões "Atualizar por..." e "Apagar por..." do cabeçalho das telas de cadastro. As colunas vêm do controller
-         (columnFields: todas as que servem de filtro; updatableFields: as que também aceitam um novo valor). -->
     <th:block th:fragment="buttons">
         <button type="button" class="btn btn-secondary" popovertarget="atualizar-por" th:if="${!#lists.isEmpty(updatableFields)}">Atualizar por...</button>
         <button type="button" class="btn btn-secondary" popovertarget="apagar-por" th:if="${!#lists.isEmpty(columnFields)}">Apagar por...</button>
     </th:block>
 
-    <!-- Popups dos dois botões. Ficam junto dos outros popups da tela, no fim da página. -->
     <th:block th:fragment="dialogs">
     <dialog class="modal" id="atualizar-por" popover aria-labelledby="atualizar-por-titulo" th:if="${!#lists.isEmpty(updatableFields)}">
         <header class="modal-header">

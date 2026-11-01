@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Lista do histórico, com detalhes de cada registro. -->
 <html lang="pt-BR" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
     <head th:replace="~{fragments/head :: head('Relatório de usuários', ${ {'detail'} }, false)}"></head>
 
@@ -70,7 +71,6 @@
         <nav th:replace="~{fragments/pagination :: pagination(${page}, ${basePath}, ${query})}"></nav>
     </main>
 
-    <!-- Detalhes de cada registro (somente leitura) -->
     <th:block th:each="item : ${histories}">
     <dialog class="modal" popover th:attr="id=|ver-history-${item.id}|,aria-labelledby=|ver-history-${item.id}-titulo|">
         <header class="modal-header">
