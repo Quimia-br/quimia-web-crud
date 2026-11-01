@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.service.dashboard;
 
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Tick;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Trend;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Tick;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Trend;
 
 import java.util.ArrayList;
 import java.util.List;

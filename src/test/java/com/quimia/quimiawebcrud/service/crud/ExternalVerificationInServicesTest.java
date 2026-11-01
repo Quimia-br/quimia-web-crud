@@ -1,9 +1,9 @@
 package com.quimia.quimiawebcrud.service.crud;
 
-import com.quimia.quimiawebcrud.dto.AdminRequestDTO;
-import com.quimia.quimiawebcrud.dto.CompanyRequestDTO;
-import com.quimia.quimiawebcrud.dto.ProductRequestDTO;
-import com.quimia.quimiawebcrud.dto.UserRequestDTO;
+import com.quimia.quimiawebcrud.dto.request.AdminRequestDTO;
+import com.quimia.quimiawebcrud.dto.request.CompanyRequestDTO;
+import com.quimia.quimiawebcrud.dto.request.ProductRequestDTO;
+import com.quimia.quimiawebcrud.dto.request.UserRequestDTO;
 import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.AdminMapper;
 import com.quimia.quimiawebcrud.mapper.CompanyMapper;

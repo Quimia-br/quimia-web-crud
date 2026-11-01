@@ -1,16 +1,16 @@
 package com.quimia.quimiawebcrud.service.dashboard;
 
-import com.quimia.quimiawebcrud.dto.DashboardDTO;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.ActivityItem;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.AlertItem;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Kpi;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.LineChart;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.RankItem;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Trend;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.ActivityItem;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.AlertItem;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Kpi;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.LineChart;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.RankItem;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Trend;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO;
 import com.quimia.quimiawebcrud.exception.DashboardUnavailableException;
 import com.quimia.quimiawebcrud.model.enums.Status;
-import com.quimia.quimiawebcrud.repository.DashboardRepository;
-import com.quimia.quimiawebcrud.repository.DashboardRepository.Row;
+import com.quimia.quimiawebcrud.repository.support.DashboardRepository.Row;
+import com.quimia.quimiawebcrud.repository.support.DashboardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;

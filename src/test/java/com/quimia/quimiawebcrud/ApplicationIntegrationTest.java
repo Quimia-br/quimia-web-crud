@@ -4,6 +4,7 @@ import com.quimia.quimiawebcrud.model.Admin;
 import com.quimia.quimiawebcrud.model.User;
 import com.quimia.quimiawebcrud.model.enums.Status;
 import com.quimia.quimiawebcrud.repository.*;
+import com.quimia.quimiawebcrud.repository.support.DashboardRepository;
 import com.quimia.quimiawebcrud.security.PasswordHasher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;

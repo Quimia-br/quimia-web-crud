@@ -1,7 +1,8 @@
 package com.quimia.quimiawebcrud.mapper;
 
-import com.quimia.quimiawebcrud.dto.HistoryTypeRequestDTO;
-import com.quimia.quimiawebcrud.dto.HistoryTypeResponseDTO;
+import com.quimia.quimiawebcrud.dto.request.HistoryTypeRequestDTO;
+import com.quimia.quimiawebcrud.dto.response.HistoryTypeResponseDTO;
+import com.quimia.quimiawebcrud.mapper.support.Mapper;
 import com.quimia.quimiawebcrud.model.HistoryType;
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,8 @@
 package com.quimia.quimiawebcrud.mapper;
 
-import com.quimia.quimiawebcrud.dto.AdminRequestDTO;
-import com.quimia.quimiawebcrud.dto.AdminResponseDTO;
+import com.quimia.quimiawebcrud.dto.request.AdminRequestDTO;
+import com.quimia.quimiawebcrud.dto.response.AdminResponseDTO;
+import com.quimia.quimiawebcrud.mapper.support.Mapper;
 import com.quimia.quimiawebcrud.model.Admin;
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.service.crud;
 
-import com.quimia.quimiawebcrud.dto.HistoryTypeRequestDTO;
-import com.quimia.quimiawebcrud.dto.HistoryTypeResponseDTO;
+import com.quimia.quimiawebcrud.dto.request.HistoryTypeRequestDTO;
+import com.quimia.quimiawebcrud.dto.response.HistoryTypeResponseDTO;
 import com.quimia.quimiawebcrud.exception.DuplicateResourceException;
 import com.quimia.quimiawebcrud.mapper.HistoryTypeMapper;
 import com.quimia.quimiawebcrud.model.HistoryType;

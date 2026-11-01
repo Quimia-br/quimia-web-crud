@@ -1,8 +1,8 @@
 package com.quimia.quimiawebcrud.service.dashboard;
 
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Donut;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Slice;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Trend;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Donut;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Slice;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Trend;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashMap;

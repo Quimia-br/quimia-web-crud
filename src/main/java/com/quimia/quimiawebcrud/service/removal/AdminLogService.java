@@ -1,6 +1,6 @@
 package com.quimia.quimiawebcrud.service.removal;
 
-import com.quimia.quimiawebcrud.dto.AdminLogResponseDTO;
+import com.quimia.quimiawebcrud.dto.response.AdminLogResponseDTO;
 import com.quimia.quimiawebcrud.mapper.AdminLogMapper;
 import com.quimia.quimiawebcrud.model.AdminLog;
 import com.quimia.quimiawebcrud.model.enums.AdminAction;

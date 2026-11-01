@@ -1,11 +1,12 @@
 package com.quimia.quimiawebcrud.mapper;
 
-import com.quimia.quimiawebcrud.dto.AdminLogResponseDTO;
+import com.quimia.quimiawebcrud.dto.response.AdminLogResponseDTO;
+import com.quimia.quimiawebcrud.mapper.support.ResponseMapper;
 import com.quimia.quimiawebcrud.model.AdminLog;
 import com.quimia.quimiawebcrud.service.removal.RemovalLogFormat;
 import org.springframework.stereotype.Component;
 
-import static com.quimia.quimiawebcrud.mapper.References.idOf;
+import static com.quimia.quimiawebcrud.mapper.support.References.idOf;
 
 /**
  * Converte registro do log de edições entre entidade e DTO.

@@ -2,6 +2,7 @@ package com.quimia.quimiawebcrud.repository;
 
 import com.quimia.quimiawebcrud.model.UserProduct;
 import com.quimia.quimiawebcrud.model.id.UserProductId;
+import com.quimia.quimiawebcrud.repository.support.ColumnFilterRepository;
 import org.springframework.stereotype.Repository;
 
 /**

@@ -1,8 +1,8 @@
 package com.quimia.quimiawebcrud.service.dashboard;
 
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Bar;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.MonthGroup;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.MonthlyChart;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Bar;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.MonthGroup;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.MonthlyChart;
 
 import java.time.YearMonth;
 import java.time.format.TextStyle;

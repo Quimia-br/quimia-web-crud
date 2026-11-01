@@ -1,12 +1,13 @@
 package com.quimia.quimiawebcrud.mapper;
 
-import com.quimia.quimiawebcrud.dto.ProductRequestDTO;
-import com.quimia.quimiawebcrud.dto.ProductResponseDTO;
+import com.quimia.quimiawebcrud.dto.request.ProductRequestDTO;
+import com.quimia.quimiawebcrud.dto.response.ProductResponseDTO;
+import com.quimia.quimiawebcrud.mapper.support.Mapper;
 import com.quimia.quimiawebcrud.model.Product;
 import org.springframework.stereotype.Component;
 
-import static com.quimia.quimiawebcrud.mapper.References.company;
-import static com.quimia.quimiawebcrud.mapper.References.idOf;
+import static com.quimia.quimiawebcrud.mapper.support.References.company;
+import static com.quimia.quimiawebcrud.mapper.support.References.idOf;
 
 /**
  * Converte produto entre entidade e DTO.

@@ -1,11 +1,11 @@
 package com.quimia.quimiawebcrud.service.dashboard;
 
 import com.quimia.quimiawebcrud.TestMessages;
-import com.quimia.quimiawebcrud.dto.DashboardDTO;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO;
 import com.quimia.quimiawebcrud.exception.DashboardUnavailableException;
 import com.quimia.quimiawebcrud.model.enums.Status;
-import com.quimia.quimiawebcrud.repository.DashboardRepository;
-import com.quimia.quimiawebcrud.repository.DashboardRepository.Row;
+import com.quimia.quimiawebcrud.repository.support.DashboardRepository.Row;
+import com.quimia.quimiawebcrud.repository.support.DashboardRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.BadSqlGrammarException;

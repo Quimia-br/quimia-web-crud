@@ -1,10 +1,11 @@
 package com.quimia.quimiawebcrud.mapper;
 
-import com.quimia.quimiawebcrud.dto.ShelfResponseDTO;
+import com.quimia.quimiawebcrud.dto.response.ShelfResponseDTO;
+import com.quimia.quimiawebcrud.mapper.support.ResponseMapper;
 import com.quimia.quimiawebcrud.model.Shelf;
 import org.springframework.stereotype.Component;
 
-import static com.quimia.quimiawebcrud.mapper.References.idOf;
+import static com.quimia.quimiawebcrud.mapper.support.References.idOf;
 
 /**
  * Converte estante entre entidade e DTO.
