@@ -1,6 +1,6 @@
 package com.quimia.quimiawebcrud.service.crud;
 
-import com.quimia.quimiawebcrud.dto.HistoryResponseDTO;
+import com.quimia.quimiawebcrud.dto.response.HistoryResponseDTO;
 import com.quimia.quimiawebcrud.mapper.HistoryMapper;
 import com.quimia.quimiawebcrud.model.History;
 import com.quimia.quimiawebcrud.repository.HistoryRepository;

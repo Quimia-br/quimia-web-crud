@@ -1,10 +1,11 @@
 package com.quimia.quimiawebcrud.mapper;
 
-import com.quimia.quimiawebcrud.dto.LocationResponseDTO;
+import com.quimia.quimiawebcrud.dto.response.LocationResponseDTO;
+import com.quimia.quimiawebcrud.mapper.support.ResponseMapper;
 import com.quimia.quimiawebcrud.model.Location;
 import org.springframework.stereotype.Component;
 
-import static com.quimia.quimiawebcrud.mapper.References.idOf;
+import static com.quimia.quimiawebcrud.mapper.support.References.idOf;
 
 /**
  * Converte localização entre entidade e DTO.

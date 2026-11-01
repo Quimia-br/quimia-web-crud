@@ -1,6 +1,6 @@
 package com.quimia.quimiawebcrud.service.photo;
 
-import com.quimia.quimiawebcrud.dto.UserRequestDTO;
+import com.quimia.quimiawebcrud.dto.request.UserRequestDTO;
 import com.quimia.quimiawebcrud.exception.PhotoException;
 import com.quimia.quimiawebcrud.mapper.UserMapper;
 import com.quimia.quimiawebcrud.model.User;

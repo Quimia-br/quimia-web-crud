@@ -1,8 +1,8 @@
 package com.quimia.quimiawebcrud.service.dashboard;
 
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Dot;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.LineChart;
-import com.quimia.quimiawebcrud.dto.DashboardDTO.Tick;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Dot;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.LineChart;
+import com.quimia.quimiawebcrud.dto.response.DashboardDTO.Tick;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

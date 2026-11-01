@@ -1,7 +1,7 @@
 package com.quimia.quimiawebcrud.service.crud;
 
-import com.quimia.quimiawebcrud.dto.CompanyRequestDTO;
-import com.quimia.quimiawebcrud.dto.CompanyResponseDTO;
+import com.quimia.quimiawebcrud.dto.request.CompanyRequestDTO;
+import com.quimia.quimiawebcrud.dto.response.CompanyResponseDTO;
 import com.quimia.quimiawebcrud.exception.DuplicateResourceException;
 import com.quimia.quimiawebcrud.exception.InvalidDataException;
 import com.quimia.quimiawebcrud.mapper.CompanyMapper;

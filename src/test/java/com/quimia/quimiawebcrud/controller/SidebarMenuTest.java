@@ -1,5 +1,6 @@
 package com.quimia.quimiawebcrud.controller;
 
+import com.quimia.quimiawebcrud.controller.crud.UserController;
 import com.quimia.quimiawebcrud.service.crud.UserService;
 import com.quimia.quimiawebcrud.service.photo.PhotoUrlPolicy;
 import org.junit.jupiter.api.Test;

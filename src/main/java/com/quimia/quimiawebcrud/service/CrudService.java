@@ -1,6 +1,6 @@
 package com.quimia.quimiawebcrud.service;
 
-import com.quimia.quimiawebcrud.mapper.Mapper;
+import com.quimia.quimiawebcrud.mapper.support.Mapper;
 import com.quimia.quimiawebcrud.model.BaseEntity;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

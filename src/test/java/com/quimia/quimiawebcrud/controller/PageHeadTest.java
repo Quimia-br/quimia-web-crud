@@ -1,5 +1,7 @@
 package com.quimia.quimiawebcrud.controller;
 
+import com.quimia.quimiawebcrud.controller.crud.HistoryController;
+import com.quimia.quimiawebcrud.controller.crud.UserController;
 import com.quimia.quimiawebcrud.service.crud.HistoryService;
 import com.quimia.quimiawebcrud.service.crud.HistoryTypeService;
 import com.quimia.quimiawebcrud.service.crud.ShelfService;

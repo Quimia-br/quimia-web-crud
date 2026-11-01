@@ -1,12 +1,13 @@
 package com.quimia.quimiawebcrud.mapper;
 
-import com.quimia.quimiawebcrud.dto.DisposalRequestDTO;
-import com.quimia.quimiawebcrud.dto.DisposalResponseDTO;
+import com.quimia.quimiawebcrud.dto.request.DisposalRequestDTO;
+import com.quimia.quimiawebcrud.dto.response.DisposalResponseDTO;
+import com.quimia.quimiawebcrud.mapper.support.Mapper;
 import com.quimia.quimiawebcrud.model.Disposal;
 import org.springframework.stereotype.Component;
 
-import static com.quimia.quimiawebcrud.mapper.References.idOf;
-import static com.quimia.quimiawebcrud.mapper.References.product;
+import static com.quimia.quimiawebcrud.mapper.support.References.idOf;
+import static com.quimia.quimiawebcrud.mapper.support.References.product;
 
 /**
  * Converte descarte entre entidade e DTO.
