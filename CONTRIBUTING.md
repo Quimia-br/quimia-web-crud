@@ -90,7 +90,7 @@ Ao abrir a PR, o GitHub preenche a descrição com o modelo em [`.github/pull_re
 
 ## Bugs e sugestões
 
-Use a aba [Issues](https://github.com/Quimia-br/quimia-web-crud/issues) do repositório:
+Use a aba [Issues](https://github.com/Quimia-br/quimia-web-crud/issues) do repositório e escolha o modelo **Bug** ou **Melhoria**:
 
 - **Bug:** descreva o que aconteceu, o que era esperado e como reproduzir (tela, passos e, se houver, a mensagem de erro). Não cole senhas, chaves nem dados pessoais.
 - **Melhoria:** explique o problema ou a necessidade e o que você imagina como solução.
