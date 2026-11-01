@@ -162,7 +162,7 @@ class LoginSecurityTest {
 
     @Test
     void loginMessagesAppearOnlyWhenNeeded() throws Exception {
-        String hidden = "(?s).*<p class=\"auth-message auth-message-error\"[^>]*hidden[^>]*>.*";
+        String hidden = "(?s).*<p class=\"auth-message auth-message-error\"[^>]*hidden[^>]*>E-mail ou senha.*";
         String plain = mvc.perform(get("/login")).andReturn().getResponse().getContentAsString();
         String failed = mvc.perform(get("/login").param("error", "")).andReturn().getResponse().getContentAsString();
 
