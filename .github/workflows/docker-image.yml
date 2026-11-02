@@ -1,0 +1,47 @@
+name: Docker image
+
+# Quando algo entra na main, monta a imagem do painel (Dockerfile da raiz) e publica no GitHub Container Registry.
+# O Render só baixa a imagem pronta: o build deixa de rodar lá.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: docker-image
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v4
+
+      - name: Entrar no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Definir o nome e as tags da imagem
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
+
+      - name: Montar e publicar a imagem
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
