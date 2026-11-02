@@ -45,3 +45,16 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      # O Render não percebe sozinho que a tag latest mudou: o Deploy Hook (segredo RENDER_DEPLOY_HOOK) manda baixar a imagem nova.
+      # Sem o segredo, o passo só avisa e termina, e o deploy continua manual no Render.
+      - name: Avisar o Render para baixar a imagem nova
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "RENDER_DEPLOY_HOOK não está configurado: o deploy no Render não foi disparado."
+            exit 0
+          fi
+          curl --fail --silent --show-error --max-time 30 --request POST "$RENDER_DEPLOY_HOOK" > /dev/null
+          echo "Deploy pedido ao Render."
